@@ -1,265 +1,270 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أنا هنا - نسخة متكاملة</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-<style>
-body { font-family: 'Cairo', sans-serif; background-color: #eef4ff; }
-.tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; }
-.blue { background:#2563eb }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أنا هنا - النسخة الزرقاء</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        body { font-family: 'Cairo', sans-serif; background-color: #f0f7ff; }
+        .chat-bg { background-color: #e3f2fd; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); }
+        .tab-active { border-bottom: 3px solid #ffffff; color: #ffffff; }
+        .msg-bubble { cursor: pointer; transition: 0.2s; position: relative; max-width: 85%; }
+        .msg-bubble:active { transform: scale(0.98); }
+        .bg-royal-blue { background-color: #1e40af; } /* لون أزرق ملكي */
+    </style>
 </head>
+<body class="h-screen flex flex-col overflow-hidden">
 
-<body class="h-screen flex flex-col">
+    <header class="bg-royal-blue text-white p-4 shadow-lg flex justify-between items-center z-50">
+        <h1 class="text-xl font-bold">أنا هنا</h1>
+        <div class="flex space-x-4 space-x-reverse">
+            <button onclick="showSection('profile')"><i class="fas fa-user-circle text-2xl"></i></button>
+            <button onclick="showSection('nearby')"><i class="fas fa-radar text-xl"></i></button>
+            <button class="relative"><i class="fas fa-ellipsis-v text-xl"></i></button>
+        </div>
+    </header>
 
-<!-- الهيدر -->
-<header class="blue text-white p-4 flex justify-between">
-<h1>أنا هنا</h1>
-<button onclick="showSection('profile')"><i class="fas fa-user"></i></button>
-</header>
+    <nav class="bg-royal-blue text-blue-100 shadow flex justify-around font-bold z-40">
+        <button onclick="showSection('nearby')" id="tab-nearby" class="py-3 px-2 flex-1 tab-active">القريبين</button>
+        <button onclick="showSection('chats')" id="tab-chats" class="py-3 px-2 flex-1">دردشة</button>
+        <button onclick="showSection('status')" id="tab-status" class="py-3 px-2 flex-1">حالات</button>
+        <button onclick="showSection('calls')" id="tab-calls" class="py-3 px-2 flex-1">مكالمات</button>
+    </nav>
 
-<!-- التبويبات -->
-<nav class="bg-white flex justify-around">
-<button onclick="showSection('chats')" class="tab-active">دردشة</button>
-<button onclick="showSection('status')">الحالات</button>
-<button onclick="showSection('groups')">القروبات</button>
-<button onclick="showSection('loans')">القروض</button>
-</nav>
+    <main class="flex-1 overflow-y-auto pb-20">
+        <section id="section-nearby" class="p-4 space-y-4">
+            <div class="bg-blue-600 text-white p-4 rounded-xl flex items-center justify-between shadow-md">
+                <div>
+                    <h3 class="font-bold">رادار البحث نشط</h3>
+                    <p class="text-xs">يتم عرض الأشخاص والمنشآت حولك</p>
+                </div>
+                <i class="fas fa-satellite-dish animate-pulse"></i>
+            </div>
+            
+            <div class="bg-white p-3 rounded-xl shadow-sm flex items-center justify-between border-r-4 border-blue-600">
+                <div class="flex items-center">
+                    <img id="my-small-pic" src="https://ui-avatars.com/api/?name=Nabeel&background=1e40af&color=fff" class="w-12 h-12 rounded-full">
+                    <div class="mr-3 text-right">
+                        <h4 class="font-bold">نبيل (أنت)</h4>
+                        <p class="text-xs text-blue-500 font-bold">متصل الآن</p>
+                    </div>
+                </div>
+                <button onclick="openChat('أحمد')" class="bg-blue-600 text-white p-3 rounded-full shadow-lg"><i class="fas fa-comment-dots"></i></button>
+            </div>
+        </section>
 
-<!-- المحتوى -->
-<main class="flex-1 overflow-auto p-4">
+        <section id="section-chats" class="hidden divide-y">
+            <div onclick="openChat('أحمد')" class="flex items-center p-4 bg-white hover:bg-blue-50 cursor-pointer">
+                <img src="https://ui-avatars.com/api/?name=Ahmed&background=1e40af&color=fff" class="w-14 h-14 rounded-full ml-4">
+                <div class="flex-1 text-right">
+                    <div class="flex justify-between">
+                        <h4 class="font-bold">أحمد</h4>
+                        <span class="text-xs text-gray-400">10:30 ص</span>
+                    </div>
+                    <p class="text-sm text-gray-500 truncate">تفعيل الموقع والصوت الحقيقي</p>
+                </div>
+            </div>
+        </section>
 
-<!-- الدردشة -->
-<section id="section-chats">
-<div onclick="openChat('أحمد')" class="p-3 bg-white rounded mb-2">أحمد</div>
-</section>
+        <section id="section-status" class="hidden p-6 text-center">
+            <div id="status-container" class="space-y-4 py-10">
+                <i class="fas fa-circle-notch text-5xl text-blue-200 animate-spin-slow"></i>
+                <p class="text-gray-400">لا توجد حالات حالياً</p>
+            </div>
+            <button onclick="document.getElementById('status-input').click()" class="fixed bottom-24 left-6 bg-blue-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center">
+                <i class="fas fa-plus text-xl"></i>
+            </button>
+            <input type="file" id="status-input" class="hidden" accept="image/*" onchange="postStatus(event)">
+        </section>
 
-<!-- الحالات -->
-<section id="section-status" class="hidden">
-<button onclick="addStatus()" class="blue text-white p-3 rounded mb-3">+ إضافة حالة</button>
-<div id="status-list"></div>
-</section>
+        <section id="section-profile" class="hidden p-8 text-center">
+            <div class="relative inline-block mb-4">
+                <img id="profile-img" src="https://ui-avatars.com/api/?name=Nabeel&size=128&background=1e40af&color=fff" class="w-32 h-32 rounded-full border-4 border-white shadow-xl">
+                <button onclick="document.getElementById('profile-upload').click()" class="absolute bottom-0 left-0 bg-blue-600 text-white p-2 rounded-full border-2 border-white"><i class="fas fa-camera"></i></button>
+                <input type="file" id="profile-upload" class="hidden" onchange="updateProfile(event)">
+            </div>
+            <h2 class="text-2xl font-bold text-blue-900">نبيل</h2>
+            <p class="text-gray-500 mb-6">content creator & developer</p>
+            <button onclick="showCreateGroup()" class="w-full bg-white p-4 rounded-xl shadow-sm flex items-center mb-3">
+                <i class="fas fa-users text-blue-600 ml-4"></i> إنشاء مجموعة جديدة
+            </button>
+        </section>
+    </main>
 
-<!-- القروبات -->
-<section id="section-groups" class="hidden">
-<button onclick="addGroup()" class="blue text-white p-3 rounded mb-3">+ إنشاء قروب</button>
-<div id="group-list"></div>
-</section>
+    <div id="chat-win" class="fixed inset-0 bg-white z-[100] hidden flex flex-col">
+        <header class="bg-royal-blue text-white p-4 flex items-center">
+            <button onclick="closeChat()" class="ml-4 text-xl"><i class="fas fa-arrow-right"></i></button>
+            <img id="chat-avatar" src="" class="w-10 h-10 rounded-full ml-3 border">
+            <h4 id="chat-title" class="font-bold flex-1 text-right">اسم الشخص</h4>
+            <div class="flex space-x-5 space-x-reverse mr-4">
+                <button onclick="startCall('voice')"><i class="fas fa-phone"></i></button>
+                <button onclick="startCall('video')"><i class="fas fa-video"></i></button>
+            </div>
+        </header>
 
-<!-- القروض -->
-<section id="section-loans" class="hidden">
-<button onclick="addLoan()" class="blue text-white p-3 rounded mb-3">+ إضافة قرض</button>
-<div id="loan-list"></div>
-</section>
+        <div id="chat-box" class="flex-1 p-4 overflow-y-auto chat-bg flex flex-col space-y-4"></div>
 
-<!-- الملف الشخصي -->
-<section id="section-profile" class="hidden">
-<input id="nameInput" placeholder="اسمك" class="border p-2 w-full mb-2">
-<input type="file" onchange="changeProfilePic(event)" class="mb-2">
-<img id="profilePic" width="80" class="rounded-full mb-2">
-<button onclick="saveProfile()" class="blue text-white p-2 rounded">حفظ</button>
-</section>
+        <footer class="p-3 bg-white border-t flex items-center gap-2">
+            <button onclick="document.getElementById('chat-img').click()" class="text-blue-600 text-xl px-1"><i class="fas fa-image"></i></button>
+            <input type="file" id="chat-img" class="hidden" accept="image/*" onchange="sendImage(event)">
+            
+            <input id="msg-input" type="text" placeholder="اكتب رسالة..." class="flex-1 p-3 bg-gray-100 rounded-2xl text-right outline-none border focus:border-blue-300">
+            
+            <button onclick="sendRealLocation()" class="text-red-500 text-xl px-1"><i class="fas fa-map-marker-alt"></i></button>
+            
+            <button id="mic-btn" onmousedown="startRecording()" onmouseup="stopRecording()" class="text-green-600 text-xl px-1">
+                <i class="fas fa-microphone"></i>
+            </button>
+            
+            <button onclick="sendMsg()" class="bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-paper-plane"></i></button>
+        </footer>
+    </div>
 
-</main>
+    <div id="app-modal" class="fixed inset-0 bg-black/60 z-[200] hidden flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 id="modal-h" class="text-xl font-bold mb-5 text-blue-800 text-center border-b pb-3">خيارات</h3>
+            <div id="modal-b" class="flex flex-col gap-3"></div>
+            <button onclick="closeModal()" class="mt-4 w-full text-center text-gray-400 font-bold">إلغاء</button>
+        </div>
+    </div>
 
-<!-- نافذة المحادثة -->
-<div id="chat" class="hidden fixed inset-0 bg-white flex flex-col">
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
 
-<header class="blue text-white p-3 flex justify-between">
-<span id="chatName"></span>
-<div>
-<button onclick="startCall('video')"><i class="fas fa-video"></i></button>
-<button onclick="startCall('voice')"><i class="fas fa-phone"></i></button>
-<button onclick="closeChat()">✖</button>
-</div>
-</header>
+        function showSection(id) {
+            document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('section-' + id).classList.remove('hidden');
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById('tab-' + id)?.classList.add('tab-active');
+        }
 
-<div id="messages" class="flex-1 p-3 overflow-auto"></div>
+        function openChat(name) {
+            document.getElementById('chat-win').classList.remove('hidden');
+            document.getElementById('chat-title').innerText = name;
+            document.getElementById('chat-avatar').src = "https://ui-avatars.com/api/?name=" + name + "&background=1e40af&color=fff";
+        }
+        function closeChat() { document.getElementById('chat-win').classList.add('hidden'); }
 
-<footer class="p-2 flex gap-1 flex-wrap">
-<input id="msg" class="flex-1 border p-2">
-<button onclick="sendMsg()" class="blue text-white px-3">إرسال</button>
-<button onclick="sendLocation()">📍</button>
-<button onclick="sendImage()">🖼️</button>
-<button onclick="sendAudio()">🎤</button>
-</footer>
+        // --- 1. إرسال رسالة نصية وحذفها ---
+        function sendMsg() {
+            const inp = document.getElementById('msg-input');
+            if(inp.value.trim()){
+                createBubble(`<p>${inp.value}</p>`, 'text');
+                inp.value = "";
+            }
+        }
 
-</div>
+        function createBubble(content, type) {
+            const id = "m-" + Date.now();
+            const bubble = document.createElement('div');
+            bubble.id = id;
+            bubble.onclick = () => showMsgMenu(id);
+            bubble.className = "self-start bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none shadow-md msg-bubble ml-auto mb-2";
+            bubble.innerHTML = content + `<span class="block text-[8px] text-blue-200 mt-1">الآن</span>`;
+            document.getElementById('chat-box').appendChild(bubble);
+            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+        }
 
-<script>
+        function showMsgMenu(id) {
+            const m = document.getElementById('app-modal');
+            const b = document.getElementById('modal-b');
+            document.getElementById('modal-h').innerText = "إدارة الرسالة";
+            m.classList.remove('hidden');
+            b.innerHTML = `
+                <button onclick="deleteMsg('${id}', 'all')" class="p-4 bg-red-50 text-red-600 rounded-2xl font-bold text-right">الحذف لدى الجميع</button>
+                <button onclick="deleteMsg('${id}', 'me')" class="p-4 bg-gray-50 text-gray-700 rounded-2xl font-bold text-right">الحذف لدي فقط</button>
+            `;
+        }
 
-/* البيانات */
-let messages = [];
-let statuses = [];
-let loans = [];
-let groups = [];
+        function deleteMsg(id, type) {
+            const el = document.getElementById(id);
+            if(type === 'all') {
+                el.innerHTML = `<p class="text-[10px] italic opacity-70">🚫 تم حذف هذه الرسالة من الطرفين</p>`;
+                el.classList.replace('bg-blue-600', 'bg-gray-200');
+                el.classList.replace('text-white', 'text-gray-400');
+                el.onclick = null;
+            } else { el.remove(); }
+            closeModal();
+        }
 
-/* التنقل */
-function showSection(id){
-document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
-document.getElementById('section-'+id).classList.remove('hidden');
-}
+        // --- 2. إرسال صورة فعلي ---
+        function sendImage(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = () => createBubble(`<img src="${reader.result}" class="rounded-xl max-w-full">`, 'img');
+            reader.readAsDataURL(file);
+        }
 
-/* الدردشة */
-function openChat(name){
-document.getElementById('chat').classList.remove('hidden');
-document.getElementById('chatName').innerText=name;
-}
+        // --- 3. تسجيل صوتي حقيقي ---
+        async function startRecording() {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunks, { type: 'audio/ogg' });
+                const url = URL.createObjectURL(blob);
+                createBubble(`<audio controls class="w-full h-8"><source src="${url}"></audio>`, 'voice');
+                audioChunks = [];
+            };
+            mediaRecorder.start();
+            document.getElementById('mic-btn').classList.add('animate-pulse', 'text-red-500');
+        }
 
-function closeChat(){
-document.getElementById('chat').classList.add('hidden');
-}
+        function stopRecording() {
+            mediaRecorder.stop();
+            document.getElementById('mic-btn').classList.remove('animate-pulse', 'text-red-500');
+        }
 
-function sendMsg(){
-let text=document.getElementById('msg').value;
-if(!text) return;
-messages.push(text);
-document.getElementById('msg').value='';
-renderMsgs();
-}
+        // --- 4. إرسال موقع GPS حقيقي ---
+        function sendRealLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    createBubble(`<a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" class="flex flex-col items-center"><i class="fas fa-map-marked-alt text-2xl mb-1"></i><b>موقعي الحالي</b></a>`, 'loc');
+                }, () => alert("يرجى تفعيل الـ GPS"));
+            }
+        }
 
-function renderMsgs(){
-let box=document.getElementById('messages');
-box.innerHTML='';
-messages.forEach((m,i)=>{
-box.innerHTML+=`
-<div class="bg-gray-200 p-2 m-1 rounded">
-${m}
-<div class="flex gap-2 mt-1">
-<button onclick="deleteMsg(${i})" class="text-red-500 text-xs">حذف عندي</button>
-<button onclick="deleteMsgAll(${i})" class="text-red-700 text-xs">حذف للجميع</button>
-</div>
-</div>`;
-});
-}
+        // --- 5. الحالات والملف الشخصي ---
+        function postStatus(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('status-container').innerHTML = `
+                    <div class="relative inline-block"><img src="${reader.result}" class="w-64 h-96 object-cover rounded-3xl border-4 border-blue-600 shadow-2xl">
+                    <span class="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs">حالتك الآن</span></div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
 
-function deleteMsg(i){
-messages.splice(i,1);
-renderMsgs();
-}
+        function updateProfile(e) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('profile-img').src = reader.result;
+                document.getElementById('my-small-pic').src = reader.result;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
 
-function deleteMsgAll(i){
-messages.splice(i,1);
-renderMsgs();
-}
+        function showCreateGroup() {
+            const m = document.getElementById('app-modal');
+            const b = document.getElementById('modal-b');
+            document.getElementById('modal-h').innerText = "إنشاء مجموعة جديدة";
+            m.classList.remove('hidden');
+            b.innerHTML = `
+                <input type="text" id="g-name" placeholder="اسم المجموعة" class="p-3 border rounded-xl text-right">
+                <button onclick="alert('تم إنشاء المجموعة بنجاح ✅'); closeModal()" class="p-3 bg-blue-600 text-white rounded-xl font-bold">تأكيد</button>
+            `;
+        }
 
-/* إرسال إضافي */
-function sendLocation(){
-messages.push("📍 موقعي الحالي");
-renderMsgs();
-}
-
-function sendImage(){
-messages.push("🖼️ صورة");
-renderMsgs();
-}
-
-function sendAudio(){
-messages.push("🎤 تسجيل صوتي");
-renderMsgs();
-}
-
-/* اتصال */
-function startCall(type){
-alert("اتصال " + (type==='video'?'فيديو 📹':'صوت 📞'));
-}
-
-/* الحالات */
-function addStatus(){
-let text=prompt("اكتب الحالة");
-if(text){
-statuses.push(text);
-renderStatus();
-}
-}
-
-function renderStatus(){
-let box=document.getElementById('status-list');
-box.innerHTML='';
-statuses.forEach((s,i)=>{
-box.innerHTML+=`
-<div class="bg-white p-2 mb-2 rounded">
-${s}
-<button onclick="editStatus(${i})" class="text-blue-500 text-xs">تعديل</button>
-</div>`;
-});
-}
-
-function editStatus(i){
-let t=prompt("تعديل",statuses[i]);
-if(t){
-statuses[i]=t;
-renderStatus();
-}
-}
-
-/* القروض */
-function addLoan(){
-let val=prompt("المبلغ");
-if(val){
-loans.push(val);
-renderLoans();
-}
-}
-
-function renderLoans(){
-let box=document.getElementById('loan-list');
-box.innerHTML='';
-loans.forEach(l=>{
-box.innerHTML+=`<div class="bg-white p-2 mb-2 rounded">${l}</div>`;
-});
-}
-
-/* القروبات */
-function addGroup(){
-let name=prompt("اسم القروب");
-if(name){
-groups.push(name);
-renderGroups();
-}
-}
-
-function renderGroups(){
-let box=document.getElementById('group-list');
-box.innerHTML='';
-groups.forEach((g,i)=>{
-box.innerHTML+=`
-<div class="bg-white p-2 mb-2 rounded">
-${g}
-<button onclick="editGroup(${i})" class="text-blue-500 text-xs">تعديل</button>
-</div>`;
-});
-}
-
-function editGroup(i){
-let n=prompt("تعديل الاسم",groups[i]);
-if(n){
-groups[i]=n;
-renderGroups();
-}
-}
-
-/* الملف الشخصي */
-function saveProfile(){
-let name=document.getElementById('nameInput').value;
-alert("تم الحفظ: "+name);
-}
-
-function changeProfilePic(e){
-let file=e.target.files[0];
-let reader=new FileReader();
-reader.onload=function(){
-document.getElementById('profilePic').src=reader.result;
-}
-reader.readAsDataURL(file);
-}
-
-</script>
-
+        function startCall(t) { alert(`جاري بدء مكالمة ${t === 'video' ? 'فيديو' : 'صوتية'} مشفرة... 📞`); }
+        function closeModal() { document.getElementById('app-modal').classList.add('hidden'); }
+    </script>
 </body>
 </html>
