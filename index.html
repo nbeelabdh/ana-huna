@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أنا هنا - النسخة الكاملة</title>
+    <title>أنا هنا - النسخة النهائية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -12,8 +12,10 @@
         .bg-royal-blue { background-color: #1e40af; }
         .chat-bg { background-color: #e3f2fd; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); }
         .tab-active { border-bottom: 4px solid #ffffff; color: #ffffff; }
-        .msg-bubble { position: relative; cursor: pointer; transition: 0.2s; max-width: 85%; }
-        .msg-bubble:active { transform: scale(0.98); }
+        /* أنيميشن الحذف */
+        .deleted-anim { opacity: 0.5; font-style: italic; transition: 0.5s; }
+        .msg-bubble { cursor: pointer; transition: 0.2s; max-width: 85%; position: relative; }
+        .msg-bubble:active { transform: scale(0.96); }
     </style>
 </head>
 <body class="h-screen flex flex-col">
@@ -34,140 +36,15 @@
     </nav>
 
     <main class="flex-1 overflow-y-auto pb-24">
-        <section id="section-nearby" class="p-4 space-y-4">
-            <div class="bg-blue-600 text-white p-4 rounded-2xl shadow-lg flex justify-between items-center">
-                <div><h3 class="font-bold">رادار القريبين نشط</h3><p class="text-xs">يتم عرض الأشخاص في نطاق 5 كم</p></div>
-                <i class="fas fa-satellite-dish animate-pulse"></i>
-            </div>
-            <div class="bg-white p-4 rounded-xl flex items-center justify-between border-r-4 border-blue-600 shadow-sm">
-                <div class="flex items-center">
-                    <img id="my-avatar-sm" src="https://ui-avatars.com/api/?name=Nabeel&background=1e40af&color=fff" class="w-12 h-12 rounded-full">
-                    <div class="mr-3 text-right">
-                        <h4 class="font-bold">نبيل (أنت)</h4>
-                        <p class="text-xs text-green-500 font-bold">متصل الآن</p>
-                    </div>
-                </div>
-                <button onclick="openChat('الدعم الفني')" class="bg-blue-100 text-blue-700 p-3 rounded-full"><i class="fas fa-comment"></i></button>
-            </div>
-        </section>
-
-        <section id="section-chats" class="hidden divide-y">
-            <div onclick="openChat('أحمد')" class="flex items-center p-4 bg-white hover:bg-blue-50 cursor-pointer">
-                <img src="https://ui-avatars.com/api/?name=Ahmed&background=1e40af&color=fff" class="w-14 h-14 rounded-full ml-4">
+        <section id="section-chats" class="divide-y divide-gray-100">
+            <div onclick="openChat('أحمد')" class="flex items-center p-4 bg-white hover:bg-blue-50 cursor-pointer transition">
+                <img src="https://ui-avatars.com/api/?name=Ahmed&background=1e40af&color=fff" class="w-14 h-14 rounded-full ml-4 shadow-sm">
                 <div class="flex-1 text-right">
                     <div class="flex justify-between"><h4 class="font-bold">أحمد</h4><span class="text-xs text-gray-400">الآن</span></div>
-                    <p class="text-sm text-gray-500 truncate">أرسل لي الموقع يا نبيل</p>
+                    <p class="text-sm text-gray-500">جرب ميزة الحذف الجديدة يا نبيل</p>
                 </div>
             </div>
         </section>
 
-        <section id="section-status" class="hidden p-6 text-center">
-            <div id="status-box" class="py-20 text-gray-400"><i class="fas fa-history text-5xl mb-4"></i><p>لا توجد حالات حالياً</p></div>
-            <button onclick="document.getElementById('st-up').click()" class="fixed bottom-28 left-6 bg-blue-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center"><i class="fas fa-camera"></i></button>
-            <input type="file" id="st-up" class="hidden" accept="image/*" onchange="postStatus(event)">
-        </section>
-
-        <section id="section-profile" class="hidden p-8 text-center">
-            <img id="prof-img" src="https://ui-avatars.com/api/?name=Nabeel&size=128&background=1e40af&color=fff" class="w-32 h-32 rounded-full border-4 border-white shadow-xl mx-auto mb-4">
-            <h2 class="text-2xl font-bold">نبيل</h2>
-            <button onclick="document.getElementById('prof-up').click()" class="bg-blue-600 text-white px-6 py-2 rounded-full mt-4">تغيير الصورة</button>
-            <input type="file" id="prof-up" class="hidden" onchange="updateProfile(event)">
-        </section>
-    </main>
-
-    <div id="chat-win" class="fixed inset-0 bg-white z-[100] hidden flex flex-col">
-        <header class="bg-royal-blue text-white p-4 flex items-center shadow-lg">
-            <button onclick="closeChat()" class="ml-4 text-xl"><i class="fas fa-arrow-right"></i></button>
-            <img id="chat-avatar" src="" class="w-10 h-10 rounded-full ml-3 border">
-            <h4 id="chat-title" class="font-bold flex-1 text-right">الاسم</h4>
-            <div class="flex space-x-6 space-x-reverse mr-4">
-                <button onclick="initiateCall('صوتية')"><i class="fas fa-phone"></i></button>
-                <button onclick="initiateCall('فيديو')"><i class="fas fa-video"></i></button>
-            </div>
-        </header>
-        <div id="chat-box" class="flex-1 p-4 overflow-y-auto chat-bg flex flex-col space-y-4"></div>
-        <footer class="p-3 bg-white border-t flex items-center gap-2">
-            <button onclick="document.getElementById('chat-img').click()" class="text-blue-600 text-xl"><i class="fas fa-image"></i></button>
-            <input type="file" id="chat-img" class="hidden" accept="image/*" onchange="sendImg(event)">
-            <input id="chat-inp" type="text" placeholder="اكتب رسالة..." class="flex-1 p-3 bg-gray-100 rounded-2xl text-right outline-none">
-            <button onclick="sendLoc()" class="text-red-500 text-xl"><i class="fas fa-map-marker-alt"></i></button>
-            <button id="mic-btn" onmousedown="startRec()" onmouseup="stopRec()" class="text-green-600 text-xl"><i class="fas fa-microphone"></i></button>
-            <button onclick="sendTxt()" class="bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
-        </footer>
-    </div>
-
-    <div id="call-screen" class="fixed inset-0 bg-royal-blue z-[300] hidden flex flex-col items-center justify-center text-white">
-        <div class="text-center animate-pulse"><img id="c-img" src="" class="w-32 h-32 rounded-full border-4 mb-6"><h2 id="c-name" class="text-3xl font-bold">أحمد</h2><p id="c-type" class="mt-2 opacity-80">اتصال...</p></div>
-        <button onclick="endCall()" class="absolute bottom-20 bg-red-500 p-6 rounded-full shadow-2xl"><i class="fas fa-phone-slash text-3xl"></i></button>
-    </div>
-
-    <div id="modal-over" class="fixed inset-0 bg-black/60 z-[200] hidden flex items-center justify-center p-6 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl w-full max-w-xs p-6 shadow-2xl">
-            <h3 class="text-xl font-bold mb-5 text-blue-800 text-center border-b pb-2">خيارات الرسالة</h3>
-            <div id="modal-btns" class="flex flex-col gap-3"></div>
-            <button onclick="closeMod()" class="mt-4 w-full text-center text-gray-400">إلغاء</button>
-        </div>
-    </div>
-
-    <script>
-        let mediaRec; let audioChunks = [];
-        function showSection(id) {
-            document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
-            document.getElementById('section-' + id).classList.remove('hidden');
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
-            document.getElementById('tab-' + id)?.classList.add('tab-active');
-        }
-
-        function openChat(n) {
-            document.getElementById('chat-win').classList.remove('hidden');
-            document.getElementById('chat-title').innerText = n;
-            document.getElementById('chat-avatar').src = "https://ui-avatars.com/api/?name=" + n + "&background=1e40af&color=fff";
-        }
-        function closeChat() { document.getElementById('chat-win').classList.add('hidden'); }
-
-        function sendTxt() {
-            const i = document.getElementById('chat-inp');
-            if(i.value.trim()) { createBub(`<p>${i.value}</p>`); i.value = ""; }
-        }
-
-        function createBub(c) {
-            const id = "m-" + Date.now();
-            const b = document.createElement('div');
-            b.id = id; b.onclick = () => showMMenu(id);
-            b.className = "self-start bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none ml-auto mb-2 text-right shadow-md msg-bubble";
-            b.innerHTML = c + `<span class="block text-[8px] opacity-70 mt-1">الآن</span>`;
-            document.getElementById('chat-box').appendChild(b);
-            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
-        }
-
-        function showMMenu(id) {
-            document.getElementById('modal-over').classList.remove('hidden');
-            document.getElementById('modal-btns').innerHTML = `
-                <button onclick="delMsg('${id}','all')" class="p-4 bg-red-50 text-red-600 rounded-xl font-bold">حذف للجميع</button>
-                <button onclick="delMsg('${id}','me')" class="p-4 bg-gray-50 text-gray-700 rounded-xl font-bold">حذف عندي فقط</button>`;
-        }
-        function delMsg(id, t) {
-            const e = document.getElementById(id);
-            if(t === 'all') { e.innerHTML = `<p class="text-[10px] italic opacity-50">تم حذف الرسالة للطرفين</p>`; e.classList.replace('bg-blue-600','bg-gray-200'); e.classList.replace('text-white','text-gray-400'); e.onclick=null; }
-            else { e.remove(); } closeMod();
-        }
-
-        function sendImg(e) {
-            const r = new FileReader(); r.onload = () => createBub(`<img src="${r.result}" class="rounded-xl">`); r.readAsDataURL(e.target.files[0]);
-        }
-
-        async function startRec() {
-            const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRec = new MediaRecorder(s); mediaRec.ondataavailable = e => audioChunks.push(e.data);
-            mediaRec.onstop = () => {
-                const u = URL.createObjectURL(new Blob(audioChunks, { type: 'audio/ogg' }));
-                createBub(`<audio controls class="w-full h-8"><source src="${u}"></audio>`); audioChunks = [];
-            };
-            mediaRec.start(); document.getElementById('mic-btn').classList.add('animate-pulse','text-red-500');
-        }
-        function stopRec() { mediaRec.stop(); document.getElementById('mic-btn').classList.remove('animate-pulse','text-red-500'); }
-
-        function sendLoc() {
-            navigator.geolocation.getCurrentPosition(p => {
-                const u = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-                createBub(`<a href="${u}" target="_blank" class="text-xs">📍 موقعي الحالي (اضغط للم
+        <section id="section-nearby" class="hidden p-4">الرادار نشط...</section>
+        <section id="section-status" class
