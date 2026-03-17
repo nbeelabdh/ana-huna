@@ -13,6 +13,8 @@
         .tab-active { border-bottom: 3px solid #128c7e; color: #128c7e; }
         .section-content { display: none; }
         .section-content.active { display: block; }
+        .msg-bubble { position: relative; cursor: pointer; transition: 0.2s; }
+        .msg-bubble:active { transform: scale(0.98); opacity: 0.8; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
@@ -21,8 +23,8 @@
         <h1 class="text-xl font-bold">أنا هنا</h1>
         <div class="flex space-x-4 space-x-reverse">
             <button onclick="showSection('profile')"><i class="fas fa-user-circle text-2xl"></i></button>
-            <button><i class="fas fa-search text-xl"></i></button>
-            <button onclick="alert('الاعدادات')"><i class="fas fa-ellipsis-v text-xl"></i></button>
+            <button onclick="triggerCall('قائمة الاتصال')"><i class="fas fa-phone-alt text-xl"></i></button>
+            <button onclick="alert('القائمة')"><i class="fas fa-ellipsis-v text-xl"></i></button>
         </div>
     </header>
 
@@ -34,96 +36,86 @@
     </nav>
 
     <main class="flex-1 overflow-y-auto pb-20">
-        
         <section id="section-nearby" class="section-content active p-4 space-y-4">
-            <div class="bg-blue-100 p-4 rounded-xl text-right">
-                <h3 class="font-bold text-blue-800">الرادار نشط</h3>
-                <p class="text-sm">اكتشف الأشخاص والمنشآت حولك</p>
+            <div class="bg-blue-100 p-4 rounded-xl text-right mb-4">
+                <h3 class="font-bold text-blue-800">رادار أنا هنا</h3>
+                <p class="text-sm">اكتشف من حولك الآن</p>
             </div>
+            
             <div class="bg-white p-3 rounded-xl shadow-sm flex items-center justify-between border-r-4 border-green-500">
                 <div class="flex items-center">
                     <img id="nearby-my-pic" src="https://ui-avatars.com/api/?name=Nabeel" class="w-12 h-12 rounded-full border">
                     <div class="mr-3 text-right">
                         <h4 class="font-bold">نبيل (أنت)</h4>
-                        <p class="text-xs text-green-500 font-bold">نشط الآن</p>
+                        <p class="text-xs text-green-500">نشط الآن</p>
                     </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openChat('أحمد')" class="bg-green-100 text-[#075E54] p-3 rounded-full">
+                        <i class="fas fa-comment-dots"></i>
+                    </button>
                 </div>
             </div>
         </section>
 
         <section id="section-chats" class="section-content">
-            <div class="bg-gray-100 p-2 text-right text-xs font-bold text-gray-500 border-b">المجموعات</div>
-            <div onclick="openChat('جروب المطورين 🚀', true)" class="flex items-center p-4 bg-white border-b cursor-pointer">
-                <div class="w-14 h-14 bg-[#128c7e] rounded-full ml-4 flex items-center justify-center text-white text-xl shadow-inner"><i class="fas fa-users"></i></div>
-                <div class="flex-1 text-right">
-                    <h4 class="font-bold">جروب المطورين 🚀</h4>
-                    <p class="text-sm text-gray-500">آخر رسالة: جاري العمل على التحديث..</p>
-                </div>
-            </div>
-
-            <div class="bg-gray-100 p-2 text-right text-xs font-bold text-gray-500 border-b">المحادثات المباشرة</div>
             <div onclick="openChat('أحمد')" class="flex items-center p-4 bg-white border-b cursor-pointer">
-                <img src="https://ui-avatars.com/api/?name=Ahmed&background=random" class="w-14 h-14 rounded-full ml-4 shadow-sm">
+                <img src="https://ui-avatars.com/api/?name=Ahmed" class="w-14 h-14 rounded-full ml-4">
                 <div class="flex-1 text-right">
                     <h4 class="font-bold">أحمد</h4>
-                    <p class="text-sm text-gray-500">أهلاً نبيل، كيف حال المشروع؟</p>
+                    <p class="text-sm text-gray-500">انقر للمراسلة</p>
                 </div>
             </div>
         </section>
 
         <section id="section-profile" class="section-content p-10 text-center">
             <div class="relative inline-block">
-                <img id="profile-img-main" src="https://ui-avatars.com/api/?name=Nabeel&size=128" class="w-32 h-32 rounded-full border-4 border-white shadow-xl mx-auto object-cover">
-                <button onclick="document.getElementById('upload-pic').click()" class="absolute bottom-0 left-0 bg-[#075E54] text-white p-3 rounded-full shadow-lg border-2 border-white"><i class="fas fa-camera"></i></button>
-                <input type="file" id="upload-pic" class="hidden" accept="image/*" onchange="syncProfilePic(event)">
+                <img id="profile-img-main" src="https://ui-avatars.com/api/?name=Nabeel&size=128" class="w-32 h-32 rounded-full border-4 border-white shadow-xl mx-auto">
+                <button onclick="document.getElementById('upload-pic').click()" class="absolute bottom-0 left-0 bg-[#075E54] text-white p-3 rounded-full border-2 border-white"><i class="fas fa-camera"></i></button>
+                <input type="file" id="upload-pic" class="hidden" onchange="syncProfilePic(event)">
             </div>
             <h2 class="text-2xl font-bold mt-4 text-[#075E54]">نبيل</h2>
-            <p class="text-gray-500 mt-2">مطور تطبيق "أنا هنا"</p>
         </section>
 
-        <section id="section-status" class="section-content p-10 text-center text-gray-400">سجل الحالات فارغ</section>
-        <section id="section-calls" class="section-content p-10 text-center text-gray-400">لا توجد مكالمات مؤخراً</section>
+        <section id="section-status" class="section-content p-10 text-center text-gray-400">لا توجد حالات</section>
+        <section id="section-calls" class="section-content p-10 text-center text-gray-400">لا توجد مكالمات</section>
     </main>
 
-    <div class="fixed bottom-24 left-6 flex flex-col space-y-3">
-        <button onclick="openCreateModal('group')" class="bg-[#128c7e] text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center"><i class="fas fa-users text-xl"></i></button>
-        <button onclick="openCreateModal('entity')" class="bg-orange-500 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center"><i class="fas fa-store text-xl"></i></button>
-    </div>
-
     <div id="chat-window" class="fixed inset-0 bg-white z-[100] hidden flex flex-col">
-        <header class="bg-[#075E54] text-white p-4 flex items-center shadow-md">
+        <header class="bg-[#075E54] text-white p-4 flex items-center">
             <button onclick="closeChat()" class="ml-4 text-xl"><i class="fas fa-arrow-right"></i></button>
-            <img id="chat-header-pic" src="" class="w-10 h-10 rounded-full ml-3 border border-white/50">
-            <h4 id="chat-name" class="font-bold flex-1 text-right">الاسم</h4>
+            <h4 id="chat-name" class="font-bold flex-1 text-right">أحمد</h4>
             <div class="flex space-x-5 space-x-reverse mr-4">
-                <button onclick="triggerCall('فيديو')"><i class="fas fa-video"></i></button>
-                <button onclick="triggerCall('صوت')"><i class="fas fa-phone"></i></button>
+                <button onclick="triggerCall('أحمد')"><i class="fas fa-phone"></i></button>
             </div>
         </header>
-        <div id="chat-box" class="flex-1 p-4 overflow-y-auto chat-bg flex flex-col space-y-4"></div>
+        <div id="chat-box" class="flex-1 p-4 overflow-y-auto chat-bg flex flex-col space-y-4">
+            </div>
         <footer class="p-2 bg-gray-100 flex items-center gap-2 border-t">
-            <button onclick="document.getElementById('msg-file').click()"><i class="fas fa-paperclip text-xl text-gray-500"></i></button>
-            <input type="file" id="msg-file" class="hidden" onchange="sendImg(event)">
-            <input id="msg-input" type="text" placeholder="اكتب رسالة..." class="flex-1 p-2 rounded-full border text-right outline-none bg-white focus:ring-1 ring-[#075E54]">
-            <button onclick="sendLoc()"><i class="fas fa-map-marker-alt text-xl text-red-500"></i></button>
-            <button onmousedown="micStart()" onmouseup="micStop()" class="text-green-600 text-xl"><i class="fas fa-microphone"></i></button>
-            <button onclick="sendTxt()" class="bg-[#075E54] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md"><i class="fas fa-paper-plane text-sm"></i></button>
+            <input id="msg-input" type="text" placeholder="اكتب رسالة..." class="flex-1 p-2 rounded-full border text-right outline-none">
+            <button onclick="sendTxt()" class="bg-[#075E54] text-white w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
         </footer>
     </div>
 
     <div id="app-modal" class="fixed inset-0 bg-black/60 z-[200] hidden flex items-center justify-center p-6 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl w-full max-w-xs p-6 shadow-2xl">
-            <h3 id="modal-h" class="text-xl font-bold mb-4 text-[#075E54] text-right">عنوان</h3>
-            <div id="modal-b" class="mb-6"></div>
-            <div class="flex justify-end gap-3">
-                <button onclick="closeModal()" class="px-4 py-2 text-gray-400 font-bold">إلغاء</button>
-                <button onclick="confirmModal()" class="px-6 py-2 bg-[#075E54] text-white rounded-xl font-bold">تأكيد</button>
+        <div class="bg-white rounded-3xl w-full max-w-xs p-6">
+            <h3 id="modal-h" class="text-xl font-bold mb-4 text-right">خيارات</h3>
+            <div id="modal-b" class="flex flex-col gap-3"></div>
+            <div class="mt-4 flex justify-end">
+                <button onclick="closeModal()" class="text-gray-400 font-bold">إغاء</button>
             </div>
         </div>
     </div>
 
+    <div id="call-screen" class="fixed inset-0 bg-[#075E54] z-[300] hidden flex flex-col items-center justify-center text-white">
+        <h2 class="text-2xl font-bold mb-8">جاري الاتصال...</h2>
+        <div class="w-32 h-32 bg-white/20 rounded-full mb-20 animate-pulse"></div>
+        <button onclick="document.getElementById('call-screen').classList.add('hidden')" class="bg-red-500 p-6 rounded-full"><i class="fas fa-phone-slash text-2xl"></i></button>
+    </div>
+
     <script>
         let currentPic = "https://ui-avatars.com/api/?name=Nabeel";
+        let lastMsgId = 0;
 
         function showSection(id) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
@@ -132,92 +124,77 @@
             document.getElementById('tab-' + id)?.classList.add('tab-active');
         }
 
-        // تحديث الصورة في كل مكان
-        function syncProfilePic(e) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                currentPic = reader.result;
-                document.getElementById('profile-img-main').src = currentPic;
-                document.getElementById('nearby-my-pic').src = currentPic;
-                alert("تم تحديث صورة الملف الشخصي بنجاح!");
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-
-        function openChat(name, isGroup = false) {
+        function openChat(name) {
             document.getElementById('chat-window').classList.remove('hidden');
             document.getElementById('chat-name').innerText = name;
-            // إذا كان جروب نضع أيقونة جروب، إذا كان شخص نضع صورته
-            document.getElementById('chat-header-pic').src = isGroup ? "https://ui-avatars.com/api/?name=Group" : "https://ui-avatars.com/api/?name=" + name;
         }
-
         function closeChat() { document.getElementById('chat-window').classList.add('hidden'); }
 
-        function appendMsg(content, type = 'text') {
-            const box = document.getElementById('chat-box');
-            const wrapper = document.createElement('div');
-            wrapper.className = "self-start bg-[#dcf8c6] p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%] text-right flex flex-col gap-2 border border-green-100";
-            
-            // فقاعة الرسالة مع صورة نبيل الجديدة
-            let html = `<div class="flex items-center gap-2 mb-1 border-b border-green-200 pb-1">
-                            <span class="text-[10px] font-bold text-green-800">نبيل (أنت)</span>
-                            <img src="${currentPic}" class="w-5 h-5 rounded-full border border-white">
-                        </div>`;
-
-            if(type === 'text') html += `<p class="text-sm">${content}</p>`;
-            else if(type === 'img') html += `<img src="${content}" class="rounded-lg max-h-64 object-cover">`;
-            else if(type === 'html') html += content;
-
-            wrapper.innerHTML = html;
-            box.appendChild(wrapper);
-            box.scrollTop = box.scrollHeight;
-        }
-
+        // إرسال رسالة مع ميزة الحذف
         function sendTxt() {
             const inp = document.getElementById('msg-input');
-            if(inp.value.trim()){ appendMsg(inp.value); inp.value = ""; }
+            if(inp.value.trim()){
+                lastMsgId++;
+                const box = document.getElementById('chat-box');
+                const msgDiv = document.createElement('div');
+                msgDiv.id = "msg-" + lastMsgId;
+                msgDiv.className = "self-start bg-[#dcf8c6] p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%] text-right msg-bubble";
+                msgDiv.innerHTML = `<p class="text-sm">${inp.value}</p>`;
+                
+                // إضافة النقر المطول للمسح
+                msgDiv.onclick = () => showDeleteOptions(msgDiv.id);
+                
+                box.appendChild(msgDiv);
+                inp.value = "";
+                box.scrollTop = box.scrollHeight;
+            }
         }
 
-        function sendImg(e) {
+        function showDeleteOptions(id) {
+            const modal = document.getElementById('app-modal');
+            const body = document.getElementById('modal-b');
+            document.getElementById('modal-h').innerText = "إدارة الرسالة";
+            modal.classList.remove('hidden');
+            body.innerHTML = `
+                <button onclick="deleteMsg('${id}', 'me')" class="bg-gray-100 p-3 rounded-xl text-right font-bold text-gray-700">الحذف لدي</button>
+                <button onclick="deleteMsg('${id}', 'all')" class="bg-red-50 p-3 rounded-xl text-right font-bold text-red-600">الحذف لدى الجميع</button>
+            `;
+        }
+
+        function deleteMsg(id, type) {
+            const msg = document.getElementById(id);
+            if(type === 'all') {
+                msg.innerHTML = `<p class="text-xs italic text-gray-400">🚫 تم حذف هذه الرسالة لدى الجميع</p>`;
+                msg.style.backgroundColor = "#f0f0f0";
+            } else {
+                msg.remove();
+            }
+            closeModal();
+        }
+
+        function triggerCall(name) {
+            const modal = document.getElementById('app-modal');
+            const body = document.getElementById('modal-b');
+            document.getElementById('modal-h').innerText = "اتصال بـ " + name;
+            modal.classList.remove('hidden');
+            body.innerHTML = `
+                <button onclick="startCall('صوت')" class="bg-green-50 p-3 rounded-xl text-right font-bold text-green-700"><i class="fas fa-phone ml-2"></i> مكالمة صوتية</button>
+                <button onclick="startCall('فيديو')" class="bg-blue-50 p-3 rounded-xl text-right font-bold text-blue-700"><i class="fas fa-video ml-2"></i> مكالمة فيديو</button>
+            `;
+        }
+
+        function startCall(t) { closeModal(); document.getElementById('call-screen').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('app-modal').classList.add('hidden'); }
+
+        function syncProfilePic(e) {
             const r = new FileReader();
-            r.onload = () => appendMsg(r.result, 'img');
+            r.onload = () => {
+                currentPic = r.result;
+                document.getElementById('profile-img-main').src = currentPic;
+                document.getElementById('nearby-my-pic').src = currentPic;
+            };
             r.readAsDataURL(e.target.files[0]);
         }
-
-        function sendLoc() {
-            if(navigator.geolocation) {
-                appendMsg("⌛ جاري استخراج موقعك الحالي...");
-                navigator.geolocation.getCurrentPosition(p => {
-                    const url = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-                    appendMsg(`<a href="${url}" target="_blank" class="text-blue-600 font-bold block">📍 موقعي الحالي على الخريطة (اضغط هنا)</a>`, 'html');
-                });
-            }
-        }
-
-        function micStart() { document.getElementById('msg-input').placeholder = "جاري التسجيل... 🎙️"; }
-        function micStop() { 
-            document.getElementById('msg-input').placeholder = "اكتب رسالة..."; 
-            appendMsg(`<div class="flex items-center gap-3"><span>0:05</span><i class="fas fa-play text-green-700"></i><div class="flex-1 h-1 bg-green-300 rounded"></div><i class="fas fa-microphone"></i></div>`, 'html');
-        }
-
-        function triggerCall(type) { alert(`جاري بدء مكالمة ${type} مع ${document.getElementById('chat-name').innerText}...`); }
-
-        function openCreateModal(type) {
-            const m = document.getElementById('app-modal');
-            const h = document.getElementById('modal-h');
-            const b = document.getElementById('modal-b');
-            m.classList.remove('hidden');
-            if(type === 'group') {
-                h.innerText = "إنشاء مجموعة";
-                b.innerHTML = `<input id="inp-name" type="text" placeholder="اسم المجموعة" class="w-full border p-3 rounded-xl text-right outline-none focus:border-[#075E54]">`;
-            } else {
-                h.innerText = "إضافة منشأة";
-                b.innerHTML = `<input id="inp-name" type="text" placeholder="اسم المنشأة" class="w-full border p-3 rounded-xl text-right mb-3 outline-none focus:border-orange-500">
-                               <select class="w-full border p-3 rounded-xl text-right bg-white"><option>مطعم / كافيه</option><option>محل تجاري</option><option>مكتب عقاري</option></select>`;
-            }
-        }
-        function closeModal() { document.getElementById('app-modal').classList.add('hidden'); }
-        function confirmModal() { alert("تم الحفظ في قاعدة بيانات أنا هنا بنجاح!"); closeModal(); }
     </script>
 </body>
 </html>
