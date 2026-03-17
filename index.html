@@ -3,48 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أنا هنا - النسخة النهائية</title>
+    <title>أنا هنا - Ana Huna</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; background-color: #f0f7ff; overflow: hidden; }
-        .bg-royal-blue { background-color: #1e40af; }
-        .chat-bg { background-color: #e3f2fd; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); }
-        .tab-active { border-bottom: 4px solid #ffffff; color: #ffffff; }
-        /* أنيميشن الحذف */
-        .deleted-anim { opacity: 0.5; font-style: italic; transition: 0.5s; }
-        .msg-bubble { cursor: pointer; transition: 0.2s; max-width: 85%; position: relative; }
-        .msg-bubble:active { transform: scale(0.96); }
+        body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; overflow: hidden; }
+        .chat-bg { background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: #e5ddd5; }
+        .tab-active { border-bottom: 3px solid #128c7e; color: #128c7e; }
+        .msg-bubble { position: relative; cursor: pointer; transition: 0.2s; max-width: 85%; }
+        .msg-bubble:active { transform: scale(0.98); opacity: 0.8; }
     </style>
 </head>
 <body class="h-screen flex flex-col">
 
-    <header class="bg-royal-blue text-white p-4 shadow-lg flex justify-between items-center z-50">
+    <header class="bg-[#075E54] text-white p-4 shadow-lg flex justify-between items-center z-50">
         <h1 class="text-xl font-bold">أنا هنا</h1>
         <div class="flex space-x-4 space-x-reverse">
             <button onclick="showSection('profile')"><i class="fas fa-user-circle text-2xl"></i></button>
-            <button onclick="showSection('nearby')"><i class="fas fa-radar text-xl"></i></button>
+            <button onclick="alert('البحث قريباً...')"><i class="fas fa-search text-xl"></i></button>
+            <button onclick="alert('خيارات إضافية...')"><i class="fas fa-ellipsis-v text-xl"></i></button>
         </div>
     </header>
 
-    <nav class="bg-royal-blue text-blue-100 shadow flex justify-around font-bold z-40">
-        <button onclick="showSection('nearby')" id="tab-nearby" class="py-3 flex-1 tab-active">الرادار</button>
-        <button onclick="showSection('chats')" id="tab-chats" class="py-3 flex-1">دردشة</button>
-        <button onclick="showSection('status')" id="tab-status" class="py-3 flex-1">حالات</button>
-        <button onclick="showSection('calls')" id="tab-calls" class="py-3 flex-1">مكالمات</button>
+    <nav class="bg-white shadow flex justify-around text-gray-500 font-bold z-40">
+        <button onclick="showSection('nearby')" id="tab-nearby" class="py-3 px-2 flex-1 tab-active"><i class="fas fa-map-marker-alt ml-2"></i>القريبين</button>
+        <button onclick="showSection('chats')" id="tab-chats" class="py-3 px-2 flex-1"><i class="fas fa-comment ml-2"></i>دردشة</button>
+        <button onclick="showSection('status')" id="tab-status" class="py-3 px-2 flex-1"><i class="fas fa-circle-notch ml-2"></i>حالات</button>
+        <button onclick="showSection('calls')" id="tab-calls" class="py-3 px-2 flex-1"><i class="fas fa-phone ml-2"></i>مكالمات</button>
     </nav>
 
-    <main class="flex-1 overflow-y-auto pb-24">
-        <section id="section-chats" class="divide-y divide-gray-100">
-            <div onclick="openChat('أحمد')" class="flex items-center p-4 bg-white hover:bg-blue-50 cursor-pointer transition">
-                <img src="https://ui-avatars.com/api/?name=Ahmed&background=1e40af&color=fff" class="w-14 h-14 rounded-full ml-4 shadow-sm">
-                <div class="flex-1 text-right">
-                    <div class="flex justify-between"><h4 class="font-bold">أحمد</h4><span class="text-xs text-gray-400">الآن</span></div>
-                    <p class="text-sm text-gray-500">جرب ميزة الحذف الجديدة يا نبيل</p>
+    <main class="flex-1 overflow-y-auto pb-20">
+        <section id="section-nearby" class="p-4 space-y-4">
+            <div id="groups-container" class="space-y-3">
+                <h3 class="font-bold text-gray-700">المجموعات القريبة</h3>
+                <div id="group-item-1" class="bg-white p-3 rounded-xl shadow-sm flex items-center justify-between border-r-4 border-teal-600">
+                    <div class="flex items-center" onclick="editExistingGroup('مجموعة التقنية', 'تجمع المبرمجين')">
+                        <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-teal-600"><i class="fas fa-users"></i></div>
+                        <div class="mr-3">
+                            <h4 id="gn-1" class="font-bold">مجموعة التقنية</h4>
+                            <p id="gd-1" class="text-xs text-gray-500">تجمع المبرمجين • 12 عضو</p>
+                        </div>
+                    </div>
+                    <button onclick="deleteGroup('group-item-1')" class="text-red-400 p-2"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
         </section>
 
-        <section id="section-nearby" class="hidden p-4">الرادار نشط...</section>
-        <section id="section-status" class
+        <section id="section-chats" class="hidden divide-y">
+            <div onclick="openChat('أحمد')" class="flex items-center p-4 bg-white hover:bg-gray-50 cursor-pointer">
+                <img src="https://ui-avatars.com/api/?name=Ahmed&background=random" class="w-14 h-14 rounded-full">
+                <div class="mr-4 flex-1">
+                    <div class="flex justify-between font-bold"><h4>أحمد</h4><span class="text-xs text-gray-400 font-normal">الآن</span></div>
+                    <p class="text-sm text-gray-500 truncate">أرسل لي موقعك الجديد يا نبيل</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-profile" class="hidden p-6 text-center space-y-4">
+            <div class="relative inline-block">
+                <img id="my-avatar" src="https://ui-avatars.com/api/?name=Nabeel&size=128" class="w-32 h-32 rounded-full border-4 border-white shadow">
+                <button onclick="document.getElementById('file-prof').click()" class="absolute bottom-0 left-0 bg-green-500 text-white p-2 rounded-full"><i class="fas fa-camera"></i></button>
+                <input type="file" id="file-prof" class="hidden" onchange="updateMyPhoto(event)">
+            </div>
+            <input type="text" id="my-name-input" value="نبيل" class="text-2xl font-bold text-center w-full bg-transparent outline-none">
+            <input type="text" id="my-status-input" value="مرحباً! أنا أستخدم أنا هنا" class="text-gray-500 text-center w-full bg-transparent outline-none border-b border-gray-200 pb-2">
+            <button class="w-full bg-[#075E54] text-white p-4 rounded-xl shadow-lg font-bold">حفظ بيانات الملف</button>
+        </section>
+    </main>
+
+    <div id="chat-window" class="fixed inset-0 bg-white z-[100] hidden flex flex-col">
+        <header class="bg-[#075E54] text-white p-4 flex items-center shadow-lg">
+            <button onclick="closeChat()" class="ml-4 text-xl"><i class="fas fa-arrow-right"></i></button>
+            <img id="chat-avatar" src="" class="w-10 h-10 rounded-full ml-3 border">
+            <div class="flex-1 text-right">
+                <h4 id="chat-name" class="font-bold">الاسم</h4>
+                <p class="text-[10px] opacity-80">متصل الآن</p>
+            </div>
+            <div class="flex space-x-5 space-x-reverse mr-4">
+                <button onclick="startCall('فيديو')"><i class="fas fa-video"></i></button>
+                <button onclick="startCall('صوتية')"><i class="fas fa-phone"></i></button
