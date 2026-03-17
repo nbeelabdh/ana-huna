@@ -1,63 +1,125 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أنا هنا - نسخة مطورة</title>
+<title>أنا هنا - نسخة متكاملة</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 <style>
 body { font-family: 'Cairo', sans-serif; background-color: #eef4ff; }
 .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; }
 .blue { background:#2563eb }
 </style>
 </head>
-<body class="h-screen flex flex-col"><header class="blue text-white p-4 flex justify-between">
+
+<body class="h-screen flex flex-col">
+
+<!-- الهيدر -->
+<header class="blue text-white p-4 flex justify-between">
 <h1>أنا هنا</h1>
 <button onclick="showSection('profile')"><i class="fas fa-user"></i></button>
-</header><nav class="bg-white flex justify-around">
-<button onclick="showSection('chats')" id="tab-chats" class="tab-active">دردشة</button>
-<button onclick="showSection('status')" id="tab-status">الحالات</button>
-<button onclick="showSection('loans')" id="tab-loans">القروض</button>
-</nav><main class="flex-1 overflow-auto p-4"><section id="section-chats">
+</header>
+
+<!-- التبويبات -->
+<nav class="bg-white flex justify-around">
+<button onclick="showSection('chats')" class="tab-active">دردشة</button>
+<button onclick="showSection('status')">الحالات</button>
+<button onclick="showSection('groups')">القروبات</button>
+<button onclick="showSection('loans')">القروض</button>
+</nav>
+
+<!-- المحتوى -->
+<main class="flex-1 overflow-auto p-4">
+
+<!-- الدردشة -->
+<section id="section-chats">
 <div onclick="openChat('أحمد')" class="p-3 bg-white rounded mb-2">أحمد</div>
-</section><section id="section-status" class="hidden">
+</section>
+
+<!-- الحالات -->
+<section id="section-status" class="hidden">
 <button onclick="addStatus()" class="blue text-white p-3 rounded mb-3">+ إضافة حالة</button>
 <div id="status-list"></div>
-</section><section id="section-loans" class="hidden">
+</section>
+
+<!-- القروبات -->
+<section id="section-groups" class="hidden">
+<button onclick="addGroup()" class="blue text-white p-3 rounded mb-3">+ إنشاء قروب</button>
+<div id="group-list"></div>
+</section>
+
+<!-- القروض -->
+<section id="section-loans" class="hidden">
 <button onclick="addLoan()" class="blue text-white p-3 rounded mb-3">+ إضافة قرض</button>
 <div id="loan-list"></div>
-</section><section id="section-profile" class="hidden">
+</section>
+
+<!-- الملف الشخصي -->
+<section id="section-profile" class="hidden">
 <input id="nameInput" placeholder="اسمك" class="border p-2 w-full mb-2">
+<input type="file" onchange="changeProfilePic(event)" class="mb-2">
+<img id="profilePic" width="80" class="rounded-full mb-2">
 <button onclick="saveProfile()" class="blue text-white p-2 rounded">حفظ</button>
-</section></main><div id="chat" class="hidden fixed inset-0 bg-white flex flex-col">
+</section>
+
+</main>
+
+<!-- نافذة المحادثة -->
+<div id="chat" class="hidden fixed inset-0 bg-white flex flex-col">
+
 <header class="blue text-white p-3 flex justify-between">
 <span id="chatName"></span>
 <div>
 <button onclick="startCall('video')"><i class="fas fa-video"></i></button>
 <button onclick="startCall('voice')"><i class="fas fa-phone"></i></button>
+<button onclick="closeChat()">✖</button>
 </div>
-</header><div id="messages" class="flex-1 p-3"></div><footer class="p-2 flex">
+</header>
+
+<div id="messages" class="flex-1 p-3 overflow-auto"></div>
+
+<footer class="p-2 flex gap-1 flex-wrap">
 <input id="msg" class="flex-1 border p-2">
 <button onclick="sendMsg()" class="blue text-white px-3">إرسال</button>
+<button onclick="sendLocation()">📍</button>
+<button onclick="sendImage()">🖼️</button>
+<button onclick="sendAudio()">🎤</button>
 </footer>
-</div><script>
-let messages = [];
-let loans = [];
-let statuses = [];
 
+</div>
+
+<script>
+
+/* البيانات */
+let messages = [];
+let statuses = [];
+let loans = [];
+let groups = [];
+
+/* التنقل */
 function showSection(id){
 document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
 document.getElementById('section-'+id).classList.remove('hidden');
 }
 
+/* الدردشة */
 function openChat(name){
 document.getElementById('chat').classList.remove('hidden');
 document.getElementById('chatName').innerText=name;
 }
 
+function closeChat(){
+document.getElementById('chat').classList.add('hidden');
+}
+
 function sendMsg(){
 let text=document.getElementById('msg').value;
+if(!text) return;
 messages.push(text);
+document.getElementById('msg').value='';
 renderMsgs();
 }
 
@@ -65,6 +127,139 @@ function renderMsgs(){
 let box=document.getElementById('messages');
 box.innerHTML='';
 messages.forEach((m,i)=>{
-box.innerHTML+=`<div class="bg-gray-200 p-2 m-1 rounded">
+box.innerHTML+=`
+<div class="bg-gray-200 p-2 m-1 rounded">
 ${m}
-<button onclick
+<div class="flex gap-2 mt-1">
+<button onclick="deleteMsg(${i})" class="text-red-500 text-xs">حذف عندي</button>
+<button onclick="deleteMsgAll(${i})" class="text-red-700 text-xs">حذف للجميع</button>
+</div>
+</div>`;
+});
+}
+
+function deleteMsg(i){
+messages.splice(i,1);
+renderMsgs();
+}
+
+function deleteMsgAll(i){
+messages.splice(i,1);
+renderMsgs();
+}
+
+/* إرسال إضافي */
+function sendLocation(){
+messages.push("📍 موقعي الحالي");
+renderMsgs();
+}
+
+function sendImage(){
+messages.push("🖼️ صورة");
+renderMsgs();
+}
+
+function sendAudio(){
+messages.push("🎤 تسجيل صوتي");
+renderMsgs();
+}
+
+/* اتصال */
+function startCall(type){
+alert("اتصال " + (type==='video'?'فيديو 📹':'صوت 📞'));
+}
+
+/* الحالات */
+function addStatus(){
+let text=prompt("اكتب الحالة");
+if(text){
+statuses.push(text);
+renderStatus();
+}
+}
+
+function renderStatus(){
+let box=document.getElementById('status-list');
+box.innerHTML='';
+statuses.forEach((s,i)=>{
+box.innerHTML+=`
+<div class="bg-white p-2 mb-2 rounded">
+${s}
+<button onclick="editStatus(${i})" class="text-blue-500 text-xs">تعديل</button>
+</div>`;
+});
+}
+
+function editStatus(i){
+let t=prompt("تعديل",statuses[i]);
+if(t){
+statuses[i]=t;
+renderStatus();
+}
+}
+
+/* القروض */
+function addLoan(){
+let val=prompt("المبلغ");
+if(val){
+loans.push(val);
+renderLoans();
+}
+}
+
+function renderLoans(){
+let box=document.getElementById('loan-list');
+box.innerHTML='';
+loans.forEach(l=>{
+box.innerHTML+=`<div class="bg-white p-2 mb-2 rounded">${l}</div>`;
+});
+}
+
+/* القروبات */
+function addGroup(){
+let name=prompt("اسم القروب");
+if(name){
+groups.push(name);
+renderGroups();
+}
+}
+
+function renderGroups(){
+let box=document.getElementById('group-list');
+box.innerHTML='';
+groups.forEach((g,i)=>{
+box.innerHTML+=`
+<div class="bg-white p-2 mb-2 rounded">
+${g}
+<button onclick="editGroup(${i})" class="text-blue-500 text-xs">تعديل</button>
+</div>`;
+});
+}
+
+function editGroup(i){
+let n=prompt("تعديل الاسم",groups[i]);
+if(n){
+groups[i]=n;
+renderGroups();
+}
+}
+
+/* الملف الشخصي */
+function saveProfile(){
+let name=document.getElementById('nameInput').value;
+alert("تم الحفظ: "+name);
+}
+
+function changeProfilePic(e){
+let file=e.target.files[0];
+let reader=new FileReader();
+reader.onload=function(){
+document.getElementById('profilePic').src=reader.result;
+}
+reader.readAsDataURL(file);
+}
+
+</script>
+
+</body>
+</html>
