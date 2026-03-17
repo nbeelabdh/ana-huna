@@ -13,73 +13,86 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
         body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; overflow: hidden; height: 100vh; }
-        .chat-bg { background-color: #e5ddd5; background-image: url('https://www.transparenttextures.com/patterns/connect.png'); }
-        .tab-active { border-bottom: 4px solid #ffffff; color: #ffffff; }
-        .screen { display: none; height: 100%; overflow-y: auto; }
+        .tab-active { border-bottom: 4px solid #ffffff; color: #ffffff; font-weight: bold; }
+        .screen { display: none; height: calc(100vh - 120px); overflow-y: auto; }
         .active-screen { display: block; }
+        .header-bg { background-color: #075E54; }
     </style>
 </head>
 <body class="flex flex-col">
 
-    <header class="bg-[#075E54] text-white p-4 shadow-lg flex justify-between items-center z-50">
-        <h1 class="text-xl font-bold">أنا هنا</h1>
+    <header class="header-bg text-white p-4 shadow-lg flex justify-between items-center z-50">
+        <div class="flex items-center gap-4">
+            <i class="fas fa-ellipsis-v text-lg"></i>
+            <h1 class="text-xl font-bold">أنا هنا</h1>
+        </div>
         <div class="flex space-x-6 space-x-reverse">
-            <button onclick="showSection('profile')"><i class="fas fa-user-circle text-2xl"></i></button>
             <i class="fas fa-search text-xl"></i>
+            <button onclick="showSection('profile')"><i class="fas fa-user-circle text-2xl"></i></button>
         </div>
     </header>
 
-    <nav class="bg-[#075E54] text-blue-100 flex justify-around font-bold z-30">
-        <button onclick="showSection('nearby')" id="tab-nearby" class="py-3 flex-1 tab-active">الرادار</button>
-        <button onclick="showSection('chats')" id="tab-chats" class="py-3 flex-1">دردشة</button>
+    <nav class="header-bg text-gray-300 flex justify-around text-sm z-30">
+        <button onclick="showSection('nearby')" id="tab-nearby" class="py-3 px-4 tab-active">الرادار</button>
+        <button onclick="showSection('chats')" id="tab-chats" class="py-3 px-4">دردشة</button>
+        <button onclick="showSection('status')" id="tab-status" class="py-3 px-4">حالات</button>
+        <button onclick="showSection('calls')" id="tab-calls" class="py-3 px-4">مكالمات</button>
     </nav>
 
-    <main class="flex-1 relative overflow-hidden">
+    <main class="flex-1 relative bg-[#f8f9fa]">
+        
         <section id="section-nearby" class="screen active-screen p-4 space-y-4">
-            <div id="groups-list" class="space-y-3">
-                <p class="text-center text-gray-400">جاري الاتصال بالخادم...</p>
-            </div>
-            <button onclick="addGroup()" class="fixed bottom-20 left-6 bg-[#25d366] text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl z-50"><i class="fas fa-plus"></i></button>
-        </section>
-
-        <section id="section-chats" class="screen">
-            <div onclick="openChat('المجموعة العامة')" class="flex items-center p-4 bg-white border-b cursor-pointer">
-                <div class="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-white text-2xl"><i class="fas fa-users"></i></div>
-                <div class="mr-4 flex-1 text-right">
-                    <h4 class="font-bold">المجموعة العامة</h4>
-                    <p class="text-sm text-gray-500">دردش مع كل المستخدمين</p>
+            <div class="bg-blue-50 p-6 rounded-3xl border border-blue-100 flex justify-between items-center shadow-sm">
+                <div>
+                    <h3 class="text-blue-900 font-bold text-lg">الرادار نشط</h3>
+                    <p class="text-blue-700 text-sm">اكتشف الأشخاص والمنشآت حولك</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-map-marker-alt text-blue-600 text-xl"></i>
                 </div>
             </div>
+
+            <div id="groups-list" class="space-y-3 pt-2">
+                <p class="text-center text-gray-400 py-10">جاري تحميل المجموعات النشطة...</p>
+            </div>
+
+            <div class="fixed bottom-6 left-6 flex flex-col gap-3">
+                <button onclick="addGroup()" class="bg-[#25d366] text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-2xl"><i class="fas fa-users"></i></button>
+                <button class="bg-[#ff7a21] text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-2xl"><i class="fas fa-store"></i></button>
+            </div>
         </section>
 
-        <section id="section-profile" class="screen p-6 text-center space-y-6">
-            <h2 class="text-2xl font-bold text-gray-800">إعدادات الهوية</h2>
-            <div class="flex flex-col items-center">
-                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4 border-4 border-[#075E54]">
-                    <i class="fas fa-user text-4xl text-gray-500"></i>
+        <section id="section-chats" class="screen p-10 text-center text-gray-400">لا توجد محادثات خاصة بعد</section>
+        <section id="section-status" class="screen p-10 text-center text-gray-400">لا توجد حالات حالياً</section>
+        <section id="section-calls" class="screen p-10 text-center text-gray-400">سجل المكالمات فارغ</section>
+        
+        <section id="section-profile" class="screen p-6 space-y-4">
+             <div class="bg-white p-6 rounded-3xl shadow-sm text-center">
+                <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-green-500">
+                    <i class="fas fa-user text-3xl text-gray-400"></i>
                 </div>
-                <input type="text" id="user-display-name" placeholder="ادخل اسمك هنا" class="w-full p-4 rounded-xl border-2 border-gray-100 text-center outline-none focus:border-[#075E54]">
-            </div>
-            <button onclick="updateName()" class="w-full bg-[#075E54] text-white p-4 rounded-xl font-bold shadow-lg hover:bg-[#128c7e] transition">تحديث الاسم</button>
+                <input type="text" id="user-display-name" placeholder="اسمك المستعار" class="w-full p-3 bg-gray-50 rounded-xl text-center outline-none border focus:border-green-500">
+                <button onclick="updateName()" class="mt-4 w-full bg-[#075E54] text-white py-3 rounded-xl font-bold">حفظ التغييرات</button>
+             </div>
         </section>
     </main>
 
     <div id="chat-win" class="fixed inset-0 bg-white z-[100] hidden flex flex-col">
-        <header class="bg-[#075E54] text-white p-4 flex items-center">
-            <button onclick="closeChat()" class="ml-4"><i class="fas fa-arrow-right text-xl"></i></button>
-            <h4 id="chat-title" class="font-bold flex-1 text-right">المجموعة</h4>
+        <header class="header-bg text-white p-4 flex items-center gap-4">
+            <button onclick="closeChat()"><i class="fas fa-arrow-right text-xl"></i></button>
+            <h4 id="chat-title" class="font-bold">المجموعة</h4>
         </header>
-        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto chat-bg flex flex-col space-y-3"></div>
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-[#e5ddd5] flex flex-col gap-2"></div>
         <footer class="p-2 bg-white flex items-center gap-2 border-t">
-            <input id="msg-input" type="text" placeholder="اكتب رسالة..." class="flex-1 p-3 bg-gray-100 rounded-2xl outline-none text-right shadow-inner">
-            <button onclick="sendMessage()" class="bg-[#128c7e] text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md active:scale-95 transition"><i class="fas fa-paper-plane"></i></button>
+            <input id="msg-input" type="text" placeholder="اكتب هنا..." class="flex-1 p-3 bg-gray-100 rounded-full outline-none text-right">
+            <button onclick="sendMessage()" class="bg-[#128c7e] text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md"><i class="fas fa-paper-plane"></i></button>
         </footer>
     </div>
 
     <script>
-        // إعدادات Firebase الخاصة بك يا نبيل
+        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
-            apiKey: "AIzaSyAKQ_kWqdHyE5o7fjViCfeRtQOp1TZsg4",
+            apiKey: "AIzaSyAKQ_kWqdHyE5o7fjVi9CfeRtQOp1TZsg4",
             authDomain: "anahuna-bc15f.firebaseapp.com",
             projectId: "anahuna-bc15f",
             storageBucket: "anahuna-bc15f.firebasestorage.app",
@@ -90,7 +103,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let myName = localStorage.getItem('ana-huna-name') || "مستخدم مجهول";
+        let myName = localStorage.getItem('ana-huna-name') || "مستخدم جديد";
 
         function showSection(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
@@ -101,34 +114,39 @@
 
         function updateName() {
             const n = document.getElementById('user-display-name').value;
-            if(n) { myName = n; localStorage.setItem('ana-huna-name', n); alert('أهلاً بك يا ' + n); }
+            if(n) { myName = n; localStorage.setItem('ana-huna-name', n); alert('تم التحديث!'); }
         }
 
         function sendMessage() {
             const inp = document.getElementById('msg-input');
+            const chatName = document.getElementById('chat-title').innerText;
             if(!inp.value.trim()) return;
-            db.ref('global_messages').push({
-                name: myName,
-                msg: inp.value,
-                time: Date.now()
-            });
+            db.ref('messages/' + chatName).push({ name: myName, msg: inp.value, time: Date.now() });
             inp.value = "";
         }
 
-        db.ref('global_messages').limitToLast(50).on('child_added', (snap) => {
-            const data = snap.val();
-            const box = document.getElementById('chat-messages');
-            const div = document.createElement('div');
-            const isMe = data.name === myName;
-            div.className = `p-3 rounded-2xl max-w-[85%] ${isMe ? 'bg-[#dcf8c6] self-start ml-auto shadow-sm' : 'bg-white self-end mr-auto shadow-sm'} text-right`;
-            div.innerHTML = `<span class="block text-[10px] text-green-700 font-bold">${data.name}</span>${data.msg}`;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        });
+        function openChat(t) {
+            document.getElementById('chat-win').classList.remove('hidden');
+            document.getElementById('chat-title').innerText = t;
+            const msgBox = document.getElementById('chat-messages');
+            msgBox.innerHTML = "";
+            db.ref('messages/' + t).off();
+            db.ref('messages/' + t).on('child_added', (snap) => {
+                const data = snap.val();
+                const div = document.createElement('div');
+                const isMe = data.name === myName;
+                div.className = `p-3 rounded-2xl max-w-[85%] ${isMe ? 'bg-[#dcf8c6] self-start ml-auto shadow-sm' : 'bg-white self-end mr-auto shadow-sm'} text-right`;
+                div.innerHTML = `<span class="block text-[10px] text-green-700 font-bold">${data.name}</span>${data.msg}`;
+                msgBox.appendChild(div);
+                msgBox.scrollTop = msgBox.scrollHeight;
+            });
+        }
+
+        function closeChat() { document.getElementById('chat-win').classList.add('hidden'); }
 
         function addGroup() {
-            const g = prompt("اسم المجموعة القريبة الجديدة:");
-            if(g) db.ref('groups').push({ name: g, owner: myName });
+            const g = prompt("أدخل اسم المجموعة الجديدة:");
+            if(g) db.ref('groups').push({ name: g });
         }
 
         db.ref('groups').on('value', (snap) => {
@@ -137,14 +155,16 @@
             snap.forEach(c => {
                 const group = c.val();
                 const div = document.createElement('div');
-                div.className = "bg-white p-4 rounded-2xl shadow flex items-center justify-between border-r-4 border-[#25d366] mb-2";
-                div.innerHTML = `<h4 class="font-bold">${group.name}</h4><button onclick="openChat('${group.name}')" class="bg-[#128c7e] text-white px-4 py-2 rounded-xl text-xs font-bold">انضمام</button>`;
+                div.className = "bg-white p-4 rounded-3xl shadow-sm flex items-center justify-between border-r-4 border-green-500 mb-2";
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 text-right">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-green-600"><i class="fas fa-users text-xl"></i></div>
+                        <div><h4 class="font-bold text-gray-800">${group.name}</h4><p class="text-xs text-gray-400">نشط الآن</p></div>
+                    </div>
+                    <button onclick="openChat('${group.name}')" class="text-green-600 font-bold text-sm bg-green-50 px-4 py-2 rounded-xl">دخول</button>`;
                 list.appendChild(div);
             });
         });
-
-        function openChat(t) { document.getElementById('chat-win').classList.remove('hidden'); document.getElementById('chat-title').innerText = t; }
-        function closeChat() { document.getElementById('chat-win').classList.add('hidden'); }
     </script>
 </body>
 </html>
