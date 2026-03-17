@@ -9,57 +9,147 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
         body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; }
-        .tab-active { border-bottom: 3px solid white; }
+        .chat-bg { background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-repeat: repeat; }
+        .tab-active { border-bottom: 3px solid #075E54; color: #075E54; }
+        .section-content { display: none; }
+        .section-content.active { display: block; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
-    <header class="bg-[#075E54] text-white p-4 shadow-lg flex justify-between items-center">
-        <h1 class="text-xl font-bold text-white">أنا هنا</h1>
-        <div class="flex gap-4">
-            <i class="fas fa-search text-white"></i>
-            <i class="fas fa-ellipsis-v text-white"></i>
+    <header class="bg-[#075E54] text-white p-4 shadow-lg flex justify-between items-center z-50">
+        <h1 class="text-xl font-bold">أنا هنا</h1>
+        <div class="flex space-x-4 space-x-reverse">
+            <button onclick="showSection('profile')"><i class="fas fa-user-circle text-2xl"></i></button>
+            <button><i class="fas fa-search text-xl"></i></button>
+            <button onclick="alert('خيارات إضافية')"><i class="fas fa-ellipsis-v text-xl"></i></button>
         </div>
     </header>
 
-    <div class="bg-[#075E54] text-white flex justify-around text-sm font-bold shadow-md">
-        <div class="py-3 px-6"><i class="fas fa-camera text-white"></i></div>
-        <div class="py-3 px-6 tab-active">المحادثات</div>
-        <div class="py-3 px-6 opacity-70">الحالة</div>
-        <div class="py-3 px-6 opacity-70">الموقع</div>
-    </div>
+    <nav class="bg-white shadow flex justify-around text-gray-500 font-bold z-40">
+        <button onclick="showSection('nearby')" id="tab-nearby" class="py-3 px-2 flex-1 tab-active"><i class="fas fa-map-marker-alt ml-1"></i>القريبين</button>
+        <button onclick="showSection('chats')" id="tab-chats" class="py-3 px-2 flex-1"><i class="fas fa-comment ml-1"></i>دردشة</button>
+        <button onclick="showSection('status')" id="tab-status" class="py-3 px-2 flex-1"><i class="fas fa-circle-notch ml-1"></i>حالات</button>
+        <button onclick="showSection('calls')" id="tab-calls" class="py-3 px-2 flex-1"><i class="fas fa-phone ml-1"></i>مكالمات</button>
+    </nav>
 
-    <main class="flex-1 overflow-y-auto bg-white">
-        <div onclick="alert('سيتم فتح الدردشة فور ربطها!')" class="flex items-center p-4 border-b active:bg-gray-100">
-            <div class="w-14 h-14 bg-gray-300 rounded-full ml-4 flex items-center justify-center">
-                <i class="fas fa-user text-2xl text-white"></i>
-            </div>
-            <div class="flex-1 text-right">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-gray-800 text-lg">مستخدم قريب منك</h3>
-                    <span class="text-xs text-green-600 font-bold">10:45 م</span>
+    <main class="flex-1 overflow-y-auto pb-20">
+        
+        <section id="section-nearby" class="section-content active p-4 space-y-4">
+            <div class="bg-blue-100 p-4 rounded-xl flex items-center justify-between shadow-sm">
+                <div>
+                    <h3 class="font-bold text-blue-800">رادار القريبين نشط</h3>
+                    <p class="text-sm text-blue-600">يتم عرض الأشخاص والمنشآت في نطاق 5 كم</p>
                 </div>
-                <p class="text-gray-500 text-sm truncate">اضغط لبدء الدردشة مع جارك..</p>
+                <button onclick="alert('جاري تحديث الموقع...')" class="bg-blue-500 text-white p-3 rounded-full animate-pulse"><i class="fas fa-sync"></i></button>
             </div>
-        </div>
+            <div class="space-y-3">
+                <div class="bg-white p-3 rounded-xl shadow-sm flex items-center justify-between border-r-4 border-green-500">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl font-bold text-green-600">ن</div>
+                        <div class="mr-3 text-right">
+                            <h4 class="font-bold">نبيل (أنت)</h4>
+                            <p class="text-xs text-green-500">نشط الآن</p>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-400">0 كم</span>
+                </div>
+            </div>
+        </section>
 
-        <div onclick="alert('سيتم فتح الدردشة فور ربطها!')" class="flex items-center p-4 border-b active:bg-gray-100">
-            <div class="w-14 h-14 bg-blue-100 rounded-full ml-4 flex items-center justify-center text-blue-500">
-                <i class="fas fa-user-friends text-2xl"></i>
-            </div>
-            <div class="flex-1 text-right">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-gray-800 text-lg">مجموعة الحي</h3>
-                    <span class="text-xs text-gray-400">أمس</span>
+        <section id="section-chats" class="section-content">
+            <div class="divide-y">
+                <div onclick="openChat('أحمد')" class="flex items-center p-4 bg-white hover:bg-gray-50 cursor-pointer">
+                    <img src="https://ui-avatars.com/api/?name=Ahmed&background=random" class="w-14 h-14 rounded-full">
+                    <div class="mr-4 flex-1 text-right">
+                        <div class="flex justify-between">
+                            <h4 class="font-bold">أحمد</h4>
+                            <span class="text-xs text-gray-400">10:30 ص</span>
+                        </div>
+                        <p class="text-sm text-gray-500 truncate">هل أرسلت لي موقع المنشأة؟</p>
+                    </div>
                 </div>
-                <p class="text-gray-500 text-sm truncate">أهلاً بك في تطبيق أنا هنا!</p>
             </div>
-        </div>
+        </section>
+
+        <section id="section-status" class="section-content p-4">
+            <div class="flex items-center p-2 mb-4">
+                <div class="relative">
+                    <img src="https://ui-avatars.com/api/?name=Nabeel" class="w-14 h-14 rounded-full border-2 border-gray-300">
+                    <div class="absolute bottom-0 left-0 bg-green-500 text-white rounded-full p-1 border-2 border-white text-xs"><i class="fas fa-plus"></i></div>
+                </div>
+                <div class="mr-4 text-right">
+                    <h4 class="font-bold text-gray-800">حالتي</h4>
+                    <p class="text-sm text-gray-500">انقر لإضافة تحديث لحالتك</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-profile" class="section-content p-6 text-center">
+            <div class="relative inline-block">
+                <img src="https://ui-avatars.com/api/?name=Nabeel&size=128" class="w-32 h-32 rounded-full border-4 border-white shadow-lg">
+            </div>
+            <h2 class="text-2xl font-bold mt-4 text-gray-800">نبيل</h2>
+            <div class="mt-8 space-y-4 text-right">
+                <button onclick="changeBg()" class="w-full bg-white p-4 rounded-xl shadow-sm flex items-center justify-between">
+                    <div class="flex items-center"><i class="fas fa-image text-blue-500 ml-4"></i> تغيير خلفية المحادثة</div>
+                    <i class="fas fa-chevron-left text-gray-300"></i>
+                </button>
+            </div>
+        </section>
+
     </main>
 
-    <button class="absolute bottom-6 left-6 bg-[#25D366] text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl">
-        <i class="fas fa-comment-dots text-white"></i>
-    </button>
+    <div id="chat-window" class="fixed inset-0 bg-white z-[100] hidden flex flex-col">
+        <header class="bg-[#075E54] text-white p-4 flex items-center">
+            <button onclick="closeChat()" class="ml-4 text-xl"><i class="fas fa-arrow-right"></i></button>
+            <img id="chat-avatar" src="" class="w-10 h-10 rounded-full ml-3">
+            <div class="flex-1 text-right">
+                <h4 id="chat-name" class="font-bold">اسم الشخص</h4>
+                <p class="text-xs opacity-75">نشط الآن</p>
+            </div>
+        </header>
+        <div id="chat-content" class="flex-1 p-4 overflow-y-auto chat-bg space-y-4 flex flex-col">
+            <div class="self-start bg-white p-3 rounded-lg shadow-sm max-w-[80%] text-sm text-right">
+                أهلاً بك يا نبيل في تطبيقك الجديد!
+                <span class="block text-[10px] text-gray-400 mt-1">10:50 م</span>
+            </div>
+        </div>
+        <footer class="p-2 bg-gray-100 flex items-center">
+            <input type="text" placeholder="اكتب رسالة..." class="flex-1 p-2 rounded-full border focus:outline-none ml-2">
+            <button onclick="alert('إرسال')" class="bg-[#075E54] text-white w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
+        </footer>
+    </div>
 
+    <script>
+        function showSection(id) {
+            // إخفاء كل الأقسام
+            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+            // إظهار القسم المختار
+            document.getElementById('section-' + id).classList.add('active');
+            
+            // تحديث شكل الأزرار في النافبار
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById('tab-' + id)?.classList.add('tab-active');
+        }
+
+        function openChat(name) {
+            document.getElementById('chat-name').innerText = name;
+            document.getElementById('chat-avatar').src = "https://ui-avatars.com/api/?name=" + name + "&background=random";
+            document.getElementById('chat-window').classList.remove('hidden');
+        }
+
+        function closeChat() {
+            document.getElementById('chat-window').classList.add('hidden');
+        }
+
+        function changeBg() {
+            const color = prompt("أدخل كود اللون (مثل #e5ddd5 لرمادي واتساب):");
+            if(color) {
+                document.getElementById('chat-content').style.backgroundImage = 'none';
+                document.getElementById('chat-content').style.backgroundColor = color;
+            }
+        }
+    </script>
 </body>
 </html>
