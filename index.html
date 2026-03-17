@@ -8,57 +8,58 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; overflow: hidden; }
-        .page { display: none; height: 100vh; width: 100%; position: absolute; top: 0; left: 0; }
-        .active { display: flex; flex-direction: column; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; }
+        .tab-active { border-bottom: 3px solid white; }
     </style>
 </head>
-<body>
+<body class="h-screen flex flex-col overflow-hidden">
 
-    <div id="radarPage" class="page active bg-slate-50">
-        <header class="bg-[#075E54] text-white p-4 shadow-md text-center">
-            <h1 class="text-xl font-bold text-white">أنا هنا - الرادار</h1>
-        </header>
-        <main class="flex-1 flex flex-col items-center justify-center p-6 text-center">
-            <div class="relative w-64 h-64 mb-8">
-                <div class="absolute inset-0 bg-green-500 opacity-20 rounded-full animate-ping"></div>
-                <div class="relative bg-white rounded-full w-full h-full flex items-center justify-center border-4 border-green-600 shadow-2xl">
-                    <i class="fas fa-street-view text-7xl text-green-600"></i>
-                </div>
-            </div>
-            <button onclick="goToPage('chatListPage')" class="w-full bg-green-600 text-white py-4 rounded-2xl text-lg font-bold shadow-lg mb-4 active:scale-95 transition-transform">
-                <i class="fas fa-comments ml-2"></i> دخول للمحادثات
-            </button>
-            <button onclick="alert('تم تحديث حالتك بنجاح!')" class="w-full bg-blue-500 text-white py-4 rounded-2xl text-lg font-bold shadow-lg active:scale-95 transition-transform">
-                <i class="fas fa-circle-notch ml-2"></i> تحديث الحالة
-            </button>
-        </main>
+    <header class="bg-[#075E54] text-white p-4 shadow-lg flex justify-between items-center">
+        <h1 class="text-xl font-bold text-white">أنا هنا</h1>
+        <div class="flex gap-4">
+            <i class="fas fa-search text-white"></i>
+            <i class="fas fa-ellipsis-v text-white"></i>
+        </div>
+    </header>
+
+    <div class="bg-[#075E54] text-white flex justify-around text-sm font-bold shadow-md">
+        <div class="py-3 px-6"><i class="fas fa-camera text-white"></i></div>
+        <div class="py-3 px-6 tab-active">المحادثات</div>
+        <div class="py-3 px-6 opacity-70">الحالة</div>
+        <div class="py-3 px-6 opacity-70">الموقع</div>
     </div>
 
-    <div id="chatListPage" class="page bg-white">
-        <header class="bg-[#128C7E] text-white p-4 flex items-center shadow-md">
-            <button onclick="goToPage('radarPage')" class="ml-4"><i class="fas fa-arrow-right text-xl text-white"></i></button>
-            <h1 class="text-xl font-bold text-white">المحادثات القريبة</h1>
-        </header>
-        <div class="flex-1 overflow-y-auto p-4">
-            <div onclick="alert('جاري الاتصال بقاعدة البيانات...')" class="flex items-center p-4 border-b hover:bg-gray-50 cursor-pointer">
-                <div class="w-14 h-14 bg-gray-300 rounded-full ml-4 flex items-center justify-center">
-                    <i class="fas fa-user text-2xl text-white"></i>
+    <main class="flex-1 overflow-y-auto bg-white">
+        <div onclick="alert('سيتم فتح الدردشة فور ربطها!')" class="flex items-center p-4 border-b active:bg-gray-100">
+            <div class="w-14 h-14 bg-gray-300 rounded-full ml-4 flex items-center justify-center">
+                <i class="fas fa-user text-2xl text-white"></i>
+            </div>
+            <div class="flex-1 text-right">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 text-lg">مستخدم قريب منك</h3>
+                    <span class="text-xs text-green-600 font-bold">10:45 م</span>
                 </div>
-                <div class="flex-1 text-right">
-                    <h3 class="font-bold text-gray-800">مستخدم قريب منك</h3>
-                    <p class="text-sm text-gray-500">نشط الآن</p>
-                </div>
-                <i class="fas fa-chevron-left text-gray-300"></i>
+                <p class="text-gray-500 text-sm truncate">اضغط لبدء الدردشة مع جارك..</p>
             </div>
         </div>
-    </div>
 
-    <script>
-        function goToPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-        }
-    </script>
+        <div onclick="alert('سيتم فتح الدردشة فور ربطها!')" class="flex items-center p-4 border-b active:bg-gray-100">
+            <div class="w-14 h-14 bg-blue-100 rounded-full ml-4 flex items-center justify-center text-blue-500">
+                <i class="fas fa-user-friends text-2xl"></i>
+            </div>
+            <div class="flex-1 text-right">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 text-lg">مجموعة الحي</h3>
+                    <span class="text-xs text-gray-400">أمس</span>
+                </div>
+                <p class="text-gray-500 text-sm truncate">أهلاً بك في تطبيق أنا هنا!</p>
+            </div>
+        </div>
+    </main>
+
+    <button class="absolute bottom-6 left-6 bg-[#25D366] text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl">
+        <i class="fas fa-comment-dots text-white"></i>
+    </button>
+
 </body>
 </html>
