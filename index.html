@@ -3,131 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أنا هنا - النسخة المطورة</title>
+    <title>أنا هنا - الإصدار المصلح</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; color: #334155; overflow: hidden; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; color: #334155; overflow: hidden; }
         
-        section { display: none; height: calc(100vh - 70px); overflow-y: auto; }
+        section { display: none; height: calc(100vh - 70px); overflow-y: auto; padding-bottom: 80px; }
         section.active { display: block; }
         
-        /* Reels Styles */
+        /* Reels */
         section#sec-reels { background-color: #000; height: 100vh; overflow: hidden; padding: 0; position: relative; }
         .reels-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; scrollbar-width: none; }
         .reel-video { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Flags Scroll Bar */
+        .flags-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; background: white; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .flags-scroll::-webkit-scrollbar { display: none; }
+        .flag-item { min-width: 60px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: 0.3s; opacity: 0.6; }
+        .flag-item.active { opacity: 1; transform: scale(1.1); color: #3b82f6; }
+        .flag-img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         /* Navigation */
         nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; height: 70px; border-top: 1px solid #e2e8f0; z-index: 100; }
         .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #64748b; }
         .nav-btn.active { color: #0ea5e9; }
         .reels-nav-active { background: #000; color: white; border: none; }
-        .reels-nav-active .nav-btn.active { color: #fff; }
 
-        /* Comments System */
-        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-top-left-radius: 30px; border-top-right-radius: 30px; transition: 0.4s; z-index: 400; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
+        /* Overlays & Modals */
+        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-top-left-radius: 30px; border-top-right-radius: 30px; transition: 0.4s; z-index: 400; max-height: 80vh; display: flex; flex-direction: column; }
         .bottom-sheet.open { bottom: 0; }
-        .comment-item { border-right: 2px solid #e2e8f0; padding-right: 12px; margin-bottom: 16px; position: relative; }
-        .reply-item { margin-right: 30px; border-right: 2px solid #3b82f6; padding-right: 10px; margin-top: 8px; font-size: 0.85rem; }
         
-        /* Flags */
-        .flags-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 10px 5px; scrollbar-width: none; }
-        .flag-item { min-width: 55px; display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.5; transition: 0.3s; }
-        .flag-item.active { opacity: 1; transform: scale(1.1); }
-        .flag-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-blur: 5px; }
+        .modal-content { background: white; width: 100%; max-width: 350px; border-radius: 30px; padding: 25px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+
+        .comment-item { border-right: 2px solid #f1f5f9; padding-right: 10px; margin-bottom: 15px; }
+        .reply-item { margin-right: 25px; border-right: 2px solid #3b82f6; padding-right: 8px; margin-top: 5px; background: #f8fafc; border-radius: 5px; padding: 5px; }
     </style>
 </head>
 <body>
 
     <main>
-        <!-- 1. الريلز -->
+        <!-- قسم الريلز -->
         <section id="sec-reels" class="active">
-            <div class="reels-container" id="reels-list">
+            <div class="reels-container">
                 <div class="reel-video">
-                    <video loop onclick="this.paused ? this.play() : this.pause()" playsinline autoplay muted>
-                        <source src="https://v16-webapp-prime.tiktok.com/video/tos/alisg/v/0602/a9a6b986888448908868686868686868/..." type="video/mp4">
+                    <video loop playsinline autoplay muted onclick="this.paused ? this.play() : this.pause()">
+                        <source src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1282-large.mp4" type="video/mp4">
                     </video>
                     <div class="absolute bottom-24 right-4 text-white z-10">
                         <h3 class="font-bold text-lg">@نبيل_اليماني</h3>
-                        <p class="text-sm opacity-80">تحديث نظام التعليقات 💬</p>
+                        <p class="text-sm opacity-80">نظام التعليقات المطور 💬</p>
                     </div>
                     <div class="absolute bottom-24 left-4 flex flex-col gap-6 text-white text-center z-10">
-                        <div onclick="toggleLike(this)" class="flex flex-col items-center cursor-pointer">
-                            <i class="fas fa-heart text-2xl transition"></i><span class="text-[10px]">2.4k</span>
-                        </div>
-                        <div onclick="openComments()" class="flex flex-col items-center">
-                            <i class="fas fa-comment text-2xl"></i><span class="text-[10px]">120</span>
-                        </div>
-                        <div class="bg-blue-500 w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
-                            <i class="fas fa-share"></i>
-                        </div>
+                        <div onclick="toggleLike(this)" class="cursor-pointer"><i class="fas fa-heart text-2xl"></i><br><span class="text-[10px]">2k</span></div>
+                        <div onclick="openComments()" class="cursor-pointer"><i class="fas fa-comment text-2xl"></i><br><span class="text-[10px]">120</span></div>
+                        <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-share"></i></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. القريبين (محدث مع الـ ID) -->
-        <section id="sec-nearby" class="p-5 bg-gray-50">
-            <h2 class="text-2xl font-bold mb-6">حولك الآن</h2>
+        <!-- قسم القريبين (الاسم + الـ ID) -->
+        <section id="sec-nearby" class="p-5">
+            <h2 class="text-2xl font-bold mb-6 text-slate-800">الأشخاص القريبين</h2>
             <div id="nearby-list" class="space-y-4">
-                <div class="bg-white p-4 rounded-2xl shadow-sm flex items-center gap-3 border border-gray-100">
-                    <img src="https://ui-avatars.com/api/?name=Ali&background=random" class="w-12 h-12 rounded-full">
+                <div class="bg-white p-4 rounded-2xl shadow-sm flex items-center gap-3 border border-slate-100">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600">A</div>
                     <div class="flex-1">
-                        <h4 class="font-bold text-sm">علي محمد</h4>
-                        <p class="text-[11px] text-blue-600 font-mono">#ID-99281</p>
-                        <p class="text-[10px] text-gray-400">على بعد 150 متر</p>
+                        <h4 class="font-bold text-slate-800">أحمد اليافعي</h4>
+                        <p class="text-[11px] text-blue-500 font-mono font-bold">#ID-77281</p>
+                        <p class="text-[10px] text-slate-400">على بعد 300 متر</p>
                     </div>
-                    <button class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-bold">مراسلة</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">مراسلة</button>
                 </div>
             </div>
         </section>
 
-        <!-- 3. الغرف الصوتية -->
+        <!-- قسم الغرف الصوتية (مصلح بالكامل) -->
         <section id="sec-rooms" class="p-5">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">غرف صوتية</h2>
-                <button onclick="openCreateRoomModal()" class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-plus"></i></button>
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h2 class="text-2xl font-bold text-slate-800">غرف صوتية</h2>
+                <button onclick="openCreateRoomModal()" class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-plus"></i></button>
             </div>
-            <div class="flags-scroll mb-6" id="flags-bar"></div>
-            <div id="rooms-list" class="space-y-4"></div>
+
+            <!-- شريط الدول العربية -->
+            <div class="flags-scroll" id="flags-bar">
+                <!-- يتم التحميل بواسطة JS -->
+            </div>
+
+            <div class="relative mb-6">
+                <input type="text" id="room-search" oninput="searchRooms()" placeholder="ابحث عن غرفة بالـ ID..." class="w-full bg-white p-4 pr-12 rounded-2xl outline-none shadow-sm text-sm border-2 border-transparent focus:border-blue-400 transition">
+                <i class="fas fa-search absolute right-4 top-4.5 text-slate-300"></i>
+            </div>
+
+            <div id="rooms-list" class="space-y-4">
+                <!-- الغرف ستظهر هنا -->
+            </div>
         </section>
 
-        <!-- 4. الدردشة -->
-        <section id="sec-chats" class="bg-white">
-            <div class="p-4 border-b">
-                <input type="text" placeholder="ابحث عن صديق بالـ ID..." class="w-full bg-gray-100 p-3 rounded-xl outline-none text-sm">
-            </div>
-            <div class="p-10 text-center text-gray-400">
-                <i class="fas fa-comments text-5xl mb-4 opacity-20"></i>
-                <p>لا توجد رسائل حالياً</p>
+        <!-- قسم الدردشة -->
+        <section id="sec-chats" class="p-5">
+            <h2 class="text-2xl font-bold mb-6 text-slate-800">الدردشات</h2>
+            <div class="text-center mt-20 text-slate-400">
+                <i class="fas fa-comments text-6xl opacity-20 mb-4"></i>
+                <p>لا يوجد رسائل بعد</p>
             </div>
         </section>
     </main>
 
-    <!-- واجهة التعليقات المتطورة -->
+    <!-- Modal إنشاء غرفة -->
+    <div id="room-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-6 text-center text-slate-800">إنشاء غرفة صوتية</h3>
+            <div class="space-y-4">
+                <label class="text-xs font-bold text-slate-400 mr-2">اسم الغرفة</label>
+                <input type="text" id="room-name-input" placeholder="مثال: مجلس اليمنيين" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border border-slate-200">
+                <div class="bg-blue-50 p-4 rounded-2xl flex justify-between items-center border border-blue-100">
+                    <span class="text-xs font-bold text-blue-400">ID الغرفة:</span>
+                    <span id="new-room-id" class="font-bold text-blue-700 font-mono">#ID-0000</span>
+                </div>
+                <button onclick="createRoom()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-xl shadow-blue-200 mt-4">فتح الغرفة الآن</button>
+                <button onclick="closeModal()" class="w-full text-slate-400 text-sm font-bold pt-2">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- واجهة التعليقات -->
     <div id="comments-sheet" class="bottom-sheet">
         <div class="p-4 border-b flex justify-between items-center font-bold">
-            <span>التعليقات (120)</span>
-            <i class="fas fa-times text-gray-400 p-2" onclick="closeComments()"></i>
+            <span>التعليقات</span>
+            <i class="fas fa-times text-slate-300" onclick="closeComments()"></i>
         </div>
-        
         <div id="comments-list" class="flex-1 p-4 overflow-y-auto">
-            <!-- سيتم إضافة التعليقات هنا -->
+            <!-- تعليقات -->
         </div>
-
-        <!-- شريط الرد النشط (يظهر عند الرد على شخص) -->
-        <div id="reply-indicator" class="hidden bg-blue-50 p-2 px-4 flex justify-between items-center text-xs text-blue-600 border-t">
-            <span>الرد على: <b id="reply-target-name">...</b></span>
+        <!-- شريط الرد -->
+        <div id="reply-indicator" class="hidden bg-blue-50 p-2 px-4 flex justify-between items-center text-[10px] text-blue-600 border-t">
+            <span>الرد على: <b id="reply-target">...</b></span>
             <i class="fas fa-times-circle" onclick="cancelReply()"></i>
         </div>
-
-        <div class="p-4 border-t flex gap-2 bg-white pb-8">
-            <input type="text" id="comment-input" placeholder="اكتب تعليقك هنا..." class="flex-1 bg-gray-100 p-4 rounded-2xl outline-none text-sm border focus:border-blue-400 transition">
-            <button onclick="handleCommentSubmit()" class="bg-blue-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+        <div class="p-4 border-t flex gap-2 pb-10">
+            <input type="text" id="comment-input" placeholder="اكتب تعليقك..." class="flex-1 bg-slate-100 p-3 rounded-xl outline-none text-sm">
+            <button onclick="submitComment()" class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -140,132 +160,194 @@
     </nav>
 
     <script>
-        let commentsData = [
-            { id: 1, user: "نبيل اليماني", text: "أهلاً بكم في تطبيقي الجديد!", replies: [] }
+        // بيانات الدول العربية
+        const arabCountries = [
+            {n: 'اليمن', c: 'ye'}, {n: 'السعودية', c: 'sa'}, {n: 'الإمارات', c: 'ae'}, 
+            {n: 'العراق', c: 'iq'}, {n: 'فلسطين', c: 'ps'}, {n: 'مصر', c: 'eg'}, 
+            {n: 'عمان', c: 'om'}, {n: 'الكويت', c: 'kw'}, {n: 'قطر', c: 'qa'}, 
+            {n: 'البحرين', c: 'bh'}, {n: 'سوريا', c: 'sy'}, {n: 'لبنان', c: 'lb'}, 
+            {n: 'الأردن', c: 'jo'}, {n: 'ليبيا', c: 'ly'}, {n: 'تونس', c: 'tn'}, 
+            {n: 'الجزائر', c: 'dz'}, {n: 'المغرب', c: 'ma'}, {n: 'موريتانيا', c: 'mr'},
+            {n: 'السودان', c: 'sd'}, {n: 'جيبوتي', c: 'dj'}, {n: 'الصومال', c: 'so'}
         ];
-        let replyToId = null;
-        let editingId = null;
 
-        window.onload = function() {
+        let comments = [{id: 1, user: 'نبيل اليماني', text: 'أهلاً بالجميع في النسخة المصلحة!', replies: []}];
+        let currentReplyId = null;
+        let currentEditId = null;
+
+        // عند بدء التطبيق
+        window.onload = () => {
+            renderFlags();
+            renderRooms();
             renderComments();
-            // إضافة دول افتراضية
-            const bar = document.getElementById('flags-bar');
-            const demoCountries = [{n:'اليمن', c:'ye'}, {n:'السعودية', c:'sa'}, {n:'مصر', c:'eg'}, {n:'فلسطين', c:'ps'}];
-            bar.innerHTML = demoCountries.map(d => `<div class="flag-item"><img src="https://flagcdn.com/w80/${d.c}.png" class="flag-img"><span class="text-[9px] font-bold">${d.n}</span></div>`).join('');
         };
+
+        function renderFlags() {
+            const bar = document.getElementById('flags-bar');
+            bar.innerHTML = arabCountries.map((country, index) => `
+                <div class="flag-item ${index === 0 ? 'active' : ''}" onclick="selectFlag(this, '${country.n}')">
+                    <img src="https://flagcdn.com/w80/${country.c}.png" class="flag-img">
+                    <span class="text-[9px] font-bold">${country.n}</span>
+                </div>
+            `).join('');
+        }
+
+        function selectFlag(el, name) {
+            document.querySelectorAll('.flag-item').forEach(f => f.classList.remove('active'));
+            el.classList.add('active');
+            // هنا يمكنك إضافة فلترة للغرف حسب الدولة
+        }
 
         function switchTab(tab) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.getElementById('sec-' + tab).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-' + tab).classList.add('active');
+            
             const nav = document.getElementById('bottom-nav');
             if(tab === 'reels') nav.classList.add('reels-nav-active');
             else nav.classList.remove('reels-nav-active');
         }
 
+        // --- نظام الغرف ---
+        function openCreateRoomModal() {
+            const randomID = "#ID-" + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('new-room-id').innerText = randomID;
+            document.getElementById('room-modal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('room-modal').style.display = 'none'; }
+
+        function createRoom() {
+            const name = document.getElementById('room-name-input').value || "غرفة جديدة";
+            const id = document.getElementById('new-room-id').innerText;
+            const roomHTML = `
+                <div class="bg-white p-5 rounded-[25px] border-r-8 border-blue-600 shadow-sm transition-all" data-id="${id}">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-bold text-slate-800">${name} 🎙️</h4>
+                        <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-lg font-mono font-bold">${id}</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400">بث مباشر - منضم حديثاً</p>
+                </div>
+            `;
+            document.getElementById('rooms-list').insertAdjacentHTML('afterbegin', roomHTML);
+            closeModal();
+            document.getElementById('room-name-input').value = "";
+        }
+
+        function renderRooms() {
+            const defaultRoom = `
+                <div class="bg-white p-5 rounded-[25px] border-r-8 border-blue-600 shadow-sm" data-id="#ID-1001">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-bold text-slate-800">مجلس النشامى 🎙️</h4>
+                        <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-lg font-mono font-bold">#ID-1001</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400">اليمن - 25 شخصاً يستمعون</p>
+                </div>
+            `;
+            document.getElementById('rooms-list').innerHTML = defaultRoom;
+        }
+
+        function searchRooms() {
+            const val = document.getElementById('room-search').value.toUpperCase();
+            const items = document.querySelectorAll('#rooms-list > div');
+            items.forEach(item => {
+                const id = item.getAttribute('data-id');
+                item.style.display = id.includes(val) ? "block" : "none";
+            });
+        }
+
+        // --- نظام التعليقات ---
         function openComments() { document.getElementById('comments-sheet').classList.add('open'); }
         function closeComments() { document.getElementById('comments-sheet').classList.remove('open'); }
 
         function renderComments() {
-            const list = document.getElementById('comments-list');
-            list.innerHTML = commentsData.map(c => `
+            const container = document.getElementById('comments-list');
+            container.innerHTML = comments.map(c => `
                 <div class="comment-item">
                     <div class="flex justify-between items-start">
                         <div>
-                            <span class="font-bold text-sm block">${c.user}</span>
-                            <p class="text-sm mt-1 text-gray-700">${c.text}</p>
+                            <span class="font-bold text-xs text-slate-800">${c.user}</span>
+                            <p class="text-sm text-slate-600">${c.text}</p>
                         </div>
-                        <div class="flex gap-3 text-gray-400 text-xs">
+                        <div class="flex gap-2 text-slate-300 text-[10px]">
                             <i class="fas fa-edit cursor-pointer hover:text-blue-500" onclick="startEdit(${c.id}, '${c.text}')"></i>
                             <i class="fas fa-trash cursor-pointer hover:text-red-500" onclick="deleteComment(${c.id})"></i>
                         </div>
                     </div>
-                    <div class="mt-2 flex gap-4 text-[10px] font-bold text-gray-500">
+                    <div class="flex gap-4 mt-1 text-[10px] font-bold text-slate-400">
                         <span class="text-blue-500 cursor-pointer" onclick="setReply(${c.id}, '${c.user}')">رد</span>
-                        <span>منذ دقيقة</span>
+                        <span>الآن</span>
                     </div>
                     ${c.replies.map(r => `
                         <div class="reply-item">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <span class="font-bold text-[11px] block text-blue-600">${r.user}</span>
-                                    <p class="mt-1">${r.text}</p>
-                                </div>
-                                <i class="fas fa-trash text-[10px] text-gray-300" onclick="deleteReply(${c.id}, ${r.id})"></i>
+                            <div class="flex justify-between">
+                                <span class="font-bold text-[10px] text-blue-600">${r.user}</span>
+                                <i class="fas fa-trash text-[8px] text-slate-300" onclick="deleteReply(${c.id}, ${r.id})"></i>
                             </div>
+                            <p class="text-xs text-slate-600">${r.text}</p>
                         </div>
                     `).join('')}
                 </div>
             `).join('');
         }
 
-        function handleCommentSubmit() {
-            const inp = document.getElementById('comment-input');
-            const val = inp.value.trim();
+        function submitComment() {
+            const input = document.getElementById('comment-input');
+            const val = input.value.trim();
             if(!val) return;
 
-            if (editingId) {
-                // تعديل تعليق
-                const comment = commentsData.find(c => c.id === editingId);
-                if (comment) comment.text = val;
-                editingId = null;
-            } else if (replyToId) {
-                // إضافة رد
-                const comment = commentsData.find(c => c.id === replyToId);
-                if (comment) {
-                    comment.replies.push({ id: Date.now(), user: "أنا", text: val });
-                }
+            if(currentEditId) {
+                const c = comments.find(x => x.id === currentEditId);
+                if(c) c.text = val;
+                currentEditId = null;
+            } else if(currentReplyId) {
+                const c = comments.find(x => x.id === currentReplyId);
+                if(c) c.replies.push({id: Date.now(), user: 'أنا', text: val});
                 cancelReply();
             } else {
-                // إضافة تعليق جديد
-                commentsData.unshift({ id: Date.now(), user: "أنا", text: val, replies: [] });
+                comments.unshift({id: Date.now(), user: 'أنا', text: val, replies: []});
             }
 
-            inp.value = "";
+            input.value = "";
             renderComments();
         }
 
         function setReply(id, name) {
-            replyToId = id;
-            editingId = null;
+            currentReplyId = id;
             document.getElementById('reply-indicator').classList.remove('hidden');
-            document.getElementById('reply-target-name').innerText = name;
+            document.getElementById('reply-target').innerText = name;
             document.getElementById('comment-input').focus();
         }
 
         function cancelReply() {
-            replyToId = null;
+            currentReplyId = null;
             document.getElementById('reply-indicator').classList.add('hidden');
         }
 
         function startEdit(id, text) {
-            editingId = id;
-            replyToId = null;
-            cancelReply();
-            const inp = document.getElementById('comment-input');
-            inp.value = text;
-            inp.focus();
+            currentEditId = id;
+            const input = document.getElementById('comment-input');
+            input.value = text;
+            input.focus();
         }
 
         function deleteComment(id) {
-            commentsData = commentsData.filter(c => c.id !== id);
+            comments = comments.filter(c => c.id !== id);
             renderComments();
         }
 
-        function deleteReply(commentId, replyId) {
-            const comment = commentsData.find(c => c.id === commentId);
-            if (comment) {
-                comment.replies = comment.replies.filter(r => r.id !== replyId);
-            }
+        function deleteReply(cId, rId) {
+            const c = comments.find(x => x.id === cId);
+            if(c) c.replies = c.replies.filter(r => r.id !== rId);
             renderComments();
         }
 
         function toggleLike(el) {
-            const icon = el.querySelector('i');
-            icon.classList.toggle('fas');
-            icon.classList.toggle('far');
-            icon.style.color = icon.classList.contains('fas') ? '#ef4444' : '#fff';
+            const heart = el.querySelector('i');
+            heart.classList.toggle('fas');
+            heart.classList.toggle('far');
+            heart.style.color = heart.classList.contains('fas') ? '#ef4444' : '#fff';
         }
     </script>
 </body>
