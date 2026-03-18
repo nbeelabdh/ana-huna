@@ -3,200 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أنا هنا - Cloud Version</title>
+    <title>أنا هنا - ريلز ودردشة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; overflow: hidden; }
-        .chat-bg { background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
-        .tab-active { border-bottom: 4px solid #128c7e; color: #128c7e; }
-        section { display: none; height: calc(100vh - 130px); overflow-y: auto; }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+        body { font-family: 'Cairo', sans-serif; background-color: #000; color: white; overflow: hidden; }
+        
+        /* التبديل بين الأقسام */
+        section { display: none; height: calc(100vh - 70px); overflow-y: auto; background-color: #f0f2f5; color: #333; }
         section.active { display: block; }
-        .msg { max-width: 80%; padding: 10px; border-radius: 15px; margin-bottom: 10px; font-size: 14px; }
-        .msg-out { background-color: #dcf8c6; align-self: flex-end; border-top-left-radius: 0; shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .msg-in { background-color: white; align-self: flex-start; border-top-right-radius: 0; shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .loader { border-top-color: #128c7e; animation: spinner 1.5s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        section#sec-reels { display: none; background-color: #000; height: 100vh; overflow: hidden; padding: 0; }
+        section#sec-reels.active { display: block; }
+
+        /* ستايل الريلز */
+        .reels-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; scrollbar-width: none; }
+        .reels-container::-webkit-scrollbar { display: none; }
+        .reel-video { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        
+        .reel-actions { position: absolute; bottom: 100px; left: 15px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
+        .reel-info { position: absolute; bottom: 100px; right: 15px; text-align: right; color: white; text-shadow: 1px 1px 5px rgba(0,0,0,0.5); z-index: 10; }
+        
+        /* القائمة السفلية */
+        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: grow; border-top: 1px solid #eee; z-index: 100; height: 70px; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #666; transition: 0.3s; }
+        .nav-btn.active { color: #128c7e; }
+        .nav-btn i { font-size: 20px; margin-bottom: 2px; }
+        .reels-nav-active { background: #000; border-top: none; }
+        .reels-nav-active .nav-btn { color: #fff; }
+        .reels-nav-active .nav-btn.active { color: #128c7e; }
+
+        /* فقاعات الدردشة */
+        .msg { max-width: 80%; padding: 12px; border-radius: 18px; margin-bottom: 8px; font-size: 14px; line-height: 1.5; }
+        .msg-out { background-color: #dcf8c6; align-self: flex-end; border-bottom-left-radius: 0; }
+        .msg-in { background-color: white; align-self: flex-start; border-bottom-right-radius: 0; }
+        
+        .loader-bar { position: fixed; top: 0; left: 0; height: 3px; background: #128c7e; z-index: 1000; transition: width 0.4s; }
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body>
 
-    <header class="bg-[#075E54] text-white p-4 flex justify-between items-center shadow-lg z-50">
-        <h1 class="text-xl font-bold">أنا هنا</h1>
-        <div id="cloud-status" class="text-[10px] bg-green-500/20 px-2 py-1 rounded border border-green-500">متصل بالسحابة</div>
-    </header>
+    <div id="upload-progress" class="loader-bar" style="width: 0%"></div>
 
-    <nav class="bg-white flex shadow-md z-40">
-        <button onclick="switchTab('nearby')" id="tab-nearby" class="flex-1 py-3 font-bold tab-active">القريبين</button>
-        <button onclick="switchTab('chats')" id="tab-chats" class="flex-1 py-3 font-bold text-gray-500">دردشة</button>
-        <button onclick="switchTab('groups')" id="tab-groups" class="flex-1 py-3 font-bold text-gray-500">مجموعات</button>
-        <button onclick="switchTab('calls')" id="tab-calls" class="flex-1 py-3 font-bold text-gray-500">مكالمات</button>
-    </nav>
-
-    <main class="flex-1 relative">
-        <section id="sec-nearby" class="active p-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border-r-4 border-blue-500 mb-3" onclick="openChat('أحمد')">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">أ</div>
-                    <div class="mr-3">
-                        <h4 class="font-bold">أحمد</h4>
-                        <p class="text-xs text-gray-400">نشط الآن في موقعك</p>
+    <!-- المحتوى الرئيسي -->
+    <main>
+        <!-- قسم الريلز (تيك توك ستايل) -->
+        <section id="sec-reels" class="active">
+            <div class="reels-container" id="reels-list">
+                <!-- فيديو افتراضي في حال السحابة فارغة -->
+                <div class="reel-video">
+                    <video loop onclick="togglePlay(this)" playsinline>
+                        <source src="https://v16-webapp-prime.tiktok.com/video/tos/alisg/v/0602/a9a6b986888448908868686868686868/?..." type="video/mp4">
+                    </video>
+                    <div class="reel-info">
+                        <h3 class="font-bold text-lg">@نبيل_اليماني</h3>
+                        <p class="text-sm">مرحباً بكم في قسم الريلز الجديد 🚀</p>
+                    </div>
+                    <div class="reel-actions">
+                        <button onclick="animateHeart(this)" class="flex flex-col items-center"><i class="fas fa-heart text-2xl"></i><span class="text-xs">1.2k</span></button>
+                        <button class="flex flex-col items-center"><i class="fas fa-comment text-2xl"></i><span class="text-xs">45</span></button>
+                        <button onclick="document.getElementById('reel-upload').click()" class="bg-red-500 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-plus text-white"></i></button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="sec-chats" class="bg-white"></section>
-
-        <section id="sec-groups" class="p-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold">المجموعات السحابية</h3>
-                <button onclick="showGroupModal()" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm shadow-md">إنشاء +</button>
+        <!-- القريبين -->
+        <section id="sec-nearby">
+            <header class="bg-[#075E54] text-white p-4 font-bold text-center">الأشخاص القريبين منك</header>
+            <div class="p-4 space-y-3">
+                <div onclick="openChat('أحمد')" class="bg-white p-4 rounded-2xl shadow-sm flex items-center">
+                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">أ</div>
+                    <div class="mr-3 flex-1">
+                        <h4 class="font-bold">أحمد</h4>
+                        <p class="text-xs text-gray-400">على بعد 200 متر</p>
+                    </div>
+                    <i class="fas fa-comment-dots text-[#128c7e] text-xl"></i>
+                </div>
             </div>
-            <div id="groups-list" class="space-y-3"></div>
         </section>
 
-        <section id="sec-calls" class="p-4"></section>
-        
-        <section id="sec-profile" class="p-6 text-center">
-             <div class="relative w-32 h-32 mx-auto">
-                <img id="user-avatar" src="https://ui-avatars.com/api/?name=Nabeel" class="rounded-full w-full h-full border-4 border-white shadow-xl">
-                <button onclick="document.getElementById('file-picker').click()" class="absolute bottom-0 left-0 bg-[#128c7e] text-white p-2 rounded-full shadow-lg"><i class="fas fa-camera"></i></button>
-             </div>
-             <h2 class="mt-4 text-xl font-bold">نبيل</h2>
+        <!-- الدردشة -->
+        <section id="sec-chats">
+            <header class="bg-[#075E54] text-white p-4 font-bold">المحادثات</header>
+            <div id="chats-list" class="divide-y">
+                <div onclick="openChat('أحمد')" class="flex items-center p-4 bg-white">
+                    <div class="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center text-xl">أ</div>
+                    <div class="mr-4 flex-1">
+                        <h4 class="font-bold">أحمد</h4>
+                        <p class="text-sm text-gray-500">كيف حال الريلز الجديد؟</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- المجموعات -->
+        <section id="sec-groups" class="p-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">المجموعات</h2>
+                <button onclick="showModal('group-modal')" class="bg-[#128c7e] text-white px-4 py-2 rounded-xl text-sm shadow-md">إنشاء +</button>
+            </div>
+            <div id="groups-container" class="space-y-4"></div>
         </section>
     </main>
 
-    <div id="chat-ui" class="fixed inset-0 bg-white z-[100] hidden flex flex-col">
-        <header class="bg-[#075E54] text-white p-4 flex items-center shadow-md">
+    <!-- القائمة السفلية -->
+    <nav id="bottom-nav" class="reels-nav-active">
+        <button onclick="switchTab('reels')" id="btn-reels" class="nav-btn active"><i class="fas fa-play-circle"></i>ريلز</button>
+        <button onclick="switchTab('nearby')" id="btn-nearby" class="nav-btn"><i class="fas fa-street-view"></i>القريبين</button>
+        <button onclick="switchTab('chats')" id="btn-chats" class="nav-btn"><i class="fas fa-comments"></i>دردشة</button>
+        <button onclick="switchTab('groups')" id="btn-groups" class="nav-btn"><i class="fas fa-users"></i>مجموعات</button>
+    </nav>
+
+    <!-- واجهة الدردشة -->
+    <div id="chat-overlay" class="fixed inset-0 bg-white z-[200] hidden flex flex-col">
+        <header class="bg-[#075E54] text-white p-4 flex items-center shadow-lg">
             <i class="fas fa-arrow-right ml-4 text-xl" onclick="closeChat()"></i>
-            <div class="flex-1">
-                <h4 id="active-chat-title" class="font-bold">--</h4>
-                <p class="text-[10px] opacity-70">تشفير Appwrite مفعل</p>
-            </div>
-            <div class="flex gap-4 px-2">
-                <i class="fas fa-phone"></i>
-                <i class="fas fa-video"></i>
-            </div>
+            <h4 id="active-chat-name" class="font-bold flex-1">أحمد</h4>
+            <i class="fas fa-video ml-4"></i>
+            <i class="fas fa-phone"></i>
         </header>
-        <div id="messages-container" class="flex-1 chat-bg p-4 overflow-y-auto flex flex-col"></div>
-        <footer class="p-2 bg-gray-50 border-t flex items-center gap-2">
-            <i class="fas fa-plus text-gray-400 px-2" onclick="document.getElementById('file-picker').click()"></i>
-            <input type="text" id="msg-input" placeholder="رسالة..." class="flex-1 p-2 rounded-full border border-gray-200 outline-none px-4">
-            <button onclick="handleSend()" class="bg-[#128c7e] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md"><i class="fas fa-paper-plane"></i></button>
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col bg-[#f0f2f5] space-y-2"></div>
+        <footer class="p-2 bg-white flex items-center gap-2 border-t">
+            <i class="fas fa-plus text-gray-400 px-2" onclick="document.getElementById('file-input').click()"></i>
+            <input type="text" id="msg-input" placeholder="اكتب رسالة..." class="flex-1 p-3 rounded-full bg-gray-100 outline-none px-5">
+            <button onclick="sendMsg()" class="bg-[#128c7e] text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-paper-plane"></i></button>
         </footer>
     </div>
 
-    <div id="group-modal" class="fixed inset-0 bg-black/50 z-[200] hidden flex items-center justify-center p-6">
-        <div class="bg-white p-6 rounded-2xl w-full max-w-sm shadow-2xl">
-            <h3 class="font-bold text-lg mb-4">اسم المجموعة الجديد</h3>
-            <input type="text" id="group-name" class="w-full border p-3 rounded-xl mb-4 text-right bg-gray-50" placeholder="مثلاً: فريق العمل">
-            <div class="flex justify-end gap-2">
-                <button onclick="document.getElementById('group-modal').classList.add('hidden')" class="px-4 py-2 text-gray-400">إلغاء</button>
-                <button onclick="processCreateGroup()" class="bg-orange-500 text-white px-6 py-2 rounded-xl">تأكيد</button>
+    <!-- Modal إنشاء مجموعة -->
+    <div id="group-modal" class="fixed inset-0 bg-black/60 z-[300] hidden flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-sm text-right">
+            <h3 class="text-xl font-bold mb-4">اسم المجموعة</h3>
+            <input type="text" id="new-group-name" class="w-full border p-4 rounded-2xl mb-6 bg-gray-50 outline-none focus:ring-2 focus:ring-[#128c7e]" placeholder="مثلاً: عشاق الريلز">
+            <div class="flex justify-end gap-3">
+                <button onclick="hideModal('group-modal')" class="text-gray-400 font-bold px-4">إلغاء</button>
+                <button onclick="createGroup()" class="bg-[#128c7e] text-white px-8 py-3 rounded-2xl font-bold shadow-lg">إنشاء</button>
             </div>
         </div>
     </div>
 
-    <input type="file" id="file-picker" class="hidden" onchange="uploadToCloud(this.files[0])">
+    <!--Inputs مخفية -->
+    <input type="file" id="file-input" class="hidden" accept="image/*,video/*" onchange="uploadToAppwrite(this.files[0], 'chat')">
+    <input type="file" id="reel-upload" class="hidden" accept="video/*" onchange="uploadToAppwrite(this.files[0], 'reels')">
 
     <script>
-        // --- تهيئة سحابة Appwrite ---
+        // --- إعدادات السحابة Appwrite ---
         const client = new Appwrite.Client()
             .setEndpoint('https://fra.cloud.appwrite.io/v1')
             .setProject('69ba1fa10035b7f1de96');
 
         const storage = new Appwrite.Storage(client);
         const account = new Appwrite.Account(client);
-        const databases = new Appwrite.Databases(client);
+        const BUCKET_ID = '69ba233f001368959e2e';
 
-        // الدخول التلقائي
-        async function startSession() {
-            try { await account.createAnonymousSession(); } catch(e) { console.log("Session exists"); }
+        async function init() {
+            try { await account.createAnonymousSession(); loadReels(); } catch(e) {}
         }
-        startSession();
+        init();
 
-        // --- نظام التنقل ---
+        // --- التحكم في التنقل ---
         function switchTab(tab) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.getElementById('sec-' + tab).classList.add('active');
-            document.querySelectorAll('nav button').forEach(b => b.className = "flex-1 py-3 font-bold text-gray-500");
-            document.getElementById('tab-' + tab).className = "flex-1 py-3 font-bold tab-active";
-        }
+            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + tab).classList.add('active');
 
-        // --- إدارة الدردشة ---
-        function openChat(name) {
-            document.getElementById('active-chat-title').innerText = name;
-            document.getElementById('chat-ui').classList.remove('hidden');
-            document.getElementById('messages-container').innerHTML = `<div class="text-center text-[10px] text-gray-400 my-2">بداية المحادثة مع ${name}</div>`;
-        }
-
-        function closeChat() { document.getElementById('chat-ui').classList.add('hidden'); }
-
-        function handleSend() {
-            const input = document.getElementById('msg-input');
-            const val = input.value.trim();
-            if(!val) return;
-
-            const html = `<div class="msg msg-out shadow-sm self-end">${val}</div>`;
-            document.getElementById('messages-container').insertAdjacentHTML('beforeend', html);
-            input.value = "";
-            const box = document.getElementById('messages-container');
-            box.scrollTop = box.scrollHeight;
-        }
-
-        // --- رفع الملفات الحقيقي للسحابة ---
-        async function uploadToCloud(file) {
-            if(!file) return;
-            const status = document.getElementById('cloud-status');
-            status.innerText = "جاري الرفع...";
-            status.className = "text-[10px] bg-blue-500/20 px-2 py-1 rounded border border-blue-500 animate-pulse";
-
-            try {
-                // ملاحظة: ستحتاج لإنشاء Bucket في Appwrite وإضافة الـ ID هنا بدلاً من 'default'
-                const response = await storage.createFile('69ba233f001368959e2e', Appwrite.ID.unique(), file);
-                const fileUrl = storage.getFileView('69ba233f001368959e2e', response.$id);
-                
-                if(file.type.includes('image')) {
-                    const imgHtml = `<div class="msg msg-out p-1 self-end"><img src="${fileUrl}" class="rounded-lg max-h-60 shadow-md"></div>`;
-                    document.getElementById('messages-container').insertAdjacentHTML('beforeend', imgHtml);
-                } else {
-                    const vidHtml = `<div class="msg msg-out self-end bg-blue-50">📎 فيديو تم رفعه: ${file.name}</div>`;
-                    document.getElementById('messages-container').insertAdjacentHTML('beforeend', vidHtml);
-                }
-                
-                status.innerText = "تم الرفع بنجاح ✅";
-                status.className = "text-[10px] bg-green-500/20 px-2 py-1 rounded border border-green-500";
-            } catch (error) {
-                alert("فشل الرفع: تأكد من إعدادات الـ Bucket في Appwrite");
-                status.innerText = "خطأ في السحابة ❌";
+            const nav = document.getElementById('bottom-nav');
+            if(tab === 'reels') {
+                nav.classList.add('reels-nav-active');
+                document.querySelectorAll('video').forEach(v => v.play());
+            } else {
+                nav.classList.remove('reels-nav-active');
+                document.querySelectorAll('video').forEach(v => v.pause());
             }
         }
 
-        // --- المجموعات الحقيقية ---
-        function showGroupModal() { document.getElementById('group-modal').classList.remove('hidden'); }
+        // --- نظام الريلز ---
+        function togglePlay(video) {
+            if (video.paused) video.play(); else video.pause();
+        }
 
-        function processCreateGroup() {
-            const name = document.getElementById('group-name').value.trim();
+        async function loadReels() {
+            try {
+                const files = await storage.listFiles(BUCKET_ID);
+                const list = document.getElementById('reels-list');
+                // عرض الفيديوهات المرفوعة فقط
+                const videoFiles = files.files.filter(f => f.mimeType.includes('video'));
+                
+                videoFiles.forEach(file => {
+                    const url = storage.getFileView(BUCKET_ID, file.$id);
+                    const reelHtml = `
+                        <div class="reel-video">
+                            <video loop onclick="togglePlay(this)" playsinline>
+                                <source src="${url}" type="video/mp4">
+                            </video>
+                            <div class="reel-info">
+                                <h3 class="font-bold text-lg">@نبيل</h3>
+                                <p class="text-sm">تم الرفع من السحابة ☁️</p>
+                            </div>
+                            <div class="reel-actions">
+                                <button onclick="animateHeart(this)" class="flex flex-col items-center"><i class="fas fa-heart text-2xl"></i><span class="text-xs">0</span></button>
+                                <button class="flex flex-col items-center"><i class="fas fa-comment text-2xl"></i><span class="text-xs">0</span></button>
+                            </div>
+                        </div>`;
+                    list.insertAdjacentHTML('afterbegin', reelHtml);
+                });
+            } catch(e) { console.log("خطأ في جلب الريلز"); }
+        }
+
+        // --- الرفع للسحابة (مطور) ---
+        async function uploadToAppwrite(file, type) {
+            if(!file) return;
+            const progress = document.getElementById('upload-progress');
+            progress.style.width = "40%";
+
+            try {
+                const res = await storage.createFile(BUCKET_ID, Appwrite.ID.unique(), file);
+                const url = storage.getFileView(BUCKET_ID, res.$id);
+                progress.style.width = "100%";
+                
+                if(type === 'reels') {
+                    alert("✅ تم رفع الريلز بنجاح! سيظهر للجميع الآن.");
+                    location.reload(); 
+                } else {
+                    appendMessage(url, 'out', file.type.includes('image'));
+                }
+                setTimeout(() => progress.style.width = "0%", 1000);
+            } catch(e) {
+                alert("❌ خطأ: تأكد من أذونات السحابة (Any Permissions)");
+                progress.style.width = "0%";
+            }
+        }
+
+        // --- الدردشة والمجموعات ---
+        function openChat(name) {
+            document.getElementById('active-chat-name').innerText = name;
+            document.getElementById('chat-overlay').classList.remove('hidden');
+        }
+        function closeChat() { document.getElementById('chat-overlay').classList.add('hidden'); }
+        
+        function sendMsg() {
+            const input = document.getElementById('msg-input');
+            if(!input.value.trim()) return;
+            appendMessage(input.value, 'out');
+            input.value = "";
+        }
+
+        function appendMessage(content, type, isImg = false) {
+            const container = document.getElementById('chat-messages');
+            const html = isImg 
+                ? `<div class="msg msg-${type} p-1 shadow-sm self-end"><img src="${content}" class="rounded-xl max-h-60"></div>`
+                : `<div class="msg msg-${type} shadow-sm ${type==='out'?'self-end':''}">${content}</div>`;
+            container.insertAdjacentHTML('beforeend', html);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function createGroup() {
+            const name = document.getElementById('new-group-name').value;
             if(!name) return;
-
-            const list = document.getElementById('groups-list');
-            const groupHtml = `
-                <div onclick="openChat('${name}')" class="bg-white p-4 rounded-xl shadow-sm flex items-center border-r-4 border-orange-500 animate-slide-up">
-                    <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold">G</div>
-                    <div class="mr-3 flex-1 text-right">
-                        <h4 class="font-bold">${name}</h4>
-                        <p class="text-xs text-gray-400">مجموعة سحابية نشطة</p>
-                    </div>
+            const html = `
+                <div onclick="openChat('${name}')" class="bg-white p-5 rounded-2xl shadow-sm flex items-center border-r-8 border-[#128c7e]">
+                    <div class="w-12 h-12 bg-green-50 text-[#128c7e] rounded-xl flex items-center justify-center font-bold text-xl">#</div>
+                    <div class="mr-4"><h4 class="font-bold">${name}</h4><p class="text-xs text-gray-400">مجموعة عامة</p></div>
                 </div>`;
-            list.insertAdjacentHTML('afterbegin', groupHtml);
-            document.getElementById('group-modal').classList.add('hidden');
-            document.getElementById('group-name').value = "";
+            document.getElementById('groups-container').insertAdjacentHTML('afterbegin', html);
+            hideModal('group-modal');
+        }
+
+        function animateHeart(btn) {
+            const icon = btn.querySelector('i');
+            icon.classList.toggle('text-red-500');
+            icon.classList.toggle('fas');
+            icon.classList.toggle('far');
+            btn.classList.add('scale-125');
+            setTimeout(() => btn.classList.remove('scale-125'), 200);
         }
     </script>
 </body>
 </html>
-
 
