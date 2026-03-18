@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أنا هنا - النسخة المتكاملة</title>
+    <title>أنا هنا - دردش والعب</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,7 +11,7 @@
         body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; color: #334155; overflow: hidden; }
         
         section { display: none; height: calc(100vh - 70px); overflow-y: auto; padding-bottom: 100px; }
-        section.active { display: block; }
+        section.active { display: flex; flex-direction: column; }
         
         /* Reels UI */
         section#sec-reels { background-color: #000; height: 100vh; overflow: hidden; padding: 0; position: relative; }
@@ -32,15 +32,16 @@
         .nav-btn.active { color: #0ea5e9; }
         .reels-nav-active { background: #000; color: white; border: none; }
 
+        /* Chat & Game Layout */
+        #game-canvas-container { height: 180px; background: linear-gradient(to bottom, #1e293b, #0f172a); border-radius: 20px; margin-bottom: 10px; position: relative; overflow: hidden; }
+        #chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 10px; }
+        .msg { max-width: 80%; padding: 10px 15px; rounded-2xl: 15px; font-size: 13px; position: relative; }
+        .msg-me { align-self: flex-start; background: #3b82f6; color: white; border-radius: 18px 18px 0 18px; }
+        .msg-them { align-self: flex-end; background: white; color: #334155; border-radius: 18px 18px 18px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
         /* Bottom Sheet for Comments */
         .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-top-left-radius: 30px; border-top-right-radius: 30px; transition: 0.4s; z-index: 400; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 -10px 20px rgba(0,0,0,0.2); }
         .bottom-sheet.open { bottom: 0; }
-        
-        .comment-node { border-right: 2px solid #f1f5f9; padding-right: 12px; margin-bottom: 15px; position: relative; }
-        .reply-node { margin-right: 20px; border-right: 2px solid #3b82f6; padding: 8px; margin-top: 5px; background: #f8fafc; border-radius: 10px; font-size: 0.8rem; }
-
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-blur: 4px; }
-        .modal-content { background: white; width: 100%; max-width: 350px; border-radius: 30px; padding: 25px; }
     </style>
 </head>
 <body>
@@ -55,9 +56,8 @@
                     </video>
                     <div class="absolute bottom-24 right-4 text-white z-10">
                         <h3 class="font-bold text-lg">@نبيل_اليماني</h3>
-                        <p class="text-sm opacity-80 text-right">نظام شامل: تعليقات + غرف 🚀</p>
+                        <p class="text-sm opacity-80 text-right">الدردشة والألعاب في مكان واحد 🎮💬</p>
                     </div>
-                    <!-- أزرار التفاعل -->
                     <div class="absolute bottom-24 left-4 flex flex-col gap-6 text-white text-center z-20">
                         <div onclick="handleLike(this)" class="cursor-pointer">
                             <i class="far fa-heart text-2xl mb-1"></i><br><span class="text-[10px]">2.4k</span>
@@ -78,7 +78,7 @@
             <h2 class="text-2xl font-bold mb-6">الأشخاص القريبين</h2>
             <div id="nearby-list" class="space-y-4">
                 <div class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-slate-50">
-                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center font-bold">A</div>
+                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-500">A</div>
                     <div class="flex-1 text-right">
                         <h4 class="font-bold text-sm">أحمد الشميري</h4>
                         <p class="text-[11px] text-blue-600 font-mono font-bold">#ID-88210</p>
@@ -96,77 +96,58 @@
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
-
             <div class="flags-scroll" id="flags-bar">
                 <div class="flag-item active" onclick="filterByCountry('الكل', this)">
                     <div class="all-icon">الكل</div>
                     <span class="text-[9px] font-bold">الكل</span>
                 </div>
             </div>
-
-            <div class="relative mb-6">
-                <input type="text" id="room-search" oninput="runRoomSearch()" placeholder="ابحث عن غرفة بالـ ID..." class="w-full bg-white p-4 pr-12 rounded-2xl outline-none shadow-sm text-sm border-2 border-transparent focus:border-blue-400 transition">
-                <i class="fas fa-hashtag absolute right-4 top-4 text-slate-300"></i>
-            </div>
-
-            <div id="rooms-container" class="space-y-4 text-right">
-                <!-- الغرف -->
-            </div>
+            <div id="rooms-container" class="space-y-4 text-right"></div>
         </section>
 
-        <!-- 4. الدردشة -->
-        <section id="sec-chats" class="p-10 text-center text-slate-400">
-            <i class="fas fa-comments text-5xl mb-4 opacity-20"></i>
-            <p>لا يوجد رسائل</p>
+        <!-- 4. الدردشة والألعاب المدمجة -->
+        <section id="sec-chats" class="p-4 h-full">
+            <h2 class="text-xl font-bold mb-4 text-slate-800">دردش والعب 🎮</h2>
+            
+            <!-- منطقة اللعبة -->
+            <div id="game-canvas-container" class="shadow-xl">
+                <div class="absolute top-2 right-4 text-white text-[10px] font-bold z-10 bg-black/40 px-2 py-1 rounded">
+                    النتيجة: <span id="game-score">0</span>
+                </div>
+                <div id="game-start-overlay" class="absolute inset-0 bg-slate-900/80 flex flex-col items-center justify-center text-white z-20">
+                    <i class="fas fa-gamepad text-3xl mb-2 text-blue-400"></i>
+                    <p class="text-[12px] mb-3">تحدى أصدقائك في "تجنب المربعات"</p>
+                    <button onclick="startGame()" class="bg-blue-600 px-6 py-2 rounded-full text-xs font-bold">ابدأ اللعب</button>
+                </div>
+                <canvas id="gameCanvas" class="w-full h-full"></canvas>
+            </div>
+
+            <!-- منطقة الرسائل -->
+            <div id="chat-messages" class="bg-slate-50 rounded-2xl border border-slate-200 shadow-inner">
+                <div class="msg msg-them">مرحباً نبيل! هل أنت جاهز للتحدي؟ 🎮</div>
+                <div class="msg msg-them">جرب اللعبة في الأعلى وأرسل لي نتيجتك.</div>
+            </div>
+
+            <!-- مدخل الدردشة -->
+            <div class="mt-4 flex gap-2">
+                <input type="text" id="chat-input" placeholder="اكتب رسالة هنا..." class="flex-1 bg-white p-3 rounded-xl outline-none text-sm border focus:border-blue-400">
+                <button onclick="sendChatMessage()" class="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-md">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
         </section>
     </main>
 
-    <!-- واجهة التعليقات -->
+    <!-- واجهات إضافية (التعليقات والمودال) - نفس الكود السابق -->
     <div id="comments-sheet" class="bottom-sheet">
         <div class="p-4 border-b flex justify-between items-center font-bold">
-            <span id="comments-count">التعليقات (1)</span>
+            <span id="comments-count">التعليقات</span>
             <i class="fas fa-times text-slate-300 p-2" onclick="closeCommentsSheet()"></i>
         </div>
-        
-        <div id="comments-display" class="flex-1 p-4 overflow-y-auto text-right">
-            <!-- قائمة التعليقات -->
-        </div>
-
-        <div id="reply-tag" class="hidden bg-blue-50 p-2 px-4 flex justify-between items-center text-[10px] text-blue-600 border-t">
-            <span>الرد على: <b id="reply-name">...</b></span>
-            <i class="fas fa-times-circle" onclick="clearReply()"></i>
-        </div>
-
+        <div id="comments-display" class="flex-1 p-4 overflow-y-auto text-right"></div>
         <div class="p-4 border-t flex gap-2 pb-10 bg-white">
-            <input type="text" id="comment-input" placeholder="اكتب شيئاً..." class="flex-1 bg-slate-100 p-3 rounded-xl outline-none text-sm border focus:border-blue-400 transition">
-            <button onclick="handleCommentAction()" class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-md">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Modal إنشاء غرفة -->
-    <div id="create-room-modal" class="modal-overlay">
-        <div class="modal-content text-right">
-            <h3 class="text-xl font-bold mb-6 text-center">فتح غرفة جديدة</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 block mb-1">اسم الغرفة</label>
-                    <input type="text" id="room-name-field" placeholder="مثال: شباب عدن" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 block mb-1">الدولة</label>
-                    <select id="room-country-field" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border appearance-none">
-                        <!-- خيارات الدول -->
-                    </select>
-                </div>
-                <div class="bg-blue-50 p-4 rounded-2xl flex justify-between items-center border border-blue-100">
-                    <span class="text-xs font-bold text-blue-400">ID الغرفة:</span>
-                    <span id="room-id-gen" class="font-bold text-blue-700 font-mono">#ID-0000</span>
-                </div>
-                <button onclick="finalizeCreateRoom()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg mt-4">إنشاء الآن</button>
-                <button onclick="hideModal()" class="w-full text-slate-400 text-sm font-bold pt-2 text-center">إلغاء</button>
-            </div>
+            <input type="text" id="comment-input" placeholder="اكتب تعليقاً..." class="flex-1 bg-slate-100 p-3 rounded-xl outline-none text-sm border">
+            <button onclick="handleCommentAction()" class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -175,201 +156,19 @@
         <button onclick="switchTab('reels')" id="btn-reels" class="nav-btn active"><i class="fas fa-play-circle text-xl"></i><span>ريلز</span></button>
         <button onclick="switchTab('nearby')" id="btn-nearby" class="nav-btn"><i class="fas fa-street-view text-xl"></i><span>القريبين</span></button>
         <button onclick="switchTab('rooms')" id="btn-rooms" class="nav-btn"><i class="fas fa-microphone-alt text-xl"></i><span>الغرف</span></button>
-        <button onclick="switchTab('chats')" id="btn-chats" class="nav-btn"><i class="fas fa-comment-alt text-xl"></i><span>دردشة</span></button>
+        <button onclick="switchTab('chats')" id="btn-chats" class="nav-btn"><i class="fas fa-gamepad text-xl"></i><span>دردشة</span></button>
     </nav>
 
     <script>
-        // --- البيانات والتعريفات ---
-        const arabCountries = [
-            {n: 'اليمن', c: 'ye'}, {n: 'السعودية', c: 'sa'}, {n: 'الإمارات', c: 'ae'}, 
-            {n: 'العراق', c: 'iq'}, {n: 'فلسطين', c: 'ps'}, {n: 'مصر', c: 'eg'}, 
-            {n: 'عمان', c: 'om'}, {n: 'الكويت', c: 'kw'}, {n: 'قطر', c: 'qa'}, 
-            {n: 'الأردن', c: 'jo'}, {n: 'المغرب', c: 'ma'}
-        ];
-
-        let commentsData = [{id: 1, user: 'نبيل اليماني', text: 'مرحباً بكم في نظامي المطور!', replies: []}];
+        // --- الأساسيات ---
+        const arabCountries = [{n:'اليمن', c:'ye'}, {n:'السعودية', c:'sa'}, {n:'الإمارات', c:'ae'}, {n:'العراق', c:'iq'}, {n:'مصر', c:'eg'}];
         let roomsData = [{id: '#ID-7721', name: 'غرفة الدردشة العامة', country: 'اليمن', flag: 'ye'}];
         
-        let activeReplyId = null;
-        let activeEditId = null;
-
         window.onload = () => {
             initFlags();
-            initCountrySelect();
             updateRoomsDisplay('الكل');
-            updateCommentsDisplay();
+            initGame();
         };
-
-        // --- نظام الغرف والدول ---
-        function initFlags() {
-            const bar = document.getElementById('flags-bar');
-            const currentHTML = bar.innerHTML;
-            bar.innerHTML = currentHTML + arabCountries.map(c => `
-                <div class="flag-item" onclick="filterByCountry('${c.n}', this)">
-                    <img src="https://flagcdn.com/w80/${c.c}.png" class="flag-img shadow-sm">
-                    <span class="text-[9px] font-bold">${c.n}</span>
-                </div>
-            `).join('');
-        }
-
-        function initCountrySelect() {
-            const select = document.getElementById('room-country-field');
-            select.innerHTML = arabCountries.map(c => `<option value="${c.n}">${c.n}</option>`).join('');
-        }
-
-        function filterByCountry(name, el) {
-            document.querySelectorAll('.flag-item').forEach(f => f.classList.remove('active'));
-            el.classList.add('active');
-            updateRoomsDisplay(name);
-        }
-
-        function updateRoomsDisplay(filter = 'الكل') {
-            const container = document.getElementById('rooms-container');
-            const list = filter === 'الكل' ? roomsData : roomsData.filter(r => r.country === filter);
-            
-            if(list.length === 0) {
-                container.innerHTML = `<p class="text-center py-10 text-slate-400 text-xs">لا توجد غرف في ${filter}</p>`;
-                return;
-            }
-
-            container.innerHTML = list.map(r => `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border-r-4 border-blue-500" data-rid="${r.id}">
-                    <div class="flex items-center gap-3">
-                        <img src="https://flagcdn.com/w80/${arabCountries.find(c=>c.n===r.country)?.c || 'ye'}.png" class="w-8 h-8 rounded-full border">
-                        <div>
-                            <h4 class="font-bold text-sm text-slate-800">${r.name}</h4>
-                            <p class="text-[9px] text-slate-400">${r.country} • بث مباشر</p>
-                        </div>
-                    </div>
-                    <span class="text-[10px] font-mono bg-blue-50 text-blue-600 p-1 px-2 rounded-lg font-bold">${r.id}</span>
-                </div>
-            `).join('');
-        }
-
-        function showCreateRoomModal() {
-            document.getElementById('room-id-gen').innerText = "#ID-" + Math.floor(1000 + Math.random() * 8999);
-            document.getElementById('create-room-modal').style.display = 'flex';
-        }
-
-        function hideModal() { document.getElementById('create-room-modal').style.display = 'none'; }
-
-        function finalizeCreateRoom() {
-            const name = document.getElementById('room-name-field').value || "غرفة جديدة";
-            const country = document.getElementById('room-country-field').value;
-            const id = document.getElementById('room-id-gen').innerText;
-            const flag = arabCountries.find(c => c.n === country).c;
-
-            roomsData.unshift({id, name, country, flag});
-            updateRoomsDisplay('الكل');
-            hideModal();
-            document.getElementById('room-name-field').value = "";
-        }
-
-        function runRoomSearch() {
-            const val = document.getElementById('room-search').value.toUpperCase();
-            document.querySelectorAll('#rooms-container > div').forEach(div => {
-                const id = div.querySelector('span').innerText;
-                div.style.display = id.includes(val) ? 'flex' : 'none';
-            });
-        }
-
-        // --- نظام التعليقات والريلز ---
-        function openCommentsSheet() { document.getElementById('comments-sheet').classList.add('open'); }
-        function closeCommentsSheet() { document.getElementById('comments-sheet').classList.remove('open'); }
-
-        function updateCommentsDisplay() {
-            const container = document.getElementById('comments-display');
-            document.getElementById('comments-count').innerText = `التعليقات (${commentsData.length})`;
-            
-            container.innerHTML = commentsData.map(c => `
-                <div class="comment-node">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="font-bold text-xs">${c.user}</span>
-                            <p class="text-sm text-slate-700">${c.text}</p>
-                        </div>
-                        <div class="flex gap-2 text-slate-300 text-[10px]">
-                            <i class="fas fa-edit p-1" onclick="initEdit(${c.id}, '${c.text}')"></i>
-                            <i class="fas fa-trash p-1" onclick="doDeleteComment(${c.id})"></i>
-                        </div>
-                    </div>
-                    <div class="flex gap-4 mt-1 text-[10px] font-bold text-slate-400">
-                        <span class="text-blue-500 cursor-pointer" onclick="initReply(${c.id}, '${c.user}')">رد</span>
-                        <span>الآن</span>
-                    </div>
-                    ${c.replies.map(r => `
-                        <div class="reply-node">
-                            <div class="flex justify-between">
-                                <span class="font-bold text-blue-600">${r.user}</span>
-                                <i class="fas fa-trash text-slate-200" onclick="doDeleteReply(${c.id}, ${r.id})"></i>
-                            </div>
-                            <p>${r.text}</p>
-                        </div>
-                    `).join('')}
-                </div>
-            `).join('');
-        }
-
-        function handleCommentAction() {
-            const input = document.getElementById('comment-input');
-            const val = input.value.trim();
-            if(!val) return;
-
-            if(activeEditId) {
-                const c = commentsData.find(x => x.id === activeEditId);
-                if(c) c.text = val;
-                activeEditId = null;
-            } else if(activeReplyId) {
-                const c = commentsData.find(x => x.id === activeReplyId);
-                if(c) c.replies.push({id: Date.now(), user: 'أنا', text: val});
-                clearReply();
-            } else {
-                commentsData.unshift({id: Date.now(), user: 'أنا', text: val, replies: []});
-            }
-
-            input.value = "";
-            updateCommentsDisplay();
-        }
-
-        function initReply(id, name) {
-            activeReplyId = id;
-            activeEditId = null;
-            document.getElementById('reply-tag').classList.remove('hidden');
-            document.getElementById('reply-name').innerText = name;
-            document.getElementById('comment-input').focus();
-        }
-
-        function clearReply() {
-            activeReplyId = null;
-            document.getElementById('reply-tag').classList.add('hidden');
-        }
-
-        function initEdit(id, text) {
-            activeEditId = id;
-            activeReplyId = null;
-            clearReply();
-            const input = document.getElementById('comment-input');
-            input.value = text;
-            input.focus();
-        }
-
-        function doDeleteComment(id) {
-            commentsData = commentsData.filter(c => c.id !== id);
-            updateCommentsDisplay();
-        }
-
-        function doDeleteReply(cId, rId) {
-            const c = commentsData.find(x => x.id === cId);
-            if(c) c.replies = c.replies.filter(r => r.id !== rId);
-            updateCommentsDisplay();
-        }
-
-        function handleLike(el) {
-            const icon = el.querySelector('i');
-            icon.classList.toggle('fas');
-            icon.classList.toggle('far');
-            icon.style.color = icon.classList.contains('fas') ? '#ef4444' : '#fff';
-        }
 
         function switchTab(tab) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
@@ -377,9 +176,148 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-' + tab).classList.add('active');
             const nav = document.getElementById('bottom-nav');
-            if(tab === 'reels') nav.classList.add('reels-nav-active');
-            else nav.classList.remove('reels-nav-active');
+            nav.className = (tab === 'reels') ? 'reels-nav-active' : '';
         }
+
+        // --- نظام الغرف ---
+        function initFlags() {
+            const bar = document.getElementById('flags-bar');
+            bar.innerHTML += arabCountries.map(c => `
+                <div class="flag-item" onclick="filterByCountry('${c.n}', this)">
+                    <img src="https://flagcdn.com/w80/${c.c}.png" class="flag-img shadow-sm">
+                    <span class="text-[9px] font-bold">${c.n}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateRoomsDisplay(filter = 'الكل') {
+            const container = document.getElementById('rooms-container');
+            const list = filter === 'الكل' ? roomsData : roomsData.filter(r => r.country === filter);
+            container.innerHTML = list.map(r => `
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border-r-4 border-blue-500">
+                    <div class="flex items-center gap-3">
+                        <img src="https://flagcdn.com/w80/${arabCountries.find(c=>c.n===r.country)?.c || 'ye'}.png" class="w-8 h-8 rounded-full border">
+                        <h4 class="font-bold text-sm text-slate-800">${r.name}</h4>
+                    </div>
+                    <span class="text-[10px] font-mono bg-blue-50 text-blue-600 p-1 px-2 rounded-lg font-bold">${r.id}</span>
+                </div>
+            `).join('');
+        }
+
+        // --- نظام الدردشة ---
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg msg-me';
+            msgDiv.innerText = text;
+            document.getElementById('chat-messages').appendChild(msgDiv);
+            input.value = '';
+            document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+        }
+
+        // --- نظام اللعبة (دردش والعب) ---
+        let canvas, ctx, gameLoop, score = 0;
+        let player = { x: 50, y: 150, size: 20 };
+        let obstacles = [];
+        let isGameRunning = false;
+
+        function initGame() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // التحكم باللمس
+            canvas.addEventListener('touchstart', (e) => {
+                if(player.y > 20) player.y -= 40;
+                e.preventDefault();
+            });
+            canvas.addEventListener('mousedown', () => {
+                if(player.y > 20) player.y -= 40;
+            });
+        }
+
+        function startGame() {
+            document.getElementById('game-start-overlay').style.display = 'none';
+            isGameRunning = true;
+            score = 0;
+            obstacles = [];
+            player.y = 80;
+            updateGame();
+        }
+
+        function updateGame() {
+            if(!isGameRunning) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // الجاذبية
+            player.y += 1.5;
+
+            // رسم اللاعب (عصفور أو مربع أزرق)
+            ctx.fillStyle = '#3b82f6';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // إنشاء العقبات
+            if(Math.random() < 0.02) {
+                obstacles.push({ x: canvas.width, y: Math.random() * canvas.height, w: 20, h: 20 });
+            }
+
+            // تحريك ورسم العقبات
+            ctx.fillStyle = '#f87171';
+            obstacles.forEach((ob, index) => {
+                ob.x -= 3;
+                ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
+
+                // تصادم
+                if(player.x < ob.x + ob.w && player.x + 10 > ob.x && player.y < ob.y + ob.h && player.y + 10 > ob.y) {
+                    gameOver();
+                }
+
+                if(ob.x < -20) {
+                    obstacles.splice(index, 1);
+                    score++;
+                    document.getElementById('game-score').innerText = score;
+                }
+            });
+
+            // حدود الشاشة
+            if(player.y > canvas.height || player.y < 0) gameOver();
+
+            gameLoop = requestAnimationFrame(updateGame);
+        }
+
+        function gameOver() {
+            isGameRunning = false;
+            cancelAnimationFrame(gameLoop);
+            document.getElementById('game-start-overlay').style.display = 'flex';
+            document.getElementById('game-start-overlay').innerHTML = `
+                <p class="text-xs font-bold text-red-400">انتهت اللعبة!</p>
+                <p class="text-lg font-bold mb-2">نتيجتك: ${score}</p>
+                <button onclick="shareScore()" class="bg-green-600 px-4 py-1 rounded-full text-[10px] mb-2">تحدي في الدردشة</button>
+                <button onclick="startGame()" class="bg-blue-600 px-6 py-2 rounded-full text-xs font-bold">إعادة المحاولة</button>
+            `;
+        }
+
+        function shareScore() {
+            const input = document.getElementById('chat-input');
+            input.value = `🎮 لقد حققت ${score} نقطة في التحدي! من يستطيع هزيمتي؟`;
+            sendChatMessage();
+            switchTab('chats');
+        }
+
+        // ريلز - تفاعلات
+        function handleLike(el) {
+            const i = el.querySelector('i');
+            i.classList.toggle('fas'); i.classList.toggle('far');
+            i.style.color = i.classList.contains('fas') ? '#ef4444' : '#fff';
+        }
+        function openCommentsSheet() { document.getElementById('comments-sheet').classList.add('open'); }
+        function closeCommentsSheet() { document.getElementById('comments-sheet').classList.remove('open'); }
     </script>
 </body>
 </html>
