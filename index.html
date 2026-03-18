@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أنا هنا - النسخة الاحترافية</title>
+    <title>أنا هنا - لودو ودردشة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -19,141 +19,179 @@
         .reel-video { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Comments Bottom Sheet */
-        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-top-left-radius: 30px; border-top-right-radius: 30px; transition: 0.4s; z-index: 500; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 -10px 25px rgba(0,0,0,0.3); }
-        .bottom-sheet.open { bottom: 0; }
+        /* Ludo Game Styles */
+        #ludo-board { width: 100%; aspect-ratio: 1/1; background: #eee; display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr); border: 2px solid #333; position: relative; }
+        .ludo-cell { border: 0.1px solid #ccc; background: white; }
+        .ludo-home-red { grid-column: 1 / 7; grid-row: 1 / 7; background: #ff4d4d; border: 4px solid white; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
+        .ludo-home-blue { grid-column: 10 / 16; grid-row: 10 / 16; background: #4d94ff; border: 4px solid white; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
+        .ludo-path-center { grid-column: 7 / 10; grid-row: 7 / 10; background: #ddd; }
+        .piece { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3); cursor: pointer; }
+        .red-piece { background: #b30000; }
+        .blue-piece { background: #0047b3; }
         
-        .comment-item { border-bottom: 1px solid #f1f5f9; padding: 12px; }
-        .reply-item { margin-right: 30px; background: #f8fafc; border-right: 2px solid #3b82f6; padding: 8px; border-radius: 8px; margin-top: 5px; }
-
         /* Navigation */
         nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; height: 70px; border-top: 1px solid #e2e8f0; z-index: 100; }
         .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #64748b; }
         .nav-btn.active { color: #0ea5e9; }
         .reels-nav-active { background: #000; color: white; border: none; }
 
-        /* Flags & Rooms Styles (كما كانت) */
-        .flags-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 10px; scrollbar-width: none; background: white; border-radius: 20px; margin-bottom: 15px; }
-        .flag-item { min-width: 60px; display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 0.6; }
-        .flag-item.active { opacity: 1; color: #3b82f6; }
-        .flag-img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #eee; }
+        /* Comments Bottom Sheet */
+        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-top-left-radius: 30px; border-top-right-radius: 30px; transition: 0.4s; z-index: 500; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 -10px 25px rgba(0,0,0,0.3); }
+        .bottom-sheet.open { bottom: 0; }
     </style>
 </head>
 <body>
 
     <main>
-        <!-- 1. الريلز (مع زر الرفع) -->
+        <!-- 1. الريلز -->
         <section id="sec-reels" class="active">
-            <!-- زر رفع فيديو جديد -->
             <div class="absolute top-6 left-6 z-30">
-                <label class="bg-white/20 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center text-white cursor-pointer shadow-lg border border-white/30">
+                <label class="bg-white/20 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center text-white cursor-pointer border border-white/30">
                     <i class="fas fa-camera text-xl"></i>
                     <input type="file" accept="video/*" class="hidden" onchange="uploadNewVideo(event)">
                 </label>
             </div>
-
             <div class="reels-container" id="reels-list">
-                <!-- الفيديو الأول الافتراضي -->
                 <div class="reel-video">
                     <video loop playsinline autoplay muted onclick="this.paused ? this.play() : this.pause()">
                         <source src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1282-large.mp4" type="video/mp4">
                     </video>
                     <div class="absolute bottom-24 right-4 text-white z-10 text-right">
                         <h3 class="font-bold text-lg">@نبيل_اليماني</h3>
-                        <p class="text-sm opacity-80">جرب ميزة رفع الفيديوهات والتعليقات! ✨</p>
+                        <p class="text-sm opacity-80">الآن مع لعبة اللودو والدردشة! 🎲</p>
                     </div>
-                    <!-- أزرار التفاعل -->
                     <div class="absolute bottom-24 left-4 flex flex-col gap-6 text-white text-center z-20">
-                        <div onclick="toggleLike(this)" class="cursor-pointer">
-                            <i class="far fa-heart text-2xl"></i><br><span class="text-[10px]">1.2k</span>
-                        </div>
-                        <div onclick="openComments()" class="cursor-pointer">
-                            <i class="fas fa-comment text-2xl"></i><br><span class="text-[10px]">45</span>
-                        </div>
+                        <div onclick="toggleLike(this)" class="cursor-pointer"><i class="far fa-heart text-2xl"></i><br><span class="text-[10px]">2k</span></div>
+                        <div onclick="openComments()" class="cursor-pointer"><i class="fas fa-comment text-2xl"></i><br><span class="text-[10px]">80</span></div>
                         <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-share"></i></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. القريبين -->
-        <section id="sec-nearby" class="p-5">
-            <h2 class="text-2xl font-bold mb-6">القريبين منك</h2>
-            <div class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm">
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600">ن</div>
-                <div class="flex-1 text-right">
-                    <h4 class="font-bold text-sm">نبيل اليماني</h4>
-                    <p class="text-[10px] text-slate-400">على بعد 2 كم</p>
-                </div>
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">مراسلة</button>
-            </div>
-        </section>
-
         <!-- 3. الغرف -->
         <section id="sec-rooms" class="p-5 text-right">
             <h2 class="text-2xl font-bold mb-4">الغرف والدول</h2>
-            <div class="flags-scroll" id="flags-bar">
-                <div class="flag-item active" onclick="filterByCountry('الكل', this)">
-                    <div class="w-[35px] h-[35px] rounded-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-bold">الكل</div>
-                    <span class="text-[9px] font-bold">الكل</span>
+            <div id="rooms-container" class="space-y-4">
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <img src="https://flagcdn.com/w80/ye.png" class="w-8 h-8 rounded-full">
+                        <h4 class="font-bold text-sm">مجلس اليمن السعيد</h4>
+                    </div>
+                    <span class="text-[10px] bg-blue-50 text-blue-600 p-1 px-2 rounded-lg font-bold">#7721</span>
                 </div>
             </div>
-            <div id="rooms-container" class="space-y-4"></div>
         </section>
 
-        <!-- 4. الدردشة والألعاب -->
+        <!-- 4. الدردشة ولعبة اللودو -->
         <section id="sec-chats" class="p-4 h-full">
-            <h2 class="text-xl font-bold mb-4">دردش والعب 🎮</h2>
-            <div class="bg-slate-800 h-32 rounded-2xl mb-4 flex items-center justify-center text-white text-sm">
-                <p>مساحة اللعبة (قيد التطوير)</p>
+            <h2 class="text-xl font-bold mb-3 text-slate-800 flex items-center gap-2">
+                 دردشة ولودو <i class="fas fa-dice text-blue-500"></i>
+            </h2>
+            
+            <!-- لوحة اللودو المصغرة -->
+            <div class="bg-white p-2 rounded-2xl shadow-lg border border-slate-200 mb-4">
+                <div class="flex justify-between items-center mb-2 px-2">
+                    <div id="turn-indicator" class="text-[10px] font-bold bg-red-100 text-red-600 px-3 py-1 rounded-full border border-red-200">دور الأحمر</div>
+                    <div onclick="rollDice()" class="cursor-pointer bg-slate-800 text-white w-10 h-10 rounded-lg flex items-center justify-center shadow-md active:scale-95 transition">
+                        <span id="dice-val" class="text-lg font-bold">?</span>
+                    </div>
+                </div>
+                
+                <div id="ludo-board">
+                    <div class="ludo-home-red">
+                        <div class="piece red-piece" onclick="movePiece('red', this)"></div>
+                        <div class="piece red-piece" onclick="movePiece('red', this)"></div>
+                    </div>
+                    <div class="ludo-home-blue">
+                        <div class="piece blue-piece" onclick="movePiece('blue', this)"></div>
+                        <div class="piece blue-piece" onclick="movePiece('blue', this)"></div>
+                    </div>
+                    <div class="ludo-path-center"></div>
+                    <!-- خلايا مسار بسيطة للتمثيل -->
+                    <div class="ludo-cell" style="grid-column:7; grid-row:1"></div>
+                    <div class="ludo-cell" style="grid-column:7; grid-row:2"></div>
+                    <div class="ludo-cell" style="grid-column:8; grid-row:1; background: #eee;"></div>
+                    <div class="ludo-cell" style="grid-column:9; grid-row:1"></div>
+                </div>
             </div>
-            <div class="flex-1 bg-white rounded-2xl p-4 shadow-inner overflow-y-auto">
-                <p class="text-center text-slate-300 text-xs">ابدأ الدردشة الآن</p>
+
+            <!-- الدردشة -->
+            <div id="chat-box" class="flex-1 bg-white rounded-2xl p-4 shadow-inner overflow-y-auto mb-2 border border-slate-100">
+                <div class="text-[10px] text-center text-slate-400 mb-4">مرحباً بك في ساحة اللعب والدردشة</div>
+                <div id="messages-list" class="space-y-3">
+                    <div class="bg-blue-50 text-blue-700 p-2 rounded-xl text-xs w-fit">نبيل: من يلعب معي لودو؟ 🎲</div>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pb-2">
+                <input type="text" id="chat-msg-input" placeholder="اكتب هنا..." class="flex-1 bg-white p-3 rounded-xl outline-none text-sm border shadow-sm">
+                <button onclick="sendChat()" class="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-md"><i class="fas fa-paper-plane"></i></button>
             </div>
         </section>
     </main>
 
-    <!-- قائمة التعليقات المتطورة -->
+    <!-- واجهة التعليقات (نفس الكود المصلح) -->
     <div id="comments-sheet" class="bottom-sheet">
         <div class="p-4 border-b flex justify-between items-center font-bold">
             <span>التعليقات</span>
             <i class="fas fa-times text-slate-300 p-2" onclick="closeComments()"></i>
         </div>
-        
-        <div id="comments-list-display" class="flex-1 overflow-y-auto p-2 text-right">
-            <!-- التعليقات تظهر هنا -->
-        </div>
-
-        <!-- شريط حالة الرد أو التعديل -->
+        <div id="comments-list-display" class="flex-1 overflow-y-auto p-2 text-right"></div>
         <div id="comment-status" class="hidden bg-blue-50 p-2 px-4 flex justify-between items-center text-[10px] text-blue-600">
-            <span id="status-text">جاري الرد على...</span>
+            <span id="status-text">...</span>
             <i class="fas fa-times-circle" onclick="cancelStatus()"></i>
         </div>
-
         <div class="p-4 border-t flex gap-2 bg-white pb-8">
-            <input type="text" id="comment-input" placeholder="اكتب شيئاً..." class="flex-1 bg-slate-100 p-3 rounded-xl outline-none text-sm border focus:border-blue-400">
-            <button onclick="submitCommentAction()" class="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+            <input type="text" id="comment-input" placeholder="اكتب تعليقاً..." class="flex-1 bg-slate-100 p-3 rounded-xl outline-none text-sm border">
+            <button onclick="submitCommentAction()" class="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <!-- القائمة السفلية -->
     <nav id="bottom-nav" class="reels-nav-active">
         <button onclick="switchTab('reels')" id="btn-reels" class="nav-btn active"><i class="fas fa-play-circle text-xl"></i><span>ريلز</span></button>
-        <button onclick="switchTab('nearby')" id="btn-nearby" class="nav-btn"><i class="fas fa-street-view text-xl"></i><span>القريبين</span></button>
         <button onclick="switchTab('rooms')" id="btn-rooms" class="nav-btn"><i class="fas fa-microphone-alt text-xl"></i><span>الغرف</span></button>
-        <button onclick="switchTab('chats')" id="btn-chats" class="nav-btn"><i class="fas fa-gamepad text-xl"></i><span>دردشة</span></button>
+        <button onclick="switchTab('chats')" id="btn-chats" class="nav-btn"><i class="fas fa-dice text-xl"></i><span>دردشة ولعب</span></button>
     </nav>
 
     <script>
-        // مصفوفة التعليقات (تخزين مؤقت)
-        let comments = [
-            {id: 1, user: 'أحمد', text: 'فيديو رائع جداً!', replies: []}
-        ];
+        let comments = [{id: 1, user: 'نبيل اليماني', text: 'أهلاً بكم في التحديث الجديد!', replies: []}];
         let activeAction = { type: 'new', id: null };
+        let currentTurn = 'red';
 
-        // --- نظام الريلز ---
+        // --- نظام اللودو ---
+        function rollDice() {
+            const val = Math.floor(Math.random() * 6) + 1;
+            document.getElementById('dice-val').innerText = val;
+            // تبديل الدور ببساطة للعرض
+            setTimeout(() => {
+                currentTurn = currentTurn === 'red' ? 'blue' : 'red';
+                const indicator = document.getElementById('turn-indicator');
+                indicator.innerText = currentTurn === 'red' ? 'دور الأحمر' : 'دور الأزرق';
+                indicator.className = currentTurn === 'red' ? 
+                    'text-[10px] font-bold bg-red-100 text-red-600 px-3 py-1 rounded-full border border-red-200' :
+                    'text-[10px] font-bold bg-blue-100 text-blue-600 px-3 py-1 rounded-full border border-blue-200';
+            }, 1000);
+        }
+
+        function movePiece(color, el) {
+            if(color !== currentTurn) return;
+            // تحريك بصري بسيط للقطعة
+            el.style.transform = `translate(${Math.random()*20}px, ${Math.random()*20}px)`;
+        }
+
+        // --- نظام الدردشة ---
+        function sendChat() {
+            const input = document.getElementById('chat-msg-input');
+            if(!input.value.trim()) return;
+            const list = document.getElementById('messages-list');
+            list.innerHTML += `<div class="bg-slate-100 text-slate-700 p-2 rounded-xl text-xs w-fit mr-auto">أنا: ${input.value}</div>`;
+            input.value = '';
+            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+        }
+
+        // --- نظام التعليقات والرفع (المصلح سابقاً) ---
         function uploadNewVideo(event) {
             const file = event.target.files[0];
             if (file) {
@@ -161,13 +199,8 @@
                 const container = document.getElementById('reels-list');
                 const newReel = `
                     <div class="reel-video">
-                        <video loop playsinline autoplay muted onclick="this.paused ? this.play() : this.pause()">
-                            <source src="${url}" type="video/mp4">
-                        </video>
-                        <div class="absolute bottom-24 right-4 text-white z-10 text-right">
-                            <h3 class="font-bold text-lg">@أنا</h3>
-                            <p class="text-sm opacity-80">فيديو جديد تم رفعه الآن 🚀</p>
-                        </div>
+                        <video loop playsinline autoplay muted><source src="${url}" type="video/mp4"></video>
+                        <div class="absolute bottom-24 right-4 text-white z-10 text-right"><h3 class="font-bold text-lg">@أنا</h3><p class="text-sm opacity-80">فيديو جديد 🚀</p></div>
                         <div class="absolute bottom-24 left-4 flex flex-col gap-6 text-white text-center z-20">
                             <div onclick="toggleLike(this)" class="cursor-pointer"><i class="far fa-heart text-2xl"></i><br><span class="text-[10px]">0</span></div>
                             <div onclick="openComments()" class="cursor-pointer"><i class="fas fa-comment text-2xl"></i><br><span class="text-[10px]">0</span></div>
@@ -179,41 +212,23 @@
             }
         }
 
-        // --- نظام التعليقات الكامل ---
-        function openComments() {
-            renderComments();
-            document.getElementById('comments-sheet').classList.add('open');
-        }
-
-        function closeComments() {
-            document.getElementById('comments-sheet').classList.remove('open');
-            cancelStatus();
-        }
+        function openComments() { renderComments(); document.getElementById('comments-sheet').classList.add('open'); }
+        function closeComments() { document.getElementById('comments-sheet').classList.remove('open'); cancelStatus(); }
 
         function renderComments() {
             const list = document.getElementById('comments-list-display');
             list.innerHTML = comments.map(c => `
-                <div class="comment-item">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <span class="font-bold text-xs text-blue-600">${c.user}</span>
-                            <p class="text-sm text-slate-700">${c.text}</p>
-                        </div>
-                        <div class="flex gap-3 text-slate-300 text-xs">
-                            <i class="fas fa-edit cursor-pointer" onclick="prepareEdit(${c.id}, '${c.text}')"></i>
-                            <i class="fas fa-trash cursor-pointer text-red-200" onclick="deleteComment(${c.id})"></i>
+                <div class="border-b border-slate-50 p-3">
+                    <div class="flex justify-between">
+                        <span class="font-bold text-xs text-blue-600">${c.user}</span>
+                        <div class="flex gap-2 text-slate-300 text-[10px]">
+                            <i class="fas fa-edit" onclick="prepareEdit(${c.id}, '${c.text}')"></i>
+                            <i class="fas fa-trash" onclick="deleteComment(${c.id})"></i>
                         </div>
                     </div>
-                    <div class="flex gap-4 mt-2 text-[10px] font-bold text-slate-400">
-                        <span class="text-blue-500 cursor-pointer" onclick="prepareReply(${c.id}, '${c.user}')">رد</span>
-                        <span>منذ قليل</span>
-                    </div>
-                    ${c.replies.map(r => `
-                        <div class="reply-item">
-                            <span class="font-bold text-[10px] text-slate-500">${r.user}</span>
-                            <p class="text-xs text-slate-600">${r.text}</p>
-                        </div>
-                    `).join('')}
+                    <p class="text-xs mt-1">${c.text}</p>
+                    <div class="mt-2 text-[10px] text-blue-400 font-bold cursor-pointer" onclick="prepareReply(${c.id}, '${c.user}')">رد</div>
+                    ${c.replies.map(r => `<div class="mr-4 mt-2 bg-slate-50 p-2 rounded-lg text-xs border-r-2 border-blue-400">${r.user}: ${r.text}</div>`).join('')}
                 </div>
             `).join('');
         }
@@ -221,83 +236,48 @@
         function submitCommentAction() {
             const input = document.getElementById('comment-input');
             const val = input.value.trim();
-            if (!val) return;
-
-            if (activeAction.type === 'new') {
-                comments.unshift({ id: Date.now(), user: 'أنا', text: val, replies: [] });
-            } else if (activeAction.type === 'reply') {
-                const target = comments.find(c => c.id === activeAction.id);
-                if (target) target.replies.push({ id: Date.now(), user: 'أنا', text: val });
-            } else if (activeAction.type === 'edit') {
-                const target = comments.find(c => c.id === activeAction.id);
-                if (target) target.text = val;
+            if(!val) return;
+            if(activeAction.type === 'new') comments.unshift({id: Date.now(), user: 'أنا', text: val, replies: []});
+            else if(activeAction.type === 'reply') {
+                const c = comments.find(x => x.id === activeAction.id);
+                if(c) c.replies.push({user: 'أنا', text: val});
+            } else if(activeAction.type === 'edit') {
+                const c = comments.find(x => x.id === activeAction.id);
+                if(c) c.text = val;
             }
-
-            input.value = "";
-            cancelStatus();
-            renderComments();
+            input.value = ""; cancelStatus(); renderComments();
         }
 
         function prepareReply(id, name) {
-            activeAction = { type: 'reply', id: id };
-            const status = document.getElementById('comment-status');
-            status.classList.remove('hidden');
+            activeAction = {type: 'reply', id};
+            document.getElementById('comment-status').classList.remove('hidden');
             document.getElementById('status-text').innerText = "الرد على " + name;
-            document.getElementById('comment-input').focus();
         }
 
         function prepareEdit(id, text) {
-            activeAction = { type: 'edit', id: id };
-            const status = document.getElementById('comment-status');
-            status.classList.remove('hidden');
-            document.getElementById('status-text').innerText = "تعديل التعليق...";
-            const input = document.getElementById('comment-input');
-            input.value = text;
-            input.focus();
+            activeAction = {type: 'edit', id};
+            document.getElementById('comment-status').classList.remove('hidden');
+            document.getElementById('status-text').innerText = "تعديل...";
+            document.getElementById('comment-input').value = text;
         }
 
-        function cancelStatus() {
-            activeAction = { type: 'new', id: null };
-            document.getElementById('comment-status').classList.add('hidden');
-            document.getElementById('comment-input').value = "";
-        }
+        function cancelStatus() { activeAction = {type: 'new', id: null}; document.getElementById('comment-status').classList.add('hidden'); document.getElementById('comment-input').value = ""; }
+        function deleteComment(id) { comments = comments.filter(c => c.id !== id); renderComments(); }
 
-        function deleteComment(id) {
-            comments = comments.filter(c => c.id !== id);
-            renderComments();
-        }
-
-        // --- التحكم بالواجهة ---
         function switchTab(tab) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.getElementById('sec-' + tab).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-' + tab).classList.add('active');
-            
             const nav = document.getElementById('bottom-nav');
-            if (tab === 'reels') nav.classList.add('reels-nav-active');
-            else nav.classList.remove('reels-nav-active');
+            nav.className = tab === 'reels' ? 'reels-nav-active' : '';
         }
 
         function toggleLike(el) {
-            const icon = el.querySelector('i');
-            icon.classList.toggle('fas');
-            icon.classList.toggle('far');
-            icon.style.color = icon.classList.contains('fas') ? '#ef4444' : '#fff';
+            const i = el.querySelector('i');
+            i.classList.toggle('fas'); i.classList.toggle('far');
+            i.style.color = i.classList.contains('fas') ? '#ef4444' : '#fff';
         }
-
-        // تهيئة بسيطة للأعلام
-        function initFlags() {
-            const countries = [{n:'اليمن', c:'ye'}, {n:'السعودية', c:'sa'}, {n:'مصر', c:'eg'}];
-            const bar = document.getElementById('flags-bar');
-            bar.innerHTML += countries.map(c => `
-                <div class="flag-item" onclick="switchTab('rooms')">
-                    <img src="https://flagcdn.com/w80/${c.c}.png" class="flag-img">
-                    <span class="text-[9px] font-bold">${c.n}</span>
-                </div>
-            `).join('');
-        }
-        initFlags();
     </script>
 </body>
 </html>
