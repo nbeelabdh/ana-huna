@@ -1,379 +1,426 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أنا هنا - النسخة المتكاملة</title>
+    <title>أنا هنا - المنصة المتكاملة المفعّلة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; color: #334155; overflow: hidden; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; color: #1e293b; overflow: hidden; margin: 0; }
         
-        section { display: none; height: calc(100vh - 70px); overflow-y: auto; padding-bottom: 100px; }
+        section { display: none; height: calc(100vh - 75px); overflow-y: auto; }
         section.active { display: block; }
-        
-        /* Reels UI */
-        section#sec-reels { background-color: #000; height: 100vh; overflow: hidden; padding: 0; position: relative; }
-        .reels-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; scrollbar-width: none; }
-        .reel-video { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; background: #000; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-
-        /* Flags Styling */
-        .flags-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 10px; scrollbar-width: none; background: white; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .flag-item { min-width: 60px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; opacity: 0.6; transition: 0.3s; }
-        .flag-item.active { opacity: 1; transform: scale(1.1); color: #3b82f6; }
-        .flag-img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #eee; }
-        .all-icon { width: 35px; height: 35px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
 
         /* Navigation */
-        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; height: 70px; border-top: 1px solid #e2e8f0; z-index: 100; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #64748b; }
-        .nav-btn.active { color: #0ea5e9; }
-        .reels-nav-active { background: #000; color: white; border: none; }
+        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; height: 75px; border-top: 1px solid #e2e8f0; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+        .nav-item.active { color: #3b82f6; font-weight: bold; transform: translateY(-2px); }
 
-        /* Bottom Sheet for Comments */
-        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-top-left-radius: 30px; border-top-right-radius: 30px; transition: 0.4s; z-index: 400; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 -10px 20px rgba(0,0,0,0.2); }
-        .bottom-sheet.open { bottom: 0; }
-        
-        .comment-node { border-right: 2px solid #f1f5f9; padding-right: 12px; margin-bottom: 15px; position: relative; }
-        .reply-node { margin-right: 20px; border-right: 2px solid #3b82f6; padding: 8px; margin-top: 5px; background: #f8fafc; border-radius: 10px; font-size: 0.8rem; }
+        /* Reels */
+        .reels-actions { position: absolute; bottom: 120px; left: 15px; display: flex; flex-direction: column; gap: 25px; align-items: center; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 50; }
+        .comment-drawer { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top-left-radius: 25px; border-top-right-radius: 25px; z-index: 2000; height: 75%; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
+        .comment-drawer.open { transform: translateY(0); }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-blur: 4px; }
-        .modal-content { background: white; width: 100%; max-width: 350px; border-radius: 30px; padding: 25px; }
+        /* Room Interface */
+        .room-overlay { position: fixed; inset: 0; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); z-index: 3000; display: none; flex-direction: column; color: white; }
+        .mic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 25px 15px; }
+        .mic-slot { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+        .mic-avatar { width: 70px; height: 70px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.2); position: relative; background: rgba(255,255,255,0.03); display: flex; items-center; justify-center; transition: all 0.3s; }
+        .mic-avatar.active { border: 3px solid #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .mic-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+        /* Menus */
+        .user-context-menu { position: fixed; bottom: 0; left: 0; right: 0; background: white; color: #1e293b; border-radius: 30px 30px 0 0; z-index: 4000; padding: 25px; transform: translateY(100%); transition: transform 0.3s; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); }
+        .user-context-menu.open { transform: translateY(0); }
+
+        /* Countries Bar */
+        .countries-bar { display: flex; overflow-x: auto; padding: 12px; gap: 10px; background: white; white-space: nowrap; scrollbar-width: none; border-bottom: 1px solid #f1f5f9; }
+        .countries-bar::-webkit-scrollbar { display: none; }
+        .country-tab { padding: 6px 18px; border-radius: 50px; background: #f8fafc; font-size: 12px; cursor: pointer; border: 1px solid #e2e8f0; transition: all 0.2s; }
+        .country-tab.active { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2); }
+
+        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: rgba(30, 41, 59, 0.95); color: white; padding: 12px 30px; border-radius: 50px; font-size: 13px; z-index: 10000; display: none; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
 
+    <div id="toast"></div>
+
+    <!-- نافذة التعليقات -->
+    <div id="reels-comments" class="comment-drawer">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold text-lg">التعليقات (850)</h3>
+            <button onclick="toggleComments(false)" class="p-2"><i class="fas fa-times text-slate-400 text-xl"></i></button>
+        </div>
+        <div id="comments-list" class="space-y-5 mb-24 overflow-y-auto max-h-[80%]">
+            <div class="flex gap-3 items-start">
+                <img src="https://ui-avatars.com/api/?name=Ahmed&background=random" class="w-10 h-10 rounded-full">
+                <div class="flex-1">
+                    <div class="bg-slate-100 p-3 rounded-2xl rounded-tr-none">
+                        <p class="font-bold text-sm text-slate-800">أحمد بن علي</p>
+                        <p id="comment-1" class="text-xs text-slate-600 mt-1">ما شاء الله، تطبيق خرافي فعلاً! 🔥🚀</p>
+                    </div>
+                    <div class="flex gap-4 mt-2 px-2 text-[10px] text-blue-600 font-bold">
+                        <button onclick="editComment(1)">تعديل</button>
+                        <button onclick="replyComment('أحمد بن علي')">رد</button>
+                        <span class="text-slate-400 font-normal">منذ دقيقتين</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-4 bg-white border-t flex gap-3 items-center">
+            <input type="text" id="new-comment-input" placeholder="اكتب تعليقك هنا..." class="flex-1 bg-slate-100 rounded-full px-5 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <button onclick="submitNewComment()" class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- نافذة تحكم المستخدم (داخل الروم) -->
+    <div id="user-menu" class="user-context-menu">
+        <div class="flex items-center gap-4 mb-8">
+            <img id="menu-user-img" src="" class="w-20 h-20 rounded-full border-4 border-slate-50">
+            <div>
+                <h3 id="menu-user-name" class="font-bold text-xl">اسم المستخدم</h3>
+                <p class="text-xs text-slate-400">ليفل 25 • ID: 99827</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <button onclick="performAddFriend()" class="bg-blue-600 text-white py-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"><i class="fas fa-user-plus"></i> إضافة صديق</button>
+            <button onclick="triggerGift('user')" class="bg-orange-500 text-white py-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"><i class="fas fa-gift"></i> إرسال هدية</button>
+            <button onclick="adminAction('mic')" class="bg-slate-100 text-slate-700 py-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"><i class="fas fa-microphone-slash"></i> طرد مايك</button>
+            <button onclick="adminAction('room')" class="bg-red-50 text-red-600 py-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"><i class="fas fa-user-slash"></i> طرد نهائي</button>
+        </div>
+        <button onclick="closeUserMenu()" class="w-full mt-6 text-slate-400 font-bold text-sm">إغلاق النافذة</button>
+    </div>
+
+    <!-- واجهة الغرفة الصوتية -->
+    <div id="room-view" class="room-overlay">
+        <div class="p-5 flex justify-between items-center bg-white/5 backdrop-blur-xl border-b border-white/10">
+            <div class="flex items-center gap-4">
+                <button onclick="closeRoom()" class="text-xl"><i class="fas fa-chevron-right"></i></button>
+                <div>
+                    <h3 id="room-display-name" class="font-bold text-base">ديوان العرب</h3>
+                    <p class="text-[10px] text-white/50">85 متصل • غرفة رسمية</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-center">
+                <button onclick="showToast('جاري نسخ الرابط...')"><i class="fas fa-share-alt text-lg"></i></button>
+                <button onclick="closeRoom()" class="bg-red-600/90 text-white px-5 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-red-900/20">خروج</button>
+            </div>
+        </div>
+
+        <div class="mic-grid">
+            <div class="mic-slot" onclick="openUserMenu('المضيف (أنت)', 'https://ui-avatars.com/api/?name=Admin&background=0284c7&color=fff')">
+                <div class="mic-avatar active"><img src="https://ui-avatars.com/api/?name=Admin&background=0284c7&color=fff"></div>
+                <span class="text-[10px] font-bold text-yellow-400"><i class="fas fa-crown mr-1"></i>أنت</span>
+            </div>
+            <script>
+                for(let i=1; i<=7; i++) {
+                    document.write(`
+                        <div class="mic-slot" onclick="openUserMenu('مستخدم ${i}', 'https://ui-avatars.com/api/?name=${i}&background=random')">
+                            <div class="mic-avatar"><i class="fas fa-plus text-white/20 m-auto"></i></div>
+                            <span class="text-[10px] text-white/60">خالي</span>
+                        </div>
+                    `);
+                }
+            </script>
+        </div>
+
+        <div class="flex-1 p-5 overflow-y-auto bg-black/10" id="room-messages">
+            <div class="text-[10px] text-center text-white/30 my-5 italic">أهلاً بك في الغرفة! يحظر السب والقذف تحت طائلة الطرد.</div>
+        </div>
+
+        <div class="p-6 flex justify-between items-center bg-slate-900/80 backdrop-blur-md rounded-t-3xl border-t border-white/5">
+            <button onclick="toggleMic(this)" class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-microphone-slash text-xl"></i></button>
+            <div class="flex gap-4">
+                <button onclick="triggerGift('all')" class="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-2 rounded-full font-bold text-xs shadow-xl flex items-center gap-2 border border-white/10"><i class="fas fa-users"></i> هدية للكل</button>
+                <button onclick="triggerGift('room')" class="w-14 h-14 bg-gradient-to-tr from-yellow-400 to-orange-600 rounded-full flex items-center justify-center text-white shadow-2xl animate-bounce"><i class="fas fa-gift text-2xl"></i></button>
+            </div>
+            <button onclick="showToast('فتح الدردشة العامة...')" class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center"><i class="fas fa-comments text-xl"></i></button>
+        </div>
+    </div>
+
     <main>
-        <!-- 1. الريلز -->
-        <section id="sec-reels" class="active">
-            <div class="reels-container">
-                <div class="reel-video">
-                    <video loop playsinline autoplay muted onclick="this.paused ? this.play() : this.pause()">
-                        <source src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1282-large.mp4" type="video/mp4">
-                    </video>
-                    <div class="absolute bottom-24 right-4 text-white z-10">
-                        <h3 class="font-bold text-lg">@نبيل_اليماني</h3>
-                        <p class="text-sm opacity-80 text-right">نظام شامل: تعليقات + غرف 🚀</p>
+        <!-- Reels -->
+        <section id="sec-reels" class="active bg-black">
+            <div class="h-full relative overflow-hidden">
+                <video id="main-video" class="w-full h-full object-cover" loop playsinline autoplay src="https://v1.pexels.com/video-files/3209298/3209298-uhd_2160_3840_25fps.mp4"></video>
+                <div class="reels-actions">
+                    <div class="flex flex-col items-center gap-1" onclick="handleLike(this)">
+                        <div class="w-12 h-12 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center"><i class="fas fa-heart text-2xl"></i></div>
+                        <span class="text-[11px] font-bold">12K</span>
                     </div>
-                    <!-- أزرار التفاعل -->
-                    <div class="absolute bottom-24 left-4 flex flex-col gap-6 text-white text-center z-20">
-                        <div onclick="handleLike(this)" class="cursor-pointer">
-                            <i class="far fa-heart text-2xl mb-1"></i><br><span class="text-[10px]">2.4k</span>
-                        </div>
-                        <div onclick="openCommentsSheet()" class="cursor-pointer">
-                            <i class="fas fa-comment text-2xl mb-1"></i><br><span class="text-[10px]">120</span>
-                        </div>
-                        <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
-                            <i class="fas fa-share"></i>
-                        </div>
+                    <div class="flex flex-col items-center gap-1" onclick="toggleComments(true)">
+                        <div class="w-12 h-12 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center"><i class="fas fa-comment-dots text-2xl"></i></div>
+                        <span class="text-[11px] font-bold">850</span>
                     </div>
+                    <div class="flex flex-col items-center gap-1" onclick="handleShare()">
+                        <div class="w-12 h-12 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center"><i class="fas fa-share text-2xl"></i></div>
+                        <span class="text-[11px] font-bold">مشاركة</span>
+                    </div>
+                </div>
+                <div class="absolute bottom-10 right-5 text-white p-4 max-w-[80%]">
+                    <div class="flex items-center gap-3 mb-3">
+                        <img src="https://ui-avatars.com/api/?name=Admin" class="w-10 h-10 rounded-full border-2 border-white">
+                        <span class="font-bold">@ana_huna_official</span>
+                    </div>
+                    <p class="text-sm leading-relaxed">أجمل لحظات اللعب في لودو ستار! شاركنا الفوز 🔥🎲 #أنا_هنا #لودو</p>
                 </div>
             </div>
         </section>
 
-        <!-- 2. القريبين -->
-        <section id="sec-nearby" class="p-5">
-            <h2 class="text-2xl font-bold mb-6">الأشخاص القريبين</h2>
-            <div id="nearby-list" class="space-y-4">
-                <div class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-slate-50">
-                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center font-bold">A</div>
-                    <div class="flex-1 text-right">
-                        <h4 class="font-bold text-sm">أحمد الشميري</h4>
-                        <p class="text-[11px] text-blue-600 font-mono font-bold">#ID-88210</p>
+        <!-- Rooms -->
+        <section id="sec-rooms">
+            <div class="p-5 bg-white border-b flex justify-between items-center sticky top-0 z-50 shadow-sm">
+                <h2 class="font-bold text-xl">الغرف الصوتية</h2>
+                <div class="flex gap-2">
+                    <button onclick="showToast('جاري فتح تعديل الغرف...')" class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600"><i class="fas fa-sliders-h"></i></button>
+                    <button onclick="showToast('جاري تجهيز طلب إنشاء غرفة...')" class="bg-blue-600 text-white px-6 py-2 rounded-full text-xs font-bold shadow-lg shadow-blue-200">+ إنشاء</button>
+                </div>
+            </div>
+
+            <!-- Countries Bar -->
+            <div class="countries-bar">
+                <div class="country-tab active" onclick="filterCountry('all', this)">الكل 🌍</div>
+                <div class="country-tab" onclick="filterCountry('yem', this)">اليمن 🇾🇪</div>
+                <div class="country-tab" onclick="filterCountry('ksa', this)">السعودية 🇸🇦</div>
+                <div class="country-tab" onclick="filterCountry('egy', this)">مصر 🇪🇬</div>
+                <div class="country-tab" onclick="filterCountry('uae', this)">الإمارات 🇦🇪</div>
+                <div class="country-tab" onclick="filterCountry('irq', this)">العراق 🇮🇶</div>
+                <div class="country-tab" onclick="filterCountry('jor', this)">الأردن 🇯🇴</div>
+                <div class="country-tab" onclick="filterCountry('mar', this)">المغرب 🇲🇦</div>
+                <div class="country-tab" onclick="filterCountry('alg', this)">الجزائر 🇩🇿</div>
+            </div>
+
+            <div class="p-5 space-y-4">
+                <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between transition-transform active:scale-95" onclick="enterRoom('ديوان صنعاء')">
+                    <div class="flex items-center gap-4">
+                        <div class="relative">
+                            <img src="https://ui-avatars.com/api/?name=Yemen&background=random" class="w-16 h-16 rounded-3xl object-cover">
+                            <div class="absolute -top-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-4 border-white"></div>
+                        </div>
+                        <div>
+                            <p class="font-bold text-base">ديوان صنعاء القديمة 🇾🇪</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold">ID: 10092</span>
+                                <span class="text-[10px] text-slate-400"><i class="fas fa-users mr-1 text-[8px]"></i> 1.2K متصل</span>
+                            </div>
+                        </div>
                     </div>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">مراسلة</button>
+                    <i class="fas fa-chevron-left text-slate-300"></i>
                 </div>
             </div>
         </section>
 
-        <!-- 3. الغرف -->
-        <section id="sec-rooms" class="p-5 text-right">
-            <div class="flex justify-between items-center mb-6 px-1">
-                <h2 class="text-2xl font-bold">الغرف الصوتية</h2>
-                <button onclick="showCreateRoomModal()" class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
-                    <i class="fas fa-plus"></i>
-                </button>
+        <!-- Games -->
+        <section id="sec-games" class="bg-slate-50">
+            <div class="p-5 bg-white border-b sticky top-0">
+                <h2 class="font-bold text-xl">مركز الألعاب 🎮</h2>
             </div>
-
-            <div class="flags-scroll" id="flags-bar">
-                <div class="flag-item active" onclick="filterByCountry('الكل', this)">
-                    <div class="all-icon">الكل</div>
-                    <span class="text-[9px] font-bold">الكل</span>
+            <div class="p-5 grid grid-cols-2 gap-5">
+                <div class="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col items-center gap-3 transition-transform active:scale-95" onclick="showToast('جاري تشغيل لودو ستار...')">
+                    <div class="w-16 h-16 bg-gradient-to-tr from-blue-600 to-indigo-700 rounded-3xl flex items-center justify-center text-white text-3xl shadow-xl shadow-blue-200">🎲</div>
+                    <p class="font-bold text-sm">لودو ستار</p>
+                    <button class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-[10px] font-bold">العب الآن</button>
                 </div>
-            </div>
-
-            <div class="relative mb-6">
-                <input type="text" id="room-search" oninput="runRoomSearch()" placeholder="ابحث عن غرفة بالـ ID..." class="w-full bg-white p-4 pr-12 rounded-2xl outline-none shadow-sm text-sm border-2 border-transparent focus:border-blue-400 transition">
-                <i class="fas fa-hashtag absolute right-4 top-4 text-slate-300"></i>
-            </div>
-
-            <div id="rooms-container" class="space-y-4 text-right">
-                <!-- الغرف -->
+                <div class="bg-slate-100 p-5 rounded-[2.5rem] border border-dashed border-slate-300 flex flex-col items-center justify-center opacity-70">
+                    <div class="w-16 h-16 bg-slate-200 rounded-3xl flex items-center justify-center text-slate-400 text-3xl mb-2"><i class="fas fa-lock"></i></div>
+                    <p class="font-bold text-sm text-slate-400">قريباً</p>
+                    <p class="text-[8px] text-slate-400">ألعاب جديدة ممتعة</p>
+                </div>
             </div>
         </section>
 
-        <!-- 4. الدردشة -->
-        <section id="sec-chats" class="p-10 text-center text-slate-400">
-            <i class="fas fa-comments text-5xl mb-4 opacity-20"></i>
-            <p>لا يوجد رسائل</p>
+        <!-- Chat -->
+        <section id="sec-chat">
+            <div class="p-5 bg-white border-b sticky top-0 flex justify-between items-center z-50">
+                <h2 class="font-bold text-xl">الدردشة 💬</h2>
+                <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
+            </div>
+            <div id="chat-friends-list" class="bg-white min-h-full">
+                <div class="p-10 text-center flex flex-col items-center justify-center gap-4">
+                    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-200 text-3xl"><i class="fas fa-user-friends"></i></div>
+                    <p class="text-slate-400 text-sm">لا يوجد محادثات حالياً.<br>أضف أصدقاء من الغرف الصوتية للبدء!</p>
+                </div>
+            </div>
         </section>
     </main>
 
-    <!-- واجهة التعليقات -->
-    <div id="comments-sheet" class="bottom-sheet">
-        <div class="p-4 border-b flex justify-between items-center font-bold">
-            <span id="comments-count">التعليقات (1)</span>
-            <i class="fas fa-times text-slate-300 p-2" onclick="closeCommentsSheet()"></i>
-        </div>
-        
-        <div id="comments-display" class="flex-1 p-4 overflow-y-auto text-right">
-            <!-- قائمة التعليقات -->
-        </div>
-
-        <div id="reply-tag" class="hidden bg-blue-50 p-2 px-4 flex justify-between items-center text-[10px] text-blue-600 border-t">
-            <span>الرد على: <b id="reply-name">...</b></span>
-            <i class="fas fa-times-circle" onclick="clearReply()"></i>
-        </div>
-
-        <div class="p-4 border-t flex gap-2 pb-10 bg-white">
-            <input type="text" id="comment-input" placeholder="اكتب شيئاً..." class="flex-1 bg-slate-100 p-3 rounded-xl outline-none text-sm border focus:border-blue-400 transition">
-            <button onclick="handleCommentAction()" class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-md">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Modal إنشاء غرفة -->
-    <div id="create-room-modal" class="modal-overlay">
-        <div class="modal-content text-right">
-            <h3 class="text-xl font-bold mb-6 text-center">فتح غرفة جديدة</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 block mb-1">اسم الغرفة</label>
-                    <input type="text" id="room-name-field" placeholder="مثال: شباب عدن" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 block mb-1">الدولة</label>
-                    <select id="room-country-field" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border appearance-none">
-                        <!-- خيارات الدول -->
-                    </select>
-                </div>
-                <div class="bg-blue-50 p-4 rounded-2xl flex justify-between items-center border border-blue-100">
-                    <span class="text-xs font-bold text-blue-400">ID الغرفة:</span>
-                    <span id="room-id-gen" class="font-bold text-blue-700 font-mono">#ID-0000</span>
-                </div>
-                <button onclick="finalizeCreateRoom()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg mt-4">إنشاء الآن</button>
-                <button onclick="hideModal()" class="w-full text-slate-400 text-sm font-bold pt-2 text-center">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- القائمة السفلية -->
-    <nav id="bottom-nav" class="reels-nav-active">
-        <button onclick="switchTab('reels')" id="btn-reels" class="nav-btn active"><i class="fas fa-play-circle text-xl"></i><span>ريلز</span></button>
-        <button onclick="switchTab('nearby')" id="btn-nearby" class="nav-btn"><i class="fas fa-street-view text-xl"></i><span>القريبين</span></button>
-        <button onclick="switchTab('rooms')" id="btn-rooms" class="nav-btn"><i class="fas fa-microphone-alt text-xl"></i><span>الغرف</span></button>
-        <button onclick="switchTab('chats')" id="btn-chats" class="nav-btn"><i class="fas fa-comment-alt text-xl"></i><span>دردشة</span></button>
+    <nav>
+        <div onclick="switchTab('reels')" id="n-reels" class="nav-item active"><i class="fas fa-play-circle text-2xl"></i><span>ريلز</span></div>
+        <div onclick="switchTab('rooms')" id="n-rooms" class="nav-item"><i class="fas fa-microphone text-2xl"></i><span>الغرف</span></div>
+        <div onclick="switchTab('games')" id="n-games" class="nav-item"><i class="fas fa-gamepad text-2xl"></i><span>ألعاب</span></div>
+        <div onclick="switchTab('chat')" id="n-chat" class="nav-item"><i class="fas fa-comment-dots text-2xl"></i><span>دردشة</span></div>
     </nav>
 
     <script>
-        // --- البيانات والتعريفات ---
-        const arabCountries = [
-            {n: 'اليمن', c: 'ye'}, {n: 'السعودية', c: 'sa'}, {n: 'الإمارات', c: 'ae'}, 
-            {n: 'العراق', c: 'iq'}, {n: 'فلسطين', c: 'ps'}, {n: 'مصر', c: 'eg'}, 
-            {n: 'عمان', c: 'om'}, {n: 'الكويت', c: 'kw'}, {n: 'قطر', c: 'qa'}, 
-            {n: 'الأردن', c: 'jo'}, {n: 'المغرب', c: 'ma'}
-        ];
+        // المتغيرات العالمية
+        let currentMenuUser = { name: "", img: "" };
+        let bannedFromRooms = {}; // { roomName: timestamp }
 
-        let commentsData = [{id: 1, user: 'نبيل اليماني', text: 'مرحباً بكم في نظامي المطور!', replies: []}];
-        let roomsData = [{id: '#ID-7721', name: 'غرفة الدردشة العامة', country: 'اليمن', flag: 'ye'}];
-        
-        let activeReplyId = null;
-        let activeEditId = null;
-
-        window.onload = () => {
-            initFlags();
-            initCountrySelect();
-            updateRoomsDisplay('الكل');
-            updateCommentsDisplay();
-        };
-
-        // --- نظام الغرف والدول ---
-        function initFlags() {
-            const bar = document.getElementById('flags-bar');
-            const currentHTML = bar.innerHTML;
-            bar.innerHTML = currentHTML + arabCountries.map(c => `
-                <div class="flag-item" onclick="filterByCountry('${c.n}', this)">
-                    <img src="https://flagcdn.com/w80/${c.c}.png" class="flag-img shadow-sm">
-                    <span class="text-[9px] font-bold">${c.n}</span>
-                </div>
-            `).join('');
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
         }
 
-        function initCountrySelect() {
-            const select = document.getElementById('room-country-field');
-            select.innerHTML = arabCountries.map(c => `<option value="${c.n}">${c.n}</option>`).join('');
-        }
-
-        function filterByCountry(name, el) {
-            document.querySelectorAll('.flag-item').forEach(f => f.classList.remove('active'));
-            el.classList.add('active');
-            updateRoomsDisplay(name);
-        }
-
-        function updateRoomsDisplay(filter = 'الكل') {
-            const container = document.getElementById('rooms-container');
-            const list = filter === 'الكل' ? roomsData : roomsData.filter(r => r.country === filter);
+        function switchTab(t) {
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.getElementById('sec-'+t).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('n-'+t).classList.add('active');
             
-            if(list.length === 0) {
-                container.innerHTML = `<p class="text-center py-10 text-slate-400 text-xs">لا توجد غرف في ${filter}</p>`;
-                return;
-            }
-
-            container.innerHTML = list.map(r => `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border-r-4 border-blue-500" data-rid="${r.id}">
-                    <div class="flex items-center gap-3">
-                        <img src="https://flagcdn.com/w80/${arabCountries.find(c=>c.n===r.country)?.c || 'ye'}.png" class="w-8 h-8 rounded-full border">
-                        <div>
-                            <h4 class="font-bold text-sm text-slate-800">${r.name}</h4>
-                            <p class="text-[9px] text-slate-400">${r.country} • بث مباشر</p>
-                        </div>
-                    </div>
-                    <span class="text-[10px] font-mono bg-blue-50 text-blue-600 p-1 px-2 rounded-lg font-bold">${r.id}</span>
-                </div>
-            `).join('');
+            const v = document.getElementById('main-video');
+            if(t === 'reels') v.play(); else v.pause();
         }
 
-        function showCreateRoomModal() {
-            document.getElementById('room-id-gen').innerText = "#ID-" + Math.floor(1000 + Math.random() * 8999);
-            document.getElementById('create-room-modal').style.display = 'flex';
-        }
-
-        function hideModal() { document.getElementById('create-room-modal').style.display = 'none'; }
-
-        function finalizeCreateRoom() {
-            const name = document.getElementById('room-name-field').value || "غرفة جديدة";
-            const country = document.getElementById('room-country-field').value;
-            const id = document.getElementById('room-id-gen').innerText;
-            const flag = arabCountries.find(c => c.n === country).c;
-
-            roomsData.unshift({id, name, country, flag});
-            updateRoomsDisplay('الكل');
-            hideModal();
-            document.getElementById('room-name-field').value = "";
-        }
-
-        function runRoomSearch() {
-            const val = document.getElementById('room-search').value.toUpperCase();
-            document.querySelectorAll('#rooms-container > div').forEach(div => {
-                const id = div.querySelector('span').innerText;
-                div.style.display = id.includes(val) ? 'flex' : 'none';
-            });
-        }
-
-        // --- نظام التعليقات والريلز ---
-        function openCommentsSheet() { document.getElementById('comments-sheet').classList.add('open'); }
-        function closeCommentsSheet() { document.getElementById('comments-sheet').classList.remove('open'); }
-
-        function updateCommentsDisplay() {
-            const container = document.getElementById('comments-display');
-            document.getElementById('comments-count').innerText = `التعليقات (${commentsData.length})`;
-            
-            container.innerHTML = commentsData.map(c => `
-                <div class="comment-node">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="font-bold text-xs">${c.user}</span>
-                            <p class="text-sm text-slate-700">${c.text}</p>
-                        </div>
-                        <div class="flex gap-2 text-slate-300 text-[10px]">
-                            <i class="fas fa-edit p-1" onclick="initEdit(${c.id}, '${c.text}')"></i>
-                            <i class="fas fa-trash p-1" onclick="doDeleteComment(${c.id})"></i>
-                        </div>
-                    </div>
-                    <div class="flex gap-4 mt-1 text-[10px] font-bold text-slate-400">
-                        <span class="text-blue-500 cursor-pointer" onclick="initReply(${c.id}, '${c.user}')">رد</span>
-                        <span>الآن</span>
-                    </div>
-                    ${c.replies.map(r => `
-                        <div class="reply-node">
-                            <div class="flex justify-between">
-                                <span class="font-bold text-blue-600">${r.user}</span>
-                                <i class="fas fa-trash text-slate-200" onclick="doDeleteReply(${c.id}, ${r.id})"></i>
-                            </div>
-                            <p>${r.text}</p>
-                        </div>
-                    `).join('')}
-                </div>
-            `).join('');
-        }
-
-        function handleCommentAction() {
-            const input = document.getElementById('comment-input');
-            const val = input.value.trim();
-            if(!val) return;
-
-            if(activeEditId) {
-                const c = commentsData.find(x => x.id === activeEditId);
-                if(c) c.text = val;
-                activeEditId = null;
-            } else if(activeReplyId) {
-                const c = commentsData.find(x => x.id === activeReplyId);
-                if(c) c.replies.push({id: Date.now(), user: 'أنا', text: val});
-                clearReply();
-            } else {
-                commentsData.unshift({id: Date.now(), user: 'أنا', text: val, replies: []});
-            }
-
-            input.value = "";
-            updateCommentsDisplay();
-        }
-
-        function initReply(id, name) {
-            activeReplyId = id;
-            activeEditId = null;
-            document.getElementById('reply-tag').classList.remove('hidden');
-            document.getElementById('reply-name').innerText = name;
-            document.getElementById('comment-input').focus();
-        }
-
-        function clearReply() {
-            activeReplyId = null;
-            document.getElementById('reply-tag').classList.add('hidden');
-        }
-
-        function initEdit(id, text) {
-            activeEditId = id;
-            activeReplyId = null;
-            clearReply();
-            const input = document.getElementById('comment-input');
-            input.value = text;
-            input.focus();
-        }
-
-        function doDeleteComment(id) {
-            commentsData = commentsData.filter(c => c.id !== id);
-            updateCommentsDisplay();
-        }
-
-        function doDeleteReply(cId, rId) {
-            const c = commentsData.find(x => x.id === cId);
-            if(c) c.replies = c.replies.filter(r => r.id !== rId);
-            updateCommentsDisplay();
-        }
-
+        // --- وظائف الريلز ---
         function handleLike(el) {
             const icon = el.querySelector('i');
+            icon.classList.toggle('text-red-500');
             icon.classList.toggle('fas');
             icon.classList.toggle('far');
-            icon.style.color = icon.classList.contains('fas') ? '#ef4444' : '#fff';
+            if(icon.classList.contains('text-red-500')) showToast("أعجبك هذا المقطع ❤️");
         }
 
-        function switchTab(tab) {
-            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            document.getElementById('sec-' + tab).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-' + tab).classList.a
+        function handleShare() {
+            showToast("تم نسخ رابط المقطع للمشاركة! 🔗");
+        }
+
+        function toggleComments(show) {
+            document.getElementById('reels-comments').classList.toggle('open', show);
+        }
+
+        function submitNewComment() {
+            const inp = document.getElementById('new-comment-input');
+            if(!inp.value.trim()) return;
+            const list = document.getElementById('comments-list');
+            const div = document.createElement('div');
+            const id = Date.now();
+            div.className = "flex gap-3 items-start animate-fade-in";
+            div.innerHTML = `
+                <img src="https://ui-avatars.com/api/?name=You&background=3b82f6&color=fff" class="w-10 h-10 rounded-full">
+                <div class="flex-1">
+                    <div class="bg-blue-50 p-3 rounded-2xl rounded-tr-none border border-blue-100">
+                        <p class="font-bold text-sm text-blue-800">أنت (الآن)</p>
+                        <p id="comment-${id}" class="text-xs text-blue-700 mt-1">${inp.value}</p>
+                    </div>
+                    <div class="flex gap-4 mt-2 px-2 text-[10px] text-blue-600 font-bold">
+                        <button onclick="editComment(${id})">تعديل</button>
+                    </div>
+                </div>
+            `;
+            list.prepend(div);
+            inp.value = "";
+            showToast("تم إضافة تعليقك بنجاح ✅");
+        }
+
+        function editComment(id) {
+            const el = document.getElementById('comment-'+id);
+            const val = prompt("تعديل التعليق:", el.innerText);
+            if(val) el.innerText = val;
+        }
+
+        function replyComment(name) {
+            document.getElementById('new-comment-input').value = `@${name} `;
+            document.getElementById('new-comment-input').focus();
+        }
+
+        // --- وظائف الغرف ---
+        function filterCountry(code, el) {
+            document.querySelectorAll('.country-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            showToast(`تصفية غرف: ${el.innerText}`);
+        }
+
+        function enterRoom(name) {
+            // فحص الحظر لمدة ساعة
+            if(bannedFromRooms[name] && (Date.now() < bannedFromRooms[name])) {
+                const diff = Math.ceil((bannedFromRooms[name] - Date.now()) / (1000 * 60));
+                showToast(`أنت مطرود من هذه الغرفة! يمكنك العودة بعد ${diff} دقيقة ⛔`);
+                return;
+            }
+            document.getElementById('room-display-name').innerText = name;
+            document.getElementById('room-view').style.display = 'flex';
+        }
+
+        function closeRoom() {
+            document.getElementById('room-view').style.display = 'none';
+        }
+
+        function toggleMic(btn) {
+            const icon = btn.querySelector('i');
+            icon.classList.toggle('fa-microphone-slash');
+            icon.classList.toggle('fa-microphone');
+            btn.classList.toggle('bg-green-500');
+            btn.classList.toggle('bg-white/10');
+            showToast(icon.classList.contains('fa-microphone') ? "المايك يعمل الآن 🎙️" : "المايك مغلق 🔇");
+        }
+
+        function openUserMenu(name, img) {
+            currentMenuUser = { name, img };
+            document.getElementById('menu-user-name').innerText = name;
+            document.getElementById('menu-user-img').src = img;
+            document.getElementById('user-menu').classList.add('open');
+        }
+
+        function closeUserMenu() {
+            document.getElementById('user-menu').classList.remove('open');
+        }
+
+        function performAddFriend() {
+            const list = document.getElementById('chat-friends-list');
+            if(list.querySelector('.p-10')) list.innerHTML = "";
+            
+            const div = document.createElement('div');
+            div.className = "p-4 border-b flex items-center justify-between hover:bg-slate-50 transition-colors";
+            div.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <img src="${currentMenuUser.img}" class="w-14 h-14 rounded-full">
+                    <div>
+                        <p class="font-bold text-sm text-slate-800">${currentMenuUser.name}</p>
+                        <p class="text-[10px] text-green-500 font-bold">متصل الآن • تمت إضافته من الروم</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="triggerGift('private')" class="w-10 h-10 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center"><i class="fas fa-gift"></i></button>
+                    <button onclick="showToast('فتح الدردشة الخاصة مع ${currentMenuUser.name}')" class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center"><i class="fas fa-comment"></i></button>
+                </div>
+            `;
+            list.prepend(div);
+            showToast(`تمت إضافة ${currentMenuUser.name} لقائمة الدردشة ✅`);
+            closeUserMenu();
+            switchTab('chat');
+        }
+
+        function triggerGift(type) {
+            const gifts = ["🌹 وردة", "💎 ألماس", "🚀 صاروخ", "👑 تاج"];
+            const gift = gifts[Math.floor(Math.random() * gifts.length)];
+            let target = type === 'all' ? "الجميع" : (type === 'room' ? "الغرفة" : currentMenuUser.name);
+            showToast(`تم إرسال ${gift} إلى ${target}! 🎁`);
+            closeUserMenu();
+        }
+
+        function adminAction(type) {
+            if(type === 'mic') {
+                showToast(`تم سحب المايك من ${currentMenuUser.name} 🔇`);
+            } else {
+                const rName = document.getElementById('room-display-name').innerText;
+                bannedFromRooms[rName] = Date.now() + (60 * 60 * 1000); // حظر ساعة
+                showToast(`تم طرد ${currentMenuUser.name} وحظره لمدة ساعة ⛔`);
+                closeRoom();
+            }
+            closeUserMenu();
+        }
+
+        // تشغيل الفيديو عند التحميل
+        window.onload = () => {
+            const v = document.getElementById('main-video');
+            v.play().catch(() => {});
+        };
+    </script>
+</body>
+</html>
+
