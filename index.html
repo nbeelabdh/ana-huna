@@ -3,289 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أنا هنا - ريلز ودردشة</title>
+    <title>أنا هنا - الغرف الصوتية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; background-color: #000; color: white; overflow: hidden; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; color: #334155; overflow: hidden; }
         
-        /* التبديل بين الأقسام */
-        section { display: none; height: calc(100vh - 70px); overflow-y: auto; background-color: #f0f2f5; color: #333; }
+        section { display: none; height: calc(100vh - 70px); overflow-y: auto; }
         section.active { display: block; }
-        section#sec-reels { display: none; background-color: #000; height: 100vh; overflow: hidden; padding: 0; }
-        section#sec-reels.active { display: block; }
-
-        /* ستايل الريلز */
+        
+        /* Reels Style */
+        section#sec-reels { background-color: #000; height: 100vh; overflow: hidden; }
         .reels-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; scrollbar-width: none; }
-        .reels-container::-webkit-scrollbar { display: none; }
-        .reel-video { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #000; }
+        .reel-video { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        
-        .reel-actions { position: absolute; bottom: 100px; left: 15px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
-        .reel-info { position: absolute; bottom: 100px; right: 15px; text-align: right; color: white; text-shadow: 1px 1px 5px rgba(0,0,0,0.5); z-index: 10; }
-        
-        /* القائمة السفلية */
-        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: grow; border-top: 1px solid #eee; z-index: 100; height: 70px; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #666; transition: 0.3s; }
-        .nav-btn.active { color: #128c7e; }
-        .nav-btn i { font-size: 20px; margin-bottom: 2px; }
-        .reels-nav-active { background: #000; border-top: none; }
-        .reels-nav-active .nav-btn { color: #fff; }
-        .reels-nav-active .nav-btn.active { color: #128c7e; }
 
-        /* فقاعات الدردشة */
-        .msg { max-width: 80%; padding: 12px; border-radius: 18px; margin-bottom: 8px; font-size: 14px; line-height: 1.5; }
-        .msg-out { background-color: #dcf8c6; align-self: flex-end; border-bottom-left-radius: 0; }
-        .msg-in { background-color: white; align-self: flex-start; border-bottom-right-radius: 0; }
-        
-        .loader-bar { position: fixed; top: 0; left: 0; height: 3px; background: #128c7e; z-index: 1000; transition: width 0.4s; }
+        /* Audio Room UI */
+        .voice-room-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 500; display: none; flex-direction: column; }
+        .speaker-circle { position: relative; width: 80px; height: 80px; border-radius: 50%; border: 3px solid #1e293b; transition: 0.3s; }
+        .is-speaking { border-color: #22c55e; box-shadow: 0 0 15px #22c55e; transform: scale(1.05); }
+        .mic-badge { position: absolute; bottom: 0; right: 0; background: #ef4444; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; border: 2px solid #0f172a; }
+        .mic-on { background: #22c55e; }
+
+        /* Bottom Nav */
+        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; height: 70px; border-top: 1px solid #e2e8f0; z-index: 100; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #64748b; }
+        .nav-btn.active { color: #0ea5e9; }
+        .reels-nav-active { background: #000; color: white; border: none; }
+
+        /* Room Cards */
+        .room-card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; transition: 0.2s; }
     </style>
 </head>
 <body>
 
-    <div id="upload-progress" class="loader-bar" style="width: 0%"></div>
-
-    <!-- المحتوى الرئيسي -->
     <main>
-        <!-- قسم الريلز (تيك توك ستايل) -->
-        <section id="sec-reels" class="active">
+        <!-- قسم الريلز -->
+        <section id="sec-reels">
             <div class="reels-container" id="reels-list">
-                <!-- فيديو افتراضي في حال السحابة فارغة -->
                 <div class="reel-video">
-                    <video loop onclick="togglePlay(this)" playsinline>
-                        <source src="https://v16-webapp-prime.tiktok.com/video/tos/alisg/v/0602/a9a6b986888448908868686868686868/?..." type="video/mp4">
+                    <video loop onclick="this.paused ? this.play() : this.pause()" playsinline>
+                        <source src="https://v16-webapp-prime.tiktok.com/video/tos/..." type="video/mp4">
                     </video>
-                    <div class="reel-info">
-                        <h3 class="font-bold text-lg">@نبيل_اليماني</h3>
-                        <p class="text-sm">مرحباً بكم في قسم الريلز الجديد 🚀</p>
-                    </div>
-                    <div class="reel-actions">
-                        <button onclick="animateHeart(this)" class="flex flex-col items-center"><i class="fas fa-heart text-2xl"></i><span class="text-xs">1.2k</span></button>
-                        <button class="flex flex-col items-center"><i class="fas fa-comment text-2xl"></i><span class="text-xs">45</span></button>
-                        <button onclick="document.getElementById('reel-upload').click()" class="bg-red-500 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-plus text-white"></i></button>
+                    <div class="absolute bottom-24 right-4 text-white">
+                        <h3 class="font-bold text-lg">@نبيل</h3>
+                        <p class="text-sm">أهلاً بكم في قسم الريلز 🎥</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- القريبين -->
-        <section id="sec-nearby">
-            <header class="bg-[#075E54] text-white p-4 font-bold text-center">الأشخاص القريبين منك</header>
-            <div class="p-4 space-y-3">
-                <div onclick="openChat('أحمد')" class="bg-white p-4 rounded-2xl shadow-sm flex items-center">
-                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">أ</div>
-                    <div class="mr-3 flex-1">
-                        <h4 class="font-bold">أحمد</h4>
-                        <p class="text-xs text-gray-400">على بعد 200 متر</p>
+        <!-- قسم الغرف الصوتية -->
+        <section id="sec-rooms" class="active p-5">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">غرف صوتية</h2>
+                    <p class="text-sm text-slate-400">تحدث مباشرة مع أصدقائك</p>
+                </div>
+                <button onclick="showModal('room-modal')" class="bg-blue-600 text-white p-3 rounded-2xl shadow-lg shadow-blue-200"><i class="fas fa-plus"></i></button>
+            </div>
+            
+            <div id="rooms-list" class="grid grid-cols-1 gap-4">
+                <!-- غرفة افتراضية -->
+                <div onclick="joinVoiceRoom('مجلس اليمانية')" class="room-card group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex -space-x-3 space-x-reverse">
+                            <img src="https://ui-avatars.com/api/?name=User1" class="w-10 h-10 rounded-full border-2 border-white">
+                            <img src="https://ui-avatars.com/api/?name=User2" class="w-10 h-10 rounded-full border-2 border-white">
+                            <div class="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] text-slate-500 font-bold">+5</div>
+                        </div>
+                        <span class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wide">نشط الآن</span>
                     </div>
-                    <i class="fas fa-comment-dots text-[#128c7e] text-xl"></i>
+                    <h4 class="font-bold text-lg text-slate-800 mb-1">مجلس اليمانية 🇾🇪</h4>
+                    <p class="text-xs text-slate-500 flex items-center gap-1"><i class="fas fa-microphone text-blue-500"></i> 3 متحدثين | 15 مستمع</p>
                 </div>
             </div>
         </section>
 
-        <!-- الدردشة -->
-        <section id="sec-chats">
-            <header class="bg-[#075E54] text-white p-4 font-bold">المحادثات</header>
-            <div id="chats-list" class="divide-y">
-                <div onclick="openChat('أحمد')" class="flex items-center p-4 bg-white">
-                    <div class="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center text-xl">أ</div>
-                    <div class="mr-4 flex-1">
-                        <h4 class="font-bold">أحمد</h4>
-                        <p class="text-sm text-gray-500">كيف حال الريلز الجديد؟</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- المجموعات -->
-        <section id="sec-groups" class="p-4">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">المجموعات</h2>
-                <button onclick="showModal('group-modal')" class="bg-[#128c7e] text-white px-4 py-2 rounded-xl text-sm shadow-md">إنشاء +</button>
-            </div>
-            <div id="groups-container" class="space-y-4"></div>
-        </section>
+        <!-- الأقسام الأخرى -->
+        <section id="sec-chats" class="bg-white p-5 text-center text-slate-400 italic">المحادثات الخاصة هنا</section>
+        <section id="sec-groups" class="p-5 text-center text-slate-400 italic">المجموعات العامة</section>
     </main>
 
-    <!-- القائمة السفلية -->
-    <nav id="bottom-nav" class="reels-nav-active">
-        <button onclick="switchTab('reels')" id="btn-reels" class="nav-btn active"><i class="fas fa-play-circle"></i>ريلز</button>
-        <button onclick="switchTab('nearby')" id="btn-nearby" class="nav-btn"><i class="fas fa-street-view"></i>القريبين</button>
-        <button onclick="switchTab('chats')" id="btn-chats" class="nav-btn"><i class="fas fa-comments"></i>دردشة</button>
-        <button onclick="switchTab('groups')" id="btn-groups" class="nav-btn"><i class="fas fa-users"></i>مجموعات</button>
-    </nav>
-
-    <!-- واجهة الدردشة -->
-    <div id="chat-overlay" class="fixed inset-0 bg-white z-[200] hidden flex flex-col">
-        <header class="bg-[#075E54] text-white p-4 flex items-center shadow-lg">
-            <i class="fas fa-arrow-right ml-4 text-xl" onclick="closeChat()"></i>
-            <h4 id="active-chat-name" class="font-bold flex-1">أحمد</h4>
-            <i class="fas fa-video ml-4"></i>
-            <i class="fas fa-phone"></i>
+    <!-- واجهة الغرفة الصوتية (Full Screen) -->
+    <div id="voice-room-ui" class="voice-room-overlay">
+        <header class="p-6 flex justify-between items-center">
+            <button onclick="leaveRoom()" class="text-slate-400 text-xl"><i class="fas fa-chevron-down"></i></button>
+            <h3 id="current-room-name" class="text-white font-bold text-lg">اسم الغرفة</h3>
+            <button class="text-slate-400"><i class="fas fa-share-alt"></i></button>
         </header>
-        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col bg-[#f0f2f5] space-y-2"></div>
-        <footer class="p-2 bg-white flex items-center gap-2 border-t">
-            <i class="fas fa-plus text-gray-400 px-2" onclick="document.getElementById('file-input').click()"></i>
-            <input type="text" id="msg-input" placeholder="اكتب رسالة..." class="flex-1 p-3 rounded-full bg-gray-100 outline-none px-5">
-            <button onclick="sendMsg()" class="bg-[#128c7e] text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-paper-plane"></i></button>
+
+        <div class="flex-1 overflow-y-auto p-6">
+            <div class="mb-8">
+                <h4 class="text-slate-500 text-xs font-bold mb-4 uppercase tracking-widest">المتحدثين</h4>
+                <div class="grid grid-cols-3 gap-6 text-center">
+                    <!-- الشخص المتحدث (أنت) -->
+                    <div class="flex flex-col items-center gap-2">
+                        <div id="my-speaker-circle" class="speaker-circle is-speaking">
+                            <img src="https://ui-avatars.com/api/?name=Nabeel&background=0ea5e9&color=fff" class="w-full h-full rounded-full">
+                            <div id="my-mic-badge" class="mic-badge mic-on"><i class="fas fa-microphone"></i></div>
+                        </div>
+                        <span class="text-white text-xs font-bold">نبيل (أنت)</span>
+                    </div>
+                    <!-- متحدث آخر -->
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="speaker-circle">
+                            <img src="https://ui-avatars.com/api/?name=Ahmed" class="w-full h-full rounded-full">
+                            <div class="mic-badge"><i class="fas fa-microphone-slash"></i></div>
+                        </div>
+                        <span class="text-white text-xs">أحمد</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-slate-500 text-xs font-bold mb-4 uppercase tracking-widest">المستمعين</h4>
+                <div class="grid grid-cols-4 gap-4 text-center">
+                    <div class="flex flex-col items-center gap-2">
+                        <img src="https://ui-avatars.com/api/?name=User3" class="w-12 h-12 rounded-full border-2 border-slate-800">
+                        <span class="text-slate-400 text-[10px]">خالد</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <img src="https://ui-avatars.com/api/?name=User4" class="w-12 h-12 rounded-full border-2 border-slate-800">
+                        <span class="text-slate-400 text-[10px]">سالم</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="p-8 bg-slate-900 rounded-t-[40px] flex items-center justify-around">
+            <button onclick="toggleMic()" id="mic-btn" class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl shadow-xl shadow-blue-900/40 transition">
+                <i id="mic-icon" class="fas fa-microphone"></i>
+            </button>
+            <button onclick="leaveRoom()" class="bg-red-500/10 text-red-500 px-6 py-3 rounded-2xl font-bold flex items-center gap-2">
+                <i class="fas fa-sign-out-alt"></i> مغادرة
+            </button>
+            <button class="w-12 h-12 bg-slate-800 text-slate-400 rounded-full flex items-center justify-center">
+                <i class="fas fa-hand-paper"></i>
+            </button>
         </footer>
     </div>
 
-    <!-- Modal إنشاء مجموعة -->
-    <div id="group-modal" class="fixed inset-0 bg-black/60 z-[300] hidden flex items-center justify-center p-6 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl p-8 w-full max-w-sm text-right">
-            <h3 class="text-xl font-bold mb-4">اسم المجموعة</h3>
-            <input type="text" id="new-group-name" class="w-full border p-4 rounded-2xl mb-6 bg-gray-50 outline-none focus:ring-2 focus:ring-[#128c7e]" placeholder="مثلاً: عشاق الريلز">
-            <div class="flex justify-end gap-3">
-                <button onclick="hideModal('group-modal')" class="text-gray-400 font-bold px-4">إلغاء</button>
-                <button onclick="createGroup()" class="bg-[#128c7e] text-white px-8 py-3 rounded-2xl font-bold shadow-lg">إنشاء</button>
-            </div>
-        </div>
-    </div>
-
-    <!--Inputs مخفية -->
-    <input type="file" id="file-input" class="hidden" accept="image/*,video/*" onchange="uploadToAppwrite(this.files[0], 'chat')">
-    <input type="file" id="reel-upload" class="hidden" accept="video/*" onchange="uploadToAppwrite(this.files[0], 'reels')">
-
-    <script>
-        // --- إعدادات السحابة Appwrite ---
-        const client = new Appwrite.Client()
-            .setEndpoint('https://fra.cloud.appwrite.io/v1')
-            .setProject('69ba1fa10035b7f1de96');
-
-        const storage = new Appwrite.Storage(client);
-        const account = new Appwrite.Account(client);
-        const BUCKET_ID = '69ba233f001368959e2e';
-
-        async function init() {
-            try { await account.createAnonymousSession(); loadReels(); } catch(e) {}
-        }
-        init();
-
-        // --- التحكم في التنقل ---
-        function switchTab(tab) {
-            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            document.getElementById('sec-' + tab).classList.add('active');
-            
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-' + tab).classList.add('active');
-
-            const nav = document.getElementById('bottom-nav');
-            if(tab === 'reels') {
-                nav.classList.add('reels-nav-active');
-                document.querySelectorAll('video').forEach(v => v.play());
-            } else {
-                nav.classList.remove('reels-nav-active');
-                document.querySelectorAll('video').forEach(v => v.pause());
-            }
-        }
-
-        // --- نظام الريلز ---
-        function togglePlay(video) {
-            if (video.paused) video.play(); else video.pause();
-        }
-
-        async function loadReels() {
-            try {
-                const files = await storage.listFiles(BUCKET_ID);
-                const list = document.getElementById('reels-list');
-                // عرض الفيديوهات المرفوعة فقط
-                const videoFiles = files.files.filter(f => f.mimeType.includes('video'));
-                
-                videoFiles.forEach(file => {
-                    const url = storage.getFileView(BUCKET_ID, file.$id);
-                    const reelHtml = `
-                        <div class="reel-video">
-                            <video loop onclick="togglePlay(this)" playsinline>
-                                <source src="${url}" type="video/mp4">
-                            </video>
-                            <div class="reel-info">
-                                <h3 class="font-bold text-lg">@نبيل</h3>
-                                <p class="text-sm">تم الرفع من السحابة ☁️</p>
-                            </div>
-                            <div class="reel-actions">
-                                <button onclick="animateHeart(this)" class="flex flex-col items-center"><i class="fas fa-heart text-2xl"></i><span class="text-xs">0</span></button>
-                                <button class="flex flex-col items-center"><i class="fas fa-comment text-2xl"></i><span class="text-xs">0</span></button>
-                            </div>
-                        </div>`;
-                    list.insertAdjacentHTML('afterbegin', reelHtml);
-                });
-            } catch(e) { console.log("خطأ في جلب الريلز"); }
-        }
-
-        // --- الرفع للسحابة (مطور) ---
-        async function uploadToAppwrite(file, type) {
-            if(!file) return;
-            const progress = document.getElementById('upload-progress');
-            progress.style.width = "40%";
-
-            try {
-                const res = await storage.createFile(BUCKET_ID, Appwrite.ID.unique(), file);
-                const url = storage.getFileView(BUCKET_ID, res.$id);
-                progress.style.width = "100%";
-                
-                if(type === 'reels') {
-                    alert("✅ تم رفع الريلز بنجاح! سيظهر للجميع الآن.");
-                    location.reload(); 
-                } else {
-                    appendMessage(url, 'out', file.type.includes('image'));
-                }
-                setTimeout(() => progress.style.width = "0%", 1000);
-            } catch(e) {
-                alert("❌ خطأ: تأكد من أذونات السحابة (Any Permissions)");
-                progress.style.width = "0%";
-            }
-        }
-
-        // --- الدردشة والمجموعات ---
-        function openChat(name) {
-            document.getElementById('active-chat-name').innerText = name;
-            document.getElementById('chat-overlay').classList.remove('hidden');
-        }
-        function closeChat() { document.getElementById('chat-overlay').classList.add('hidden'); }
-        
-        function sendMsg() {
-            const input = document.getElementById('msg-input');
-            if(!input.value.trim()) return;
-            appendMessage(input.value, 'out');
-            input.value = "";
-        }
-
-        function appendMessage(content, type, isImg = false) {
-            const container = document.getElementById('chat-messages');
-            const html = isImg 
-                ? `<div class="msg msg-${type} p-1 shadow-sm self-end"><img src="${content}" class="rounded-xl max-h-60"></div>`
-                : `<div class="msg msg-${type} shadow-sm ${type==='out'?'self-end':''}">${content}</div>`;
-            container.insertAdjacentHTML('beforeend', html);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-        function createGroup() {
-            const name = document.getElementById('new-group-name').value;
-            if(!name) return;
-            const html = `
-                <div onclick="openChat('${name}')" class="bg-white p-5 rounded-2xl shadow-sm flex items-center border-r-8 border-[#128c7e]">
-                    <div class="w-12 h-12 bg-green-50 text-[#128c7e] rounded-xl flex items-center justify-center font-bold text-xl">#</div>
-                    <div class="mr-4"><h4 class="font-bold">${name}</h4><p class="text-xs text-gray-400">مجموعة عامة</p></div>
-                </div>`;
-            document.getElementById('groups-container').insertAdjacentHTML('afterbegin', html);
-            hideModal('group-modal');
-        }
-
-        function animateHeart(btn) {
-            const icon = btn.querySelector('i');
-            icon.classList.toggle('text-red-500');
-            icon.classList.toggle('fas');
-            icon.classList.toggle('far');
-            btn.classList.add('scale-125');
-            setTimeout(() => btn.classList.remove('scale-125'), 200);
-        }
-    </script>
-</body>
-</html>
+    <!-- Modal إنشاء غرفة -->
+    <div id="room-modal" class="fixed inset-0 bg-black/60 z-[600] hidden flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-white rounded-[32px] p-8 w-full max-w-sm">
+            <h3 class="text-xl font-bold mb-6 text-slate-800 text-center">بدء غرفة صوتية</h3>
+            <input type="text" id="new-room-title" class="w-full bg-slate-50 border-none p-4 rounded-2xl mb-4 text-right outline-
 
