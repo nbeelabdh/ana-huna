@@ -9,151 +9,117 @@
     <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
         .chat-bg { background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
-        .tab-active { border-bottom: 3px solid #128c7e; color: #128c7e; }
+        .tab-active { border-bottom: 4px solid #128c7e; color: #128c7e; font-weight: bold; }
+        section { display: none; }
+        section.active { display: block; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
     <header class="bg-[#075E54] text-white p-4 shadow-lg flex justify-between items-center z-50">
         <h1 class="text-xl font-bold">أنا هنا</h1>
-        <div class="flex space-x-4 space-x-reverse">
-            <button onclick="showSection('profile')"><i class="fas fa-user-circle text-2xl"></i></button>
-        </div>
+        <button onclick="showSection('profile')"><i class="fas fa-user-circle text-2xl"></i></button>
     </header>
 
-    <nav class="bg-white shadow flex justify-around text-gray-500 font-bold z-40">
-        <button onclick="showSection('nearby')" id="tab-nearby" class="py-3 px-2 flex-1 tab-active">القريبين</button>
-        <button onclick="showSection('chats')" id="tab-chats" class="py-3 px-2 flex-1">دردشة</button>
-        <button onclick="showSection('status')" id="tab-status" class="py-3 px-2 flex-1">حالات</button>
-        <button onclick="showSection('calls')" id="tab-calls" class="py-3 px-2 flex-1">مكالمات</button>
+    <nav class="bg-white shadow flex justify-around text-gray-500 z-40">
+        <button onclick="showSection('nearby')" id="tab-nearby" class="py-3 flex-1 tab-active">القريبين</button>
+        <button onclick="showSection('chats')" id="tab-chats" class="py-3 flex-1">دردشة</button>
+        <button onclick="showSection('status')" id="tab-status" class="py-3 flex-1">حالات</button>
+        <button onclick="showSection('calls')" id="tab-calls" class="py-3 flex-1">مكالمات</button>
     </nav>
 
     <main class="flex-1 overflow-y-auto pb-20">
         
-        <section id="section-nearby" class="p-4 space-y-4">
+        <section id="section-nearby" class="active p-4 space-y-4">
             <div class="bg-blue-100 p-4 rounded-xl flex items-center justify-between">
-                <div>
-                    <h3 class="font-bold text-blue-800">رادار القريبين نشط</h3>
-                    <p class="text-sm text-blue-600">يتم عرض الأشخاص في نطاق 5 كم</p>
-                </div>
-                <button onclick="location.reload()" class="bg-blue-500 text-white p-2 rounded-full"><i class="fas fa-sync"></i></button>
+                <h3 class="font-bold text-blue-800">رادار القريبين نشط</h3>
+                <button class="bg-blue-500 text-white p-2 rounded-full" onclick="location.reload()"><i class="fas fa-sync"></i></button>
             </div>
-            <div class="bg-white p-3 rounded-xl shadow-sm flex items-center justify-between">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-xl">ن</div>
-                    <div class="mr-3"><h4 class="font-bold">نبيل (أنت)</h4><p class="text-xs text-green-500 font-bold">نشط الآن</p></div>
+            <div class="bg-white p-3 rounded-xl shadow-sm flex items-center border-r-4 border-green-500">
+                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">ن</div>
+                <div class="mr-3 text-right">
+                    <h4 class="font-bold">نبيل (أنت)</h4>
+                    <p class="text-xs text-green-500">متصل الآن</p>
                 </div>
             </div>
         </section>
 
-        <section id="section-profile" class="hidden p-6 text-center">
+        <section id="section-chats" class="p-4">
+            <div onclick="openChat('أحمد')" class="bg-white p-4 rounded-xl shadow-sm flex items-center cursor-pointer mb-2">
+                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white">أ</div>
+                <div class="mr-3 text-right">
+                    <h4 class="font-bold">أحمد</h4>
+                    <p class="text-xs text-gray-500">أهلاً بك في سحابة "أنا هنا"</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-profile" class="p-6 text-center">
             <div class="relative inline-block">
                 <img src="https://ui-avatars.com/api/?name=Nabeel&size=128" class="w-32 h-32 rounded-full border-4 border-white shadow-xl">
-                <button onclick="document.getElementById('fileInp').click()" class="absolute bottom-0 left-0 bg-green-500 text-white p-2 rounded-full shadow-lg">
+                <button onclick="document.getElementById('fileInp').click()" class="absolute bottom-0 left-0 bg-green-500 text-white p-3 rounded-full shadow-lg">
                     <i class="fas fa-camera"></i>
                 </button>
                 <input type="file" id="fileInp" class="hidden" onchange="uploadToCloud(this.files[0])">
             </div>
-            <h2 class="text-2xl font-bold mt-4 text-gray-800">نبيل</h2>
-            <p id="upload-status" class="text-gray-500 mt-2">اضغط على الكاميرا لرفع الصور للسحابة</p>
-        </section>
-
-        <section id="section-chats" class="hidden divide-y">
-            <div onclick="openChat('أحمد')" class="flex items-center p-4 bg-white cursor-pointer hover:bg-gray-50">
-                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white">أ</div>
-                <div class="mr-3 flex-1">
-                    <h4 class="font-bold text-gray-800">أحمد</h4>
-                    <p class="text-xs text-gray-500 truncate">أهلاً بك في سحابة "أنا هنا"</p>
-                </div>
-            </div>
+            <h2 class="text-2xl font-bold mt-4">نبيل</h2>
+            <p id="status-msg" class="text-gray-500 mt-2 italic text-sm">اضغط على الكاميرا للرفع للسحابة</p>
         </section>
 
     </main>
 
     <div id="chat-window" class="fixed inset-0 bg-white z-[100] hidden flex flex-col">
         <header class="bg-[#075E54] text-white p-4 flex items-center justify-between">
-            <div class="flex items-center">
-                <button onclick="closeChat()" class="ml-4"><i class="fas fa-arrow-right"></i></button>
-                <h4 id="chat-name" class="font-bold text-lg">أحمد</h4>
-            </div>
+            <button onclick="closeChat()" class="ml-4"><i class="fas fa-arrow-right"></i></button>
+            <h4 id="chat-name" class="font-bold">أحمد</h4>
             <div class="flex space-x-6 space-x-reverse">
-                <button onclick="startCall('فيديو')"><i class="fas fa-video text-xl"></i></button>
-                <button onclick="startCall('صوتية')"><i class="fas fa-phone text-xl"></i></button>
+                <button onclick="alert('جاري بدء مكالمة فيديو...')"><i class="fas fa-video"></i></button>
+                <button onclick="alert('جاري الاتصال الصوتي...')"><i class="fas fa-phone"></i></button>
             </div>
         </header>
-        <div class="flex-1 chat-bg p-4" id="chat-messages"></div>
+        <div class="flex-1 chat-bg p-4 overflow-y-auto"></div>
         <footer class="p-2 bg-gray-100 flex items-center">
-            <input type="text" placeholder="اكتب رسالة..." class="flex-1 p-2 rounded-full border border-gray-300 focus:outline-none focus:border-[#128c7e]">
-            <button onclick="alert('جاري إرسال الرسالة للسحابة...')" class="mr-2 text-[#128c7e] text-2xl px-2"><i class="fas fa-paper-plane"></i></button>
+            <input type="text" placeholder="اكتب رسالة..." class="flex-1 p-2 rounded-full border focus:outline-none focus:ring-1 focus:ring-green-500">
+            <button onclick="alert('جاري الإرسال للسحابة...')" class="mr-2 text-[#128c7e] text-2xl"><i class="fas fa-paper-plane"></i></button>
         </footer>
     </div>
 
-    <div id="call-screen" class="fixed inset-0 bg-slate-900 z-[200] hidden flex flex-col items-center justify-center text-white">
-        <div class="w-32 h-32 bg-green-500 rounded-full flex items-center justify-center mb-6 animate-pulse"><i class="fas fa-user text-5xl"></i></div>
-        <h2 id="call-title" class="text-2xl font-bold">جاري الاتصال...</h2>
-        <button onclick="endCall()" class="mt-20 bg-red-500 p-6 rounded-full shadow-2xl"><i class="fas fa-phone-slash text-2xl"></i></button>
-    </div>
-
     <script>
-        // إعدادات البيئة (Environment) الخاصة بك يا نبيل
-        const Environment = {
-            appwriteProjectId: '69ba1fa10035b7f1de96',
-            appwriteProjectName: 'انا هنا ',
-            appwritePublicEndpoint: 'https://fra.cloud.appwrite.io/v1'
-        };
+        const sdk = new Appwrite.Client()
+            .setEndpoint('https://fra.cloud.appwrite.io/v1')
+            .setProject('69ba1fa10035b7f1de96');
 
-        const client = new Appwrite.Client()
-            .setEndpoint(Environment.appwritePublicEndpoint)
-            .setProject(Environment.appwriteProjectId);
+        const storage = new Appwrite.Storage(sdk);
 
-        const storage = new Appwrite.Storage(client);
-        const account = new Appwrite.Account(client);
-
-        // تفعيل الجلسة تلقائياً
-        async function init() {
-            try { await account.createAnonymousSession(); } catch(e) {}
-        }
-        init();
-
-        // وظائف الأزرار
+        // وظيفة التنقل بين الصفحات
         function showSection(id) {
-            document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
-            document.getElementById('section-' + id).classList.remove('hidden');
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
             document.getElementById('tab-' + id)?.classList.add('tab-active');
         }
 
+        // وظائف الدردشة
         function openChat(name) {
             document.getElementById('chat-name').innerText = name;
             document.getElementById('chat-window').classList.remove('hidden');
         }
-
         function closeChat() { document.getElementById('chat-window').classList.add('hidden'); }
 
-        function startCall(type) {
-            document.getElementById('call-title').innerText = "مكالمة " + type + "...";
-            document.getElementById('call-screen').classList.remove('hidden');
-        }
-
-        function endCall() { document.getElementById('call-screen').classList.add('hidden'); }
-
-        // محرك الرفع السحابي (القلب)
+        // محرك الرفع السحابي
         async function uploadToCloud(file) {
             if(!file) return;
-            const status = document.getElementById('upload-status');
-            status.innerText = "⏳ جاري الرفع للسحابة...";
-            status.className = "text-blue-500 mt-2 font-bold";
-
+            const msg = document.getElementById('status-msg');
+            msg.innerText = "⏳ جاري الرفع للسحابة...";
             try {
                 await storage.createFile('69ba233f001368959e2e', 'unique()', file);
-                status.innerText = "✅ تم الرفع بنجاح!";
-                status.className = "text-green-600 mt-2 font-bold";
-                alert("تم رفع الملف بنجاح إلى مشروعك: " + Environment.appwriteProjectName);
+                msg.innerText = "✅ تم الرفع بنجاح يا نبيل!";
+                alert("تم رفع الملف إلى سحابة Appwrite!");
             } catch (err) {
-                status.innerText = "❌ خطأ في الرفع (تأكد من الأذونات)";
-                status.className = "text-red-500 mt-2 font-bold";
+                msg.innerText = "❌ خطأ: تأكد من الأذونات";
             }
         }
     </script>
