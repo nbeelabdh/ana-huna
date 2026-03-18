@@ -1,330 +1,379 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أنا هنا - لودو وغرف صوتية</title>
+    <title>أنا هنا - النسخة المتكاملة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-        :root {
-            --app-green: #075e54;
-            --app-teal: #128c7e;
-        }
-        body { font-family: 'Cairo', sans-serif; background-color: #f4f7f6; color: #1c1e21; overflow: hidden; margin: 0; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; color: #334155; overflow: hidden; }
         
-        /* Header & Tabs - Like Image 1 */
-        header { background-color: var(--app-green); color: white; }
-        .tab-item { padding: 12px 0; font-weight: 600; font-size: 14px; flex: 1; text-align: center; cursor: pointer; border-bottom: 3px solid transparent; }
-        .tab-item.active { border-bottom-color: white; opacity: 1; }
-        .tab-item:not(.active) { opacity: 0.7; }
-
-        section { display: none; height: calc(100vh - 110px); overflow-y: auto; }
-        section.active { display: flex; flex-direction: column; }
-
-        /* Flags Scrolling */
-        .flags-bar { display: flex; gap: 15px; overflow-x: auto; padding: 15px; background: white; border-bottom: 1px solid #eee; scrollbar-width: none; }
-        .flags-bar::-webkit-scrollbar { display: none; }
-        .flag-unit { min-width: 60px; text-align: center; }
-        .flag-img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover; }
-
-        /* Ludo Pro Design - Like Image 2 */
-        .ludo-wrapper { background: #1a1a1a; padding: 10px; border-radius: 15px; margin: 10px; }
-        .ludo-board { 
-            display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr); 
-            width: 100%; aspect-ratio: 1/1; background: #fff; border: 2px solid #000;
-        }
-        .cell { border: 0.5px solid #ddd; position: relative; }
-        .b-red { background: #ff4d4d; } .b-green { background: #2ecc71; } .b-yellow { background: #f1c40f; } .b-blue { background: #3498db; }
-        .home-area { grid-column: span 6; grid-row: span 6; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .pawn-spot { background: white; border-radius: 50%; width: 100%; aspect-ratio: 1/1; border: 1px solid #ccc; position: relative; }
-        .pawn { width: 80%; height: 80%; border-radius: 50%; border: 2px solid white; position: absolute; top: 10%; left: 10%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .center-home { grid-column: 7 / 10; grid-row: 7 / 10; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .triangle { width: 0; height: 0; border-style: solid; position: absolute; }
+        section { display: none; height: calc(100vh - 70px); overflow-y: auto; padding-bottom: 100px; }
+        section.active { display: block; }
         
-        /* Room Interaction */
-        .mic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 15px; }
-        .user-seat { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .avatar-ring { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--app-teal); display: flex; align-items: center; justify-content: center; background: #f0fdfa; position: relative; }
-        .crown-icon { position: absolute; -top-2: -5px; background: #fbbf24; border-radius: 50%; padding: 3px; font-size: 8px; color: white; }
+        /* Reels UI */
+        section#sec-reels { background-color: #000; height: 100vh; overflow: hidden; padding: 0; position: relative; }
+        .reels-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; scrollbar-width: none; }
+        .reel-video { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Action Sheet */
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: none; }
-        .sheet-content { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 25px 25px 0 0; transition: 0.4s; z-index: 2001; padding: 25px; }
-        .sheet-content.active { bottom: 0; }
-        .action-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 15px; border-radius: 15px; font-weight: bold; font-size: 12px; }
+        /* Flags Styling */
+        .flags-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 10px; scrollbar-width: none; background: white; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .flag-item { min-width: 60px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; opacity: 0.6; transition: 0.3s; }
+        .flag-item.active { opacity: 1; transform: scale(1.1); color: #3b82f6; }
+        .flag-img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #eee; }
+        .all-icon { width: 35px; height: 35px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
+
+        /* Navigation */
+        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; height: 70px; border-top: 1px solid #e2e8f0; z-index: 100; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #64748b; }
+        .nav-btn.active { color: #0ea5e9; }
+        .reels-nav-active { background: #000; color: white; border: none; }
+
+        /* Bottom Sheet for Comments */
+        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-top-left-radius: 30px; border-top-right-radius: 30px; transition: 0.4s; z-index: 400; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 -10px 20px rgba(0,0,0,0.2); }
+        .bottom-sheet.open { bottom: 0; }
+        
+        .comment-node { border-right: 2px solid #f1f5f9; padding-right: 12px; margin-bottom: 15px; position: relative; }
+        .reply-node { margin-right: 20px; border-right: 2px solid #3b82f6; padding: 8px; margin-top: 5px; background: #f8fafc; border-radius: 10px; font-size: 0.8rem; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-blur: 4px; }
+        .modal-content { background: white; width: 100%; max-width: 350px; border-radius: 30px; padding: 25px; }
     </style>
 </head>
 <body>
 
-    <!-- Header & Tabs -->
-    <header>
-        <div class="p-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold">أنا هنا</h1>
-            <div class="flex gap-5 text-lg">
-                <i class="fas fa-search"></i>
-                <i class="fas fa-user-plus"></i>
-                <i class="fas fa-ellipsis-v"></i>
-            </div>
-        </div>
-        <div class="flex">
-            <div class="tab-item" onclick="showSection('nearby')">القريبين</div>
-            <div class="tab-item active" onclick="showSection('rooms')">مجموعات</div>
-            <div class="tab-item" onclick="showSection('games')">الألعاب</div>
-            <div class="tab-item" onclick="showSection('calls')">مكالمات</div>
-        </div>
-    </header>
-
     <main>
-        <!-- قسم المجموعات والغرف -->
-        <section id="sec-rooms" class="active">
-            <!-- شريط الأعلام -->
-            <div class="flags-bar" id="flags-list"></div>
-
-            <div class="p-4 flex-1">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold">الغرف الصوتية النشطة</h3>
-                    <span class="text-xs text-blue-600 font-bold">رؤية الكل</span>
-                </div>
-                
-                <div id="rooms-container" class="space-y-3">
-                    <!-- غرفة افتراضية -->
-                    <div class="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border-r-4 border-green-600" onclick="openRoom('ديوان اليمن السعيد')">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold">🇾🇪</div>
-                            <div>
-                                <h4 class="font-bold">ديوان اليمن السعيد</h4>
-                                <p class="text-[10px] text-slate-400">45 شخص يتحدثون الآن...</p>
-                            </div>
+        <!-- 1. الريلز -->
+        <section id="sec-reels" class="active">
+            <div class="reels-container">
+                <div class="reel-video">
+                    <video loop playsinline autoplay muted onclick="this.paused ? this.play() : this.pause()">
+                        <source src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1282-large.mp4" type="video/mp4">
+                    </video>
+                    <div class="absolute bottom-24 right-4 text-white z-10">
+                        <h3 class="font-bold text-lg">@نبيل_اليماني</h3>
+                        <p class="text-sm opacity-80 text-right">نظام شامل: تعليقات + غرف 🚀</p>
+                    </div>
+                    <!-- أزرار التفاعل -->
+                    <div class="absolute bottom-24 left-4 flex flex-col gap-6 text-white text-center z-20">
+                        <div onclick="handleLike(this)" class="cursor-pointer">
+                            <i class="far fa-heart text-2xl mb-1"></i><br><span class="text-[10px]">2.4k</span>
                         </div>
-                        <button class="bg-green-600 text-white px-4 py-1 rounded-lg text-xs">دخول</button>
+                        <div onclick="openCommentsSheet()" class="cursor-pointer">
+                            <i class="fas fa-comment text-2xl mb-1"></i><br><span class="text-[10px]">120</span>
+                        </div>
+                        <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-share"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- قسم الألعاب (اللودو) -->
-        <section id="sec-games" class="p-2">
-            <div class="ludo-wrapper shadow-2xl">
-                <div class="flex justify-between items-center mb-2 px-2">
-                    <div class="flex items-center gap-2 text-white">
-                        <div class="w-8 h-8 rounded-full bg-red-500 border border-white"></div>
-                        <span class="text-xs font-bold">نبيل (الأحمر)</span>
+        <!-- 2. القريبين -->
+        <section id="sec-nearby" class="p-5">
+            <h2 class="text-2xl font-bold mb-6">الأشخاص القريبين</h2>
+            <div id="nearby-list" class="space-y-4">
+                <div class="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-slate-50">
+                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center font-bold">A</div>
+                    <div class="flex-1 text-right">
+                        <h4 class="font-bold text-sm">أحمد الشميري</h4>
+                        <p class="text-[11px] text-blue-600 font-mono font-bold">#ID-88210</p>
                     </div>
-                    <button onclick="rollDice()" class="bg-white text-black px-6 py-2 rounded-xl font-bold text-xl shadow-lg active:scale-95 transition">🎲 <span id="dice-result">?</span></button>
-                </div>
-
-                <div class="ludo-board">
-                    <!-- Green Home -->
-                    <div class="home-area b-green">
-                        <div class="pawn-spot"><div class="pawn b-green"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-green"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-green"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-green"></div></div>
-                    </div>
-                    <!-- Top Path -->
-                    <div class="cell"></div><div class="cell b-yellow"></div><div class="cell"></div>
-                    <!-- Yellow Home -->
-                    <div class="home-area b-yellow">
-                        <div class="pawn-spot"><div class="pawn b-yellow"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-yellow"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-yellow"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-yellow"></div></div>
-                    </div>
-
-                    <!-- Side Paths & Center -->
-                    <div class="cell"></div><div class="cell b-green"></div><div class="cell"></div><div class="cell"></div><div class="cell b-green"></div><div class="cell"></div>
-                    <div class="center-home font-bold text-[8px] text-black">HOME</div>
-                    <div class="cell"></div><div class="cell b-yellow"></div><div class="cell"></div><div class="cell"></div><div class="cell b-yellow"></div><div class="cell"></div>
-
-                    <!-- Red Home -->
-                    <div class="home-area b-red">
-                        <div class="pawn-spot"><div class="pawn b-red"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-red"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-red"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-red"></div></div>
-                    </div>
-                    <!-- Bottom Path -->
-                    <div class="cell"></div><div class="cell b-red"></div><div class="cell"></div>
-                    <!-- Blue Home -->
-                    <div class="home-area b-blue">
-                        <div class="pawn-spot"><div class="pawn b-blue"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-blue"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-blue"></div></div>
-                        <div class="pawn-spot"><div class="pawn b-blue"></div></div>
-                    </div>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">مراسلة</button>
                 </div>
             </div>
-            
-            <div class="flex-1 bg-white mx-2 rounded-t-2xl p-4 shadow-inner">
-                <h4 class="font-bold text-sm mb-2 border-b pb-1">دردشة الألعاب</h4>
-                <div id="game-chat" class="h-32 overflow-y-auto text-xs space-y-2 mb-2">
-                    <div class="text-slate-400">نظام: بدأت اللعبة، دور اللاعب الأحمر.</div>
-                </div>
-                <div class="flex gap-2">
-                    <input type="text" id="game-input" placeholder="اكتب للاعبين..." class="flex-1 bg-slate-100 p-2 rounded-full text-xs outline-none">
-                    <button onclick="sendGameMsg()" class="w-8 h-8 bg-green-700 text-white rounded-full"><i class="fas fa-paper-plane"></i></button>
+        </section>
+
+        <!-- 3. الغرف -->
+        <section id="sec-rooms" class="p-5 text-right">
+            <div class="flex justify-between items-center mb-6 px-1">
+                <h2 class="text-2xl font-bold">الغرف الصوتية</h2>
+                <button onclick="showCreateRoomModal()" class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+
+            <div class="flags-scroll" id="flags-bar">
+                <div class="flag-item active" onclick="filterByCountry('الكل', this)">
+                    <div class="all-icon">الكل</div>
+                    <span class="text-[9px] font-bold">الكل</span>
                 </div>
             </div>
+
+            <div class="relative mb-6">
+                <input type="text" id="room-search" oninput="runRoomSearch()" placeholder="ابحث عن غرفة بالـ ID..." class="w-full bg-white p-4 pr-12 rounded-2xl outline-none shadow-sm text-sm border-2 border-transparent focus:border-blue-400 transition">
+                <i class="fas fa-hashtag absolute right-4 top-4 text-slate-300"></i>
+            </div>
+
+            <div id="rooms-container" class="space-y-4 text-right">
+                <!-- الغرف -->
+            </div>
+        </section>
+
+        <!-- 4. الدردشة -->
+        <section id="sec-chats" class="p-10 text-center text-slate-400">
+            <i class="fas fa-comments text-5xl mb-4 opacity-20"></i>
+            <p>لا يوجد رسائل</p>
         </section>
     </main>
 
-    <!-- واجهة الغرفة الكاملة -->
-    <div id="room-ui" class="fixed inset-0 bg-white z-[1500] hidden flex flex-col">
-        <div class="bg-green-900 text-white p-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-arrow-right" onclick="closeRoom()"></i>
-                <h2 id="active-room-title" class="font-bold">اسم الغرفة</h2>
-            </div>
-            <i class="fas fa-cog"></i>
+    <!-- واجهة التعليقات -->
+    <div id="comments-sheet" class="bottom-sheet">
+        <div class="p-4 border-b flex justify-between items-center font-bold">
+            <span id="comments-count">التعليقات (1)</span>
+            <i class="fas fa-times text-slate-300 p-2" onclick="closeCommentsSheet()"></i>
+        </div>
+        
+        <div id="comments-display" class="flex-1 p-4 overflow-y-auto text-right">
+            <!-- قائمة التعليقات -->
         </div>
 
-        <div class="flex-1 overflow-y-auto">
-            <div class="mic-grid">
-                <!-- المايكات -->
-                <div class="user-seat" onclick="openUserSheet('نبيل اليماني', true)">
-                    <div class="avatar-ring bg-blue-50">ن<i class="fas fa-crown crown-icon"></i></div>
-                    <span class="text-[10px] mt-1 font-bold">نبيل</span>
-                </div>
-                <div class="user-seat" onclick="openUserSheet('أحمد علي', false)">
-                    <div class="avatar-ring border-slate-200">أ</div>
-                    <span class="text-[10px] mt-1">أحمد</span>
-                </div>
-                <!-- مايكات فارغة -->
-                <div class="user-seat">
-                    <div class="avatar-ring border-dashed border-slate-300 bg-transparent text-slate-300"><i class="fas fa-plus"></i></div>
-                    <span class="text-[10px] mt-1 text-slate-300">متاح</span>
-                </div>
-            </div>
+        <div id="reply-tag" class="hidden bg-blue-50 p-2 px-4 flex justify-between items-center text-[10px] text-blue-600 border-t">
+            <span>الرد على: <b id="reply-name">...</b></span>
+            <i class="fas fa-times-circle" onclick="clearReply()"></i>
+        </div>
 
-            <!-- دردشة الغرفة -->
-            <div class="p-4 border-t">
-                <div id="room-msgs" class="h-64 overflow-y-auto mb-4 space-y-3">
-                    <div class="text-[10px] text-center text-slate-400">أهلاً بك في الديوان 🌹</div>
+        <div class="p-4 border-t flex gap-2 pb-10 bg-white">
+            <input type="text" id="comment-input" placeholder="اكتب شيئاً..." class="flex-1 bg-slate-100 p-3 rounded-xl outline-none text-sm border focus:border-blue-400 transition">
+            <button onclick="handleCommentAction()" class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-md">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal إنشاء غرفة -->
+    <div id="create-room-modal" class="modal-overlay">
+        <div class="modal-content text-right">
+            <h3 class="text-xl font-bold mb-6 text-center">فتح غرفة جديدة</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 block mb-1">اسم الغرفة</label>
+                    <input type="text" id="room-name-field" placeholder="مثال: شباب عدن" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border">
                 </div>
-                <div class="flex gap-2 items-center bg-slate-100 p-2 rounded-full">
-                    <i class="fas fa-gift text-orange-500 ml-2"></i>
-                    <input type="text" id="room-input-msg" placeholder="دردش الآن..." class="flex-1 bg-transparent text-xs outline-none">
-                    <button onclick="sendRoomMsg()" class="bg-green-700 text-white w-8 h-8 rounded-full"><i class="fas fa-paper-plane text-[10px]"></i></button>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 block mb-1">الدولة</label>
+                    <select id="room-country-field" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border appearance-none">
+                        <!-- خيارات الدول -->
+                    </select>
                 </div>
+                <div class="bg-blue-50 p-4 rounded-2xl flex justify-between items-center border border-blue-100">
+                    <span class="text-xs font-bold text-blue-400">ID الغرفة:</span>
+                    <span id="room-id-gen" class="font-bold text-blue-700 font-mono">#ID-0000</span>
+                </div>
+                <button onclick="finalizeCreateRoom()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg mt-4">إنشاء الآن</button>
+                <button onclick="hideModal()" class="w-full text-slate-400 text-sm font-bold pt-2 text-center">إلغاء</button>
             </div>
         </div>
     </div>
 
-    <!-- قائمة التحكم بالعضو -->
-    <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
-    <div class="sheet-content" id="sheet">
-        <div class="flex flex-col items-center mb-8">
-            <div id="u-avatar" class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-2xl font-bold text-slate-600 mb-2">؟</div>
-            <h3 id="u-name" class="font-bold text-lg">اسم المستخدم</h3>
-            <p class="text-[10px] text-slate-400">ID: 10092837</p>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-            <button class="action-btn bg-blue-50 text-blue-600" onclick="alert('تمت إضافة الصديق')"><i class="fas fa-user-plus"></i> إضافة صديق</button>
-            <button class="action-btn bg-teal-50 text-teal-600" onclick="goToPrivateChat()"><i class="fas fa-comment-dots"></i> محادثة خاصة</button>
-            <button class="action-btn bg-orange-50 text-orange-600" onclick="alert('تم إنزاله من المايك')"><i class="fas fa-microphone-slash"></i> إنزال مايك</button>
-            <button class="action-btn bg-red-50 text-red-600" onclick="confirmKick()"><i class="fas fa-user-times"></i> طرد من الغرفة</button>
-        </div>
-        <button class="w-full mt-8 py-3 text-slate-400 font-bold" onclick="closeSheet()">إلغاء</button>
-    </div>
+    <!-- القائمة السفلية -->
+    <nav id="bottom-nav" class="reels-nav-active">
+        <button onclick="switchTab('reels')" id="btn-reels" class="nav-btn active"><i class="fas fa-play-circle text-xl"></i><span>ريلز</span></button>
+        <button onclick="switchTab('nearby')" id="btn-nearby" class="nav-btn"><i class="fas fa-street-view text-xl"></i><span>القريبين</span></button>
+        <button onclick="switchTab('rooms')" id="btn-rooms" class="nav-btn"><i class="fas fa-microphone-alt text-xl"></i><span>الغرف</span></button>
+        <button onclick="switchTab('chats')" id="btn-chats" class="nav-btn"><i class="fas fa-comment-alt text-xl"></i><span>دردشة</span></button>
+    </nav>
 
     <script>
-        const countries = [
-            {name: 'اليمن', code: 'ye'}, {name: 'السعودية', code: 'sa'},
-            {name: 'مصر', code: 'eg'}, {name: 'العراق', code: 'iq'},
-            {name: 'المغرب', code: 'ma'}, {name: 'الكويت', code: 'kw'},
-            {name: 'تونس', code: 'tn'}, {name: 'الأردن', code: 'jo'}
+        // --- البيانات والتعريفات ---
+        const arabCountries = [
+            {n: 'اليمن', c: 'ye'}, {n: 'السعودية', c: 'sa'}, {n: 'الإمارات', c: 'ae'}, 
+            {n: 'العراق', c: 'iq'}, {n: 'فلسطين', c: 'ps'}, {n: 'مصر', c: 'eg'}, 
+            {n: 'عمان', c: 'om'}, {n: 'الكويت', c: 'kw'}, {n: 'قطر', c: 'qa'}, 
+            {n: 'الأردن', c: 'jo'}, {n: 'المغرب', c: 'ma'}
         ];
 
-        let selectedUser = "";
+        let commentsData = [{id: 1, user: 'نبيل اليماني', text: 'مرحباً بكم في نظامي المطور!', replies: []}];
+        let roomsData = [{id: '#ID-7721', name: 'غرفة الدردشة العامة', country: 'اليمن', flag: 'ye'}];
+        
+        let activeReplyId = null;
+        let activeEditId = null;
 
         window.onload = () => {
-            const list = document.getElementById('flags-list');
-            list.innerHTML = countries.map(c => `
-                <div class="flag-unit" onclick="filterBy('${c.name}')">
-                    <img src="https://flagcdn.com/w160/${c.code}.png" class="flag-img">
-                    <p class="text-[10px] mt-1 font-bold text-slate-600">${c.name}</p>
-                </div>
-            `).join('');
+            initFlags();
+            initCountrySelect();
+            updateRoomsDisplay('الكل');
+            updateCommentsDisplay();
         };
 
-        function showSection(id) {
-            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            document.getElementById('sec-' + id).classList.add('active');
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+        // --- نظام الغرف والدول ---
+        function initFlags() {
+            const bar = document.getElementById('flags-bar');
+            const currentHTML = bar.innerHTML;
+            bar.innerHTML = currentHTML + arabCountries.map(c => `
+                <div class="flag-item" onclick="filterByCountry('${c.n}', this)">
+                    <img src="https://flagcdn.com/w80/${c.c}.png" class="flag-img shadow-sm">
+                    <span class="text-[9px] font-bold">${c.n}</span>
+                </div>
+            `).join('');
         }
 
-        // --- نظام الغرفة ---
-        function openRoom(name) {
-            document.getElementById('room-ui').classList.remove('hidden');
-            document.getElementById('active-room-title').innerText = name;
+        function initCountrySelect() {
+            const select = document.getElementById('room-country-field');
+            select.innerHTML = arabCountries.map(c => `<option value="${c.n}">${c.n}</option>`).join('');
         }
 
-        function closeRoom() {
-            document.getElementById('room-ui').classList.add('hidden');
+        function filterByCountry(name, el) {
+            document.querySelectorAll('.flag-item').forEach(f => f.classList.remove('active'));
+            el.classList.add('active');
+            updateRoomsDisplay(name);
         }
 
-        function openUserSheet(name, isMe) {
-            if(isMe) return;
-            selectedUser = name;
-            document.getElementById('u-name').innerText = name;
-            document.getElementById('u-avatar').innerText = name[0];
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('sheet').classList.add('active');
-        }
-
-        function closeSheet() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('sheet').classList.remove('active');
-        }
-
-        function goToPrivateChat() {
-            alert("جارٍ الانتقال للخاص مع " + selectedUser);
-            closeSheet();
-            closeRoom();
-            // الانتقال لتبويب الدردشة
-        }
-
-        function confirmKick() {
-            if(confirm("هل أنت متأكد من طرد " + selectedUser + "؟")) {
-                alert("تم الطرد بنجاح");
-                closeSheet();
+        function updateRoomsDisplay(filter = 'الكل') {
+            const container = document.getElementById('rooms-container');
+            const list = filter === 'الكل' ? roomsData : roomsData.filter(r => r.country === filter);
+            
+            if(list.length === 0) {
+                container.innerHTML = `<p class="text-center py-10 text-slate-400 text-xs">لا توجد غرف في ${filter}</p>`;
+                return;
             }
+
+            container.innerHTML = list.map(r => `
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border-r-4 border-blue-500" data-rid="${r.id}">
+                    <div class="flex items-center gap-3">
+                        <img src="https://flagcdn.com/w80/${arabCountries.find(c=>c.n===r.country)?.c || 'ye'}.png" class="w-8 h-8 rounded-full border">
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-800">${r.name}</h4>
+                            <p class="text-[9px] text-slate-400">${r.country} • بث مباشر</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-mono bg-blue-50 text-blue-600 p-1 px-2 rounded-lg font-bold">${r.id}</span>
+                </div>
+            `).join('');
         }
 
-        function sendRoomMsg() {
-            const input = document.getElementById('room-input-msg');
-            if(!input.value) return;
-            const chat = document.getElementById('room-msgs');
-            chat.innerHTML += `<div class="bg-blue-600 text-white p-2 rounded-2xl rounded-tr-none text-xs w-fit mr-auto">أنا: ${input.value}</div>`;
-            input.value = '';
-            chat.scrollTop = chat.scrollHeight;
+        function showCreateRoomModal() {
+            document.getElementById('room-id-gen').innerText = "#ID-" + Math.floor(1000 + Math.random() * 8999);
+            document.getElementById('create-room-modal').style.display = 'flex';
         }
 
-        // --- نظام اللودو ---
-        function rollDice() {
-            const result = document.getElementById('dice-result');
-            const val = Math.floor(Math.random() * 6) + 1;
-            result.innerText = "...";
-            setTimeout(() => {
-                result.innerText = val;
-                const chat = document.getElementById('game-chat');
-                chat.innerHTML += `<div>🎲 نبيل حصل على الرقم <b>${val}</b></div>`;
-                chat.scrollTop = chat.scrollHeight;
-            }, 500);
+        function hideModal() { document.getElementById('create-room-modal').style.display = 'none'; }
+
+        function finalizeCreateRoom() {
+            const name = document.getElementById('room-name-field').value || "غرفة جديدة";
+            const country = document.getElementById('room-country-field').value;
+            const id = document.getElementById('room-id-gen').innerText;
+            const flag = arabCountries.find(c => c.n === country).c;
+
+            roomsData.unshift({id, name, country, flag});
+            updateRoomsDisplay('الكل');
+            hideModal();
+            document.getElementById('room-name-field').value = "";
         }
 
-        function sendGameMsg() {
-            const input = document.getElementById('game-input');
-            if(!input.value) return;
-            const chat = document.getElementById('game-chat');
-            chat.innerHTML += `<div class="text-white bg-green-800 p-1 rounded w-fit">أنا: ${input.value}</div>`;
-            input.value = '';
-            chat.scrollTop = chat.scrollHeight;
+        function runRoomSearch() {
+            const val = document.getElementById('room-search').value.toUpperCase();
+            document.querySelectorAll('#rooms-container > div').forEach(div => {
+                const id = div.querySelector('span').innerText;
+                div.style.display = id.includes(val) ? 'flex' : 'none';
+            });
         }
-    </script>
-</body>
-</html>
 
+        // --- نظام التعليقات والريلز ---
+        function openCommentsSheet() { document.getElementById('comments-sheet').classList.add('open'); }
+        function closeCommentsSheet() { document.getElementById('comments-sheet').classList.remove('open'); }
+
+        function updateCommentsDisplay() {
+            const container = document.getElementById('comments-display');
+            document.getElementById('comments-count').innerText = `التعليقات (${commentsData.length})`;
+            
+            container.innerHTML = commentsData.map(c => `
+                <div class="comment-node">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="font-bold text-xs">${c.user}</span>
+                            <p class="text-sm text-slate-700">${c.text}</p>
+                        </div>
+                        <div class="flex gap-2 text-slate-300 text-[10px]">
+                            <i class="fas fa-edit p-1" onclick="initEdit(${c.id}, '${c.text}')"></i>
+                            <i class="fas fa-trash p-1" onclick="doDeleteComment(${c.id})"></i>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mt-1 text-[10px] font-bold text-slate-400">
+                        <span class="text-blue-500 cursor-pointer" onclick="initReply(${c.id}, '${c.user}')">رد</span>
+                        <span>الآن</span>
+                    </div>
+                    ${c.replies.map(r => `
+                        <div class="reply-node">
+                            <div class="flex justify-between">
+                                <span class="font-bold text-blue-600">${r.user}</span>
+                                <i class="fas fa-trash text-slate-200" onclick="doDeleteReply(${c.id}, ${r.id})"></i>
+                            </div>
+                            <p>${r.text}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        function handleCommentAction() {
+            const input = document.getElementById('comment-input');
+            const val = input.value.trim();
+            if(!val) return;
+
+            if(activeEditId) {
+                const c = commentsData.find(x => x.id === activeEditId);
+                if(c) c.text = val;
+                activeEditId = null;
+            } else if(activeReplyId) {
+                const c = commentsData.find(x => x.id === activeReplyId);
+                if(c) c.replies.push({id: Date.now(), user: 'أنا', text: val});
+                clearReply();
+            } else {
+                commentsData.unshift({id: Date.now(), user: 'أنا', text: val, replies: []});
+            }
+
+            input.value = "";
+            updateCommentsDisplay();
+        }
+
+        function initReply(id, name) {
+            activeReplyId = id;
+            activeEditId = null;
+            document.getElementById('reply-tag').classList.remove('hidden');
+            document.getElementById('reply-name').innerText = name;
+            document.getElementById('comment-input').focus();
+        }
+
+        function clearReply() {
+            activeReplyId = null;
+            document.getElementById('reply-tag').classList.add('hidden');
+        }
+
+        function initEdit(id, text) {
+            activeEditId = id;
+            activeReplyId = null;
+            clearReply();
+            const input = document.getElementById('comment-input');
+            input.value = text;
+            input.focus();
+        }
+
+        function doDeleteComment(id) {
+            commentsData = commentsData.filter(c => c.id !== id);
+            updateCommentsDisplay();
+        }
+
+        function doDeleteReply(cId, rId) {
+            const c = commentsData.find(x => x.id === cId);
+            if(c) c.replies = c.replies.filter(r => r.id !== rId);
+            updateCommentsDisplay();
+        }
+
+        function handleLike(el) {
+            const icon = el.querySelector('i');
+            icon.classList.toggle('fas');
+            icon.classList.toggle('far');
+            icon.style.color = icon.classList.contains('fas') ? '#ef4444' : '#fff';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.getElementById('sec-' + tab).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + tab).classList.a
