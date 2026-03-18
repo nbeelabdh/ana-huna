@@ -3,280 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أنا هنا - لودو ودردشة</title>
+    <title>أنا هنا - الإدارة واللودو</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; color: #334155; overflow: hidden; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; color: #1e293b; overflow: hidden; }
         
-        section { display: none; height: calc(100vh - 70px); overflow-y: auto; padding-bottom: 100px; }
+        section { display: none; height: calc(100vh - 70px); overflow-y: auto; padding-bottom: 80px; }
         section.active { display: flex; flex-direction: column; }
-        
-        /* Reels UI */
-        section#sec-reels { background-color: #000; height: 100vh; overflow: hidden; padding: 0; position: relative; }
-        .reels-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; scrollbar-width: none; }
+
+        /* Reels */
         .reel-video { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Ludo Game Styles */
-        #ludo-board { width: 100%; aspect-ratio: 1/1; background: #eee; display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr); border: 2px solid #333; position: relative; }
-        .ludo-cell { border: 0.1px solid #ccc; background: white; }
-        .ludo-home-red { grid-column: 1 / 7; grid-row: 1 / 7; background: #ff4d4d; border: 4px solid white; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
-        .ludo-home-blue { grid-column: 10 / 16; grid-row: 10 / 16; background: #4d94ff; border: 4px solid white; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
-        .ludo-path-center { grid-column: 7 / 10; grid-row: 7 / 10; background: #ddd; }
-        .piece { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3); cursor: pointer; }
-        .red-piece { background: #b30000; }
-        .blue-piece { background: #0047b3; }
+        /* Ludo Board Pro */
+        .ludo-grid { display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr); width: 100%; aspect-ratio: 1/1; border: 4px solid #334155; border-radius: 8px; overflow: hidden; background: white; }
+        .base { grid-column: span 6; grid-row: span 6; border: 1px solid #ddd; position: relative; display: flex; align-items: center; justify-content: center; }
+        .red-base { background: #ff4d4d; }
+        .blue-base { background: #4d94ff; }
+        .green-base { background: #2ecc71; }
+        .yellow-base { background: #f1c40f; }
+        .inner-base { width: 70%; height: 70%; background: white; border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 10px; }
+        .path { border: 0.5px solid #e2e8f0; background: white; }
+        .center-home { grid-column: 7 / 10; grid-row: 7 / 10; background: #334155; }
         
-        /* Navigation */
-        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; height: 70px; border-top: 1px solid #e2e8f0; z-index: 100; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #64748b; }
-        .nav-btn.active { color: #0ea5e9; }
-        .reels-nav-active { background: #000; color: white; border: none; }
+        /* Room UI */
+        .user-mic { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #3b82f6; position: relative; }
+        .mic-off { position: absolute; bottom: 0; right: 0; background: red; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; items-center; justify-content: center; font-size: 10px; }
 
-        /* Comments Bottom Sheet */
-        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-top-left-radius: 30px; border-top-right-radius: 30px; transition: 0.4s; z-index: 500; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 -10px 25px rgba(0,0,0,0.3); }
-        .bottom-sheet.open { bottom: 0; }
+        /* General Navigation */
+        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; height: 70px; border-top: 1px solid #e2e8f0; z-index: 100; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #94a3b8; font-weight: bold; }
+        .nav-btn.active { color: #2563eb; }
+
+        .flag-circle { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s; }
+        .flag-circle:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
 
     <main>
-        <!-- 1. الريلز -->
+        <!-- قسم الريلز -->
         <section id="sec-reels" class="active">
             <div class="absolute top-6 left-6 z-30">
-                <label class="bg-white/20 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center text-white cursor-pointer border border-white/30">
-                    <i class="fas fa-camera text-xl"></i>
-                    <input type="file" accept="video/*" class="hidden" onchange="uploadNewVideo(event)">
-                </label>
+                <label class="bg-black/30 backdrop-blur-md p-3 rounded-full text-white cursor-pointer"><i class="fas fa-camera"></i><input type="file" class="hidden"></label>
             </div>
-            <div class="reels-container" id="reels-list">
-                <div class="reel-video">
-                    <video loop playsinline autoplay muted onclick="this.paused ? this.play() : this.pause()">
-                        <source src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1282-large.mp4" type="video/mp4">
-                    </video>
-                    <div class="absolute bottom-24 right-4 text-white z-10 text-right">
-                        <h3 class="font-bold text-lg">@نبيل_اليماني</h3>
-                        <p class="text-sm opacity-80">الآن مع لعبة اللودو والدردشة! 🎲</p>
-                    </div>
-                    <div class="absolute bottom-24 left-4 flex flex-col gap-6 text-white text-center z-20">
-                        <div onclick="toggleLike(this)" class="cursor-pointer"><i class="far fa-heart text-2xl"></i><br><span class="text-[10px]">2k</span></div>
-                        <div onclick="openComments()" class="cursor-pointer"><i class="fas fa-comment text-2xl"></i><br><span class="text-[10px]">80</span></div>
-                        <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-share"></i></div>
-                    </div>
+            <div class="reel-video">
+                <video loop autoplay muted playsinline src="https://assets.mixkit.co/videos/preview/mixkit-fashion-girl-walking-in-a-neon-city-34327-large.mp4"></video>
+                <div class="absolute bottom-24 right-4 text-white text-right z-10">
+                    <h3 class="font-bold">@نبيل_اليماني</h3>
+                    <p class="text-sm opacity-80">تحديث اللودو والإدارة 🎮👑</p>
+                </div>
+                <div class="absolute bottom-24 left-4 flex flex-col gap-5 text-white z-20">
+                    <div class="text-center"><i class="fas fa-heart text-2xl"></i><br><span class="text-[10px]">3.1k</span></div>
+                    <div class="text-center"><i class="fas fa-comment text-2xl"></i><br><span class="text-[10px]">450</span></div>
                 </div>
             </div>
         </section>
 
-        <!-- 3. الغرف -->
-        <section id="sec-rooms" class="p-5 text-right">
-            <h2 class="text-2xl font-bold mb-4">الغرف والدول</h2>
-            <div id="rooms-container" class="space-y-4">
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <img src="https://flagcdn.com/w80/ye.png" class="w-8 h-8 rounded-full">
-                        <h4 class="font-bold text-sm">مجلس اليمن السعيد</h4>
-                    </div>
-                    <span class="text-[10px] bg-blue-50 text-blue-600 p-1 px-2 rounded-lg font-bold">#7721</span>
-                </div>
+        <!-- قسم الغرف والإدارة -->
+        <section id="sec-rooms" class="p-4">
+            <h2 class="text-xl font-bold mb-4">الدول العربية</h2>
+            <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar" id="flags-list">
+                <!-- الأعلام ستضاف برمجياً -->
             </div>
+
+            <div class="bg-blue-600 rounded-2xl p-4 text-white mb-6 shadow-lg relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="font-bold">غرفتي النشطة</h3>
+                    <p class="text-[10px] opacity-80">تحكم بالمايك والطرد من هنا</p>
+                    <button onclick="openRoomDetails()" class="mt-3 bg-white text-blue-600 px-4 py-1 rounded-lg text-xs font-bold">دخول الغرفة</button>
+                </div>
+                <i class="fas fa-crown absolute -bottom-2 -left-2 text-white/10 text-6xl"></i>
+            </div>
+
+            <h3 class="font-bold mb-3">غرف مقترحة</h3>
+            <div class="space-y-3" id="rooms-list"></div>
         </section>
 
-        <!-- 4. الدردشة ولعبة اللودو -->
-        <section id="sec-chats" class="p-4 h-full">
-            <h2 class="text-xl font-bold mb-3 text-slate-800 flex items-center gap-2">
-                 دردشة ولودو <i class="fas fa-dice text-blue-500"></i>
-            </h2>
-            
-            <!-- لوحة اللودو المصغرة -->
-            <div class="bg-white p-2 rounded-2xl shadow-lg border border-slate-200 mb-4">
-                <div class="flex justify-between items-center mb-2 px-2">
-                    <div id="turn-indicator" class="text-[10px] font-bold bg-red-100 text-red-600 px-3 py-1 rounded-full border border-red-200">دور الأحمر</div>
-                    <div onclick="rollDice()" class="cursor-pointer bg-slate-800 text-white w-10 h-10 rounded-lg flex items-center justify-center shadow-md active:scale-95 transition">
-                        <span id="dice-val" class="text-lg font-bold">?</span>
+        <!-- قسم اللودو والدردشة -->
+        <section id="sec-ludo" class="p-3">
+            <div class="bg-white rounded-3xl p-3 shadow-xl border border-slate-100 mb-4">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-red-500 rounded-full border-2 border-white shadow"></div>
+                        <span class="text-xs font-bold">نبيل (الأحمر)</span>
                     </div>
+                    <div class="bg-slate-100 px-4 py-1 rounded-full text-[10px] font-bold">دورك الآن</div>
+                    <button onclick="rollLudoDice()" id="dice-btn" class="w-12 h-12 bg-slate-800 text-white rounded-xl shadow-lg flex items-center justify-center text-xl font-bold">?</button>
                 </div>
-                
-                <div id="ludo-board">
-                    <div class="ludo-home-red">
-                        <div class="piece red-piece" onclick="movePiece('red', this)"></div>
-                        <div class="piece red-piece" onclick="movePiece('red', this)"></div>
-                    </div>
-                    <div class="ludo-home-blue">
-                        <div class="piece blue-piece" onclick="movePiece('blue', this)"></div>
-                        <div class="piece blue-piece" onclick="movePiece('blue', this)"></div>
-                    </div>
-                    <div class="ludo-path-center"></div>
-                    <!-- خلايا مسار بسيطة للتمثيل -->
-                    <div class="ludo-cell" style="grid-column:7; grid-row:1"></div>
-                    <div class="ludo-cell" style="grid-column:7; grid-row:2"></div>
-                    <div class="ludo-cell" style="grid-column:8; grid-row:1; background: #eee;"></div>
-                    <div class="ludo-cell" style="grid-column:9; grid-row:1"></div>
+
+                <!-- لوحة اللودو الاحترافية -->
+                <div class="ludo-grid" id="ludo-board">
+                    <div class="base red-base"><div class="inner-base">
+                        <div class="w-full aspect-square bg-red-500 rounded-full border-2 border-white shadow cursor-pointer"></div>
+                        <div class="w-full aspect-square bg-red-500 rounded-full border-2 border-white shadow"></div>
+                    </div></div>
+                    <div class="path" style="grid-column: 7; grid-row: 1;"></div>
+                    <div class="path" style="grid-column: 8; grid-row: 1;"></div>
+                    <div class="path" style="grid-column: 9; grid-row: 1;"></div>
+                    <div class="base blue-base"></div>
+                    <!-- تكملة المسارات (تبسيط للتصميم) -->
+                    <div class="center-home"></div>
+                    <div class="base green-base"></div>
+                    <div class="base yellow-base"></div>
                 </div>
             </div>
 
-            <!-- الدردشة -->
-            <div id="chat-box" class="flex-1 bg-white rounded-2xl p-4 shadow-inner overflow-y-auto mb-2 border border-slate-100">
-                <div class="text-[10px] text-center text-slate-400 mb-4">مرحباً بك في ساحة اللعب والدردشة</div>
-                <div id="messages-list" class="space-y-3">
-                    <div class="bg-blue-50 text-blue-700 p-2 rounded-xl text-xs w-fit">نبيل: من يلعب معي لودو؟ 🎲</div>
+            <!-- دردشة اللعبة -->
+            <div class="flex-1 bg-white rounded-2xl shadow-inner p-3 flex flex-col border border-slate-100 overflow-hidden">
+                <div class="flex-1 overflow-y-auto space-y-2 mb-2" id="ludo-chat">
+                    <div class="text-[10px] text-center text-slate-400">بدأت اللعبة.. حظاً موفقاً!</div>
                 </div>
-            </div>
-
-            <div class="flex gap-2 pb-2">
-                <input type="text" id="chat-msg-input" placeholder="اكتب هنا..." class="flex-1 bg-white p-3 rounded-xl outline-none text-sm border shadow-sm">
-                <button onclick="sendChat()" class="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-md"><i class="fas fa-paper-plane"></i></button>
+                <div class="flex gap-2">
+                    <input type="text" id="ludo-input" placeholder="دردش مع اللاعبين..." class="flex-1 bg-slate-50 p-2 rounded-xl text-xs outline-none border">
+                    <button onclick="sendLudoMsg()" class="bg-blue-600 text-white px-4 rounded-xl"><i class="fas fa-paper-plane"></i></button>
+                </div>
             </div>
         </section>
     </main>
 
-    <!-- واجهة التعليقات (نفس الكود المصلح) -->
-    <div id="comments-sheet" class="bottom-sheet">
-        <div class="p-4 border-b flex justify-between items-center font-bold">
-            <span>التعليقات</span>
-            <i class="fas fa-times text-slate-300 p-2" onclick="closeComments()"></i>
+    <!-- واجهة تفاصيل الغرفة (الإدارة) -->
+    <div id="room-modal" class="fixed inset-0 bg-slate-900/90 z-[1000] hidden flex-col">
+        <div class="p-6 flex justify-between items-center text-white">
+            <h2 class="font-bold text-lg">إدارة مجلس اليمن 🇾🇪</h2>
+            <i class="fas fa-times text-2xl" onclick="closeRoomDetails()"></i>
         </div>
-        <div id="comments-list-display" class="flex-1 overflow-y-auto p-2 text-right"></div>
-        <div id="comment-status" class="hidden bg-blue-50 p-2 px-4 flex justify-between items-center text-[10px] text-blue-600">
-            <span id="status-text">...</span>
-            <i class="fas fa-times-circle" onclick="cancelStatus()"></i>
-        </div>
-        <div class="p-4 border-t flex gap-2 bg-white pb-8">
-            <input type="text" id="comment-input" placeholder="اكتب تعليقاً..." class="flex-1 bg-slate-100 p-3 rounded-xl outline-none text-sm border">
-            <button onclick="submitCommentAction()" class="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
+        
+        <div class="bg-white flex-1 rounded-t-[40px] p-6 overflow-y-auto">
+            <h4 class="text-sm font-bold mb-4 text-slate-400">الأعضاء على المايك</h4>
+            <div class="grid grid-cols-4 gap-4 mb-8">
+                <div class="flex flex-col items-center gap-1" onclick="showUserOptions('نبيل اليماني', true)">
+                    <div class="user-mic bg-blue-100 flex items-center justify-center font-bold">ن</div>
+                    <span class="text-[10px] font-bold">نبيل</span>
+                </div>
+                <div class="flex flex-col items-center gap-1" onclick="showUserOptions('عمر الحيمي', false)">
+                    <div class="user-mic border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400"><i class="fas fa-user"></i><div class="mic-off"><i class="fas fa-microphone-slash"></i></div></div>
+                    <span class="text-[10px] text-slate-400">عمر</span>
+                </div>
+            </div>
+
+            <div class="border-t pt-6">
+                <h4 class="text-sm font-bold mb-4 text-slate-400">دردشة الغرفة والهدايا</h4>
+                <div id="room-chat-msgs" class="h-48 overflow-y-auto bg-slate-50 rounded-2xl p-3 mb-4 space-y-2">
+                    <div class="text-[10px]"><span class="font-bold text-blue-600">نبيل:</span> أهلاً بالجميع 🌹</div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="bg-yellow-100 text-yellow-600 p-3 rounded-xl"><i class="fas fa-gift"></i></button>
+                    <input type="text" id="room-input" placeholder="رسالة للغرفة..." class="flex-1 bg-slate-100 p-3 rounded-xl text-xs outline-none">
+                    <button onclick="sendRoomMsg()" class="bg-blue-600 text-white p-3 rounded-xl"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- القائمة السفلية -->
-    <nav id="bottom-nav" class="reels-nav-active">
-        <button onclick="switchTab('reels')" id="btn-reels" class="nav-btn active"><i class="fas fa-play-circle text-xl"></i><span>ريلز</span></button>
-        <button onclick="switchTab('rooms')" id="btn-rooms" class="nav-btn"><i class="fas fa-microphone-alt text-xl"></i><span>الغرف</span></button>
-        <button onclick="switchTab('chats')" id="btn-chats" class="nav-btn"><i class="fas fa-dice text-xl"></i><span>دردشة ولعب</span></button>
+    <!-- مودال خيارات المستخدم -->
+    <div id="user-options" class="fixed inset-0 z-[2000] hidden flex items-end justify-center bg-black/50 p-4">
+        <div class="bg-white w-full rounded-3xl p-6 space-y-4">
+            <div class="flex items-center gap-4 border-b pb-4">
+                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold" id="opt-user-avatar">?</div>
+                <div>
+                    <h3 class="font-bold" id="opt-user-name">اسم المستخدم</h3>
+                    <p class="text-[10px] text-slate-400">معرف: #77821</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <button class="bg-blue-50 text-blue-600 p-3 rounded-2xl text-xs font-bold" onclick="alert('تمت إضافة الصديق!')"><i class="fas fa-user-plus ml-2"></i> إضافة صديق</button>
+                <button class="bg-slate-50 text-slate-600 p-3 rounded-2xl text-xs font-bold" onclick="goToPrivate()"><i class="fas fa-comment-alt ml-2"></i> رسالة خاصة</button>
+                <button class="bg-orange-50 text-orange-600 p-3 rounded-2xl text-xs font-bold" onclick="alert('تم إنزاله من المايك')"><i class="fas fa-microphone-slash ml-2"></i> إنزال مايك</button>
+                <button class="bg-red-50 text-red-600 p-3 rounded-2xl text-xs font-bold" onclick="confirmKick()"><i class="fas fa-user-times ml-2"></i> طرد من الغرفة</button>
+            </div>
+            <button class="w-full py-3 text-slate-400 text-xs font-bold" onclick="document.getElementById('user-options').classList.add('hidden')">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <button onclick="switchTab('reels')" id="btn-reels" class="nav-btn active"><i class="fas fa-film text-xl"></i><span>ريلز</span></button>
+        <button onclick="switchTab('rooms')" id="btn-rooms" class="nav-btn"><i class="fas fa-users text-xl"></i><span>الغرف</span></button>
+        <button onclick="switchTab('ludo')" id="btn-ludo" class="nav-btn"><i class="fas fa-dice text-xl"></i><span>لودو</span></button>
     </nav>
 
     <script>
-        let comments = [{id: 1, user: 'نبيل اليماني', text: 'أهلاً بكم في التحديث الجديد!', replies: []}];
-        let activeAction = { type: 'new', id: null };
-        let currentTurn = 'red';
+        const arabCountries = [
+            {n:'اليمن', c:'ye'}, {n:'السعودية', c:'sa'}, {n:'مصر', c:'eg'}, 
+            {n:'العراق', c:'iq'}, {n:'المغرب', c:'ma'}, {n:'الجزائر', c:'dz'},
+            {n:'تونس', c:'tn'}, {n:'لبنان', c:'lb'}, {n:'الأردن', c:'jo'}
+        ];
 
-        // --- نظام اللودو ---
-        function rollDice() {
-            const val = Math.floor(Math.random() * 6) + 1;
-            document.getElementById('dice-val').innerText = val;
-            // تبديل الدور ببساطة للعرض
-            setTimeout(() => {
-                currentTurn = currentTurn === 'red' ? 'blue' : 'red';
-                const indicator = document.getElementById('turn-indicator');
-                indicator.innerText = currentTurn === 'red' ? 'دور الأحمر' : 'دور الأزرق';
-                indicator.className = currentTurn === 'red' ? 
-                    'text-[10px] font-bold bg-red-100 text-red-600 px-3 py-1 rounded-full border border-red-200' :
-                    'text-[10px] font-bold bg-blue-100 text-blue-600 px-3 py-1 rounded-full border border-blue-200';
-            }, 1000);
-        }
+        window.onload = () => {
+            renderFlags();
+            renderRooms();
+        };
 
-        function movePiece(color, el) {
-            if(color !== currentTurn) return;
-            // تحريك بصري بسيط للقطعة
-            el.style.transform = `translate(${Math.random()*20}px, ${Math.random()*20}px)`;
-        }
-
-        // --- نظام الدردشة ---
-        function sendChat() {
-            const input = document.getElementById('chat-msg-input');
-            if(!input.value.trim()) return;
-            const list = document.getElementById('messages-list');
-            list.innerHTML += `<div class="bg-slate-100 text-slate-700 p-2 rounded-xl text-xs w-fit mr-auto">أنا: ${input.value}</div>`;
-            input.value = '';
-            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
-        }
-
-        // --- نظام التعليقات والرفع (المصلح سابقاً) ---
-        function uploadNewVideo(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                const container = document.getElementById('reels-list');
-                const newReel = `
-                    <div class="reel-video">
-                        <video loop playsinline autoplay muted><source src="${url}" type="video/mp4"></video>
-                        <div class="absolute bottom-24 right-4 text-white z-10 text-right"><h3 class="font-bold text-lg">@أنا</h3><p class="text-sm opacity-80">فيديو جديد 🚀</p></div>
-                        <div class="absolute bottom-24 left-4 flex flex-col gap-6 text-white text-center z-20">
-                            <div onclick="toggleLike(this)" class="cursor-pointer"><i class="far fa-heart text-2xl"></i><br><span class="text-[10px]">0</span></div>
-                            <div onclick="openComments()" class="cursor-pointer"><i class="fas fa-comment text-2xl"></i><br><span class="text-[10px]">0</span></div>
-                        </div>
-                    </div>
-                `;
-                container.insertAdjacentHTML('afterbegin', newReel);
-                switchTab('reels');
-            }
-        }
-
-        function openComments() { renderComments(); document.getElementById('comments-sheet').classList.add('open'); }
-        function closeComments() { document.getElementById('comments-sheet').classList.remove('open'); cancelStatus(); }
-
-        function renderComments() {
-            const list = document.getElementById('comments-list-display');
-            list.innerHTML = comments.map(c => `
-                <div class="border-b border-slate-50 p-3">
-                    <div class="flex justify-between">
-                        <span class="font-bold text-xs text-blue-600">${c.user}</span>
-                        <div class="flex gap-2 text-slate-300 text-[10px]">
-                            <i class="fas fa-edit" onclick="prepareEdit(${c.id}, '${c.text}')"></i>
-                            <i class="fas fa-trash" onclick="deleteComment(${c.id})"></i>
-                        </div>
-                    </div>
-                    <p class="text-xs mt-1">${c.text}</p>
-                    <div class="mt-2 text-[10px] text-blue-400 font-bold cursor-pointer" onclick="prepareReply(${c.id}, '${c.user}')">رد</div>
-                    ${c.replies.map(r => `<div class="mr-4 mt-2 bg-slate-50 p-2 rounded-lg text-xs border-r-2 border-blue-400">${r.user}: ${r.text}</div>`).join('')}
+        function renderFlags() {
+            const list = document.getElementById('flags-list');
+            list.innerHTML = arabCountries.map(c => `
+                <div class="text-center min-w-fit">
+                    <img src="https://flagcdn.com/w80/${c.c}.png" class="flag-circle" onclick="filterByCountry('${c.n}')">
+                    <p class="text-[9px] mt-1 font-bold">${c.n}</p>
                 </div>
             `).join('');
         }
 
-        function submitCommentAction() {
-            const input = document.getElementById('comment-input');
-            const val = input.value.trim();
-            if(!val) return;
-            if(activeAction.type === 'new') comments.unshift({id: Date.now(), user: 'أنا', text: val, replies: []});
-            else if(activeAction.type === 'reply') {
-                const c = comments.find(x => x.id === activeAction.id);
-                if(c) c.replies.push({user: 'أنا', text: val});
-            } else if(activeAction.type === 'edit') {
-                const c = comments.find(x => x.id === activeAction.id);
-                if(c) c.text = val;
-            }
-            input.value = ""; cancelStatus(); renderComments();
+        function renderRooms() {
+            const list = document.getElementById('rooms-list');
+            const demoRooms = [
+                {n: 'عشاق اليمن', c: 'ye', users: 45},
+                {n: 'ديوانية الرياض', c: 'sa', users: 120},
+                {n: 'سهرة النيل', c: 'eg', users: 88}
+            ];
+            list.innerHTML = demoRooms.map(r => `
+                <div class="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-slate-50">
+                    <div class="flex items-center gap-3">
+                        <img src="https://flagcdn.com/w80/${r.c}.png" class="w-8 h-8 rounded-full">
+                        <h4 class="font-bold text-sm">${r.n}</h4>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-slate-400"><i class="fas fa-user mr-1"></i>${r.users}</span>
+                        <button class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[10px] font-bold">دخول</button>
+                    </div>
+                </div>
+            `).join('');
         }
-
-        function prepareReply(id, name) {
-            activeAction = {type: 'reply', id};
-            document.getElementById('comment-status').classList.remove('hidden');
-            document.getElementById('status-text').innerText = "الرد على " + name;
-        }
-
-        function prepareEdit(id, text) {
-            activeAction = {type: 'edit', id};
-            document.getElementById('comment-status').classList.remove('hidden');
-            document.getElementById('status-text').innerText = "تعديل...";
-            document.getElementById('comment-input').value = text;
-        }
-
-        function cancelStatus() { activeAction = {type: 'new', id: null}; document.getElementById('comment-status').classList.add('hidden'); document.getElementById('comment-input').value = ""; }
-        function deleteComment(id) { comments = comments.filter(c => c.id !== id); renderComments(); }
 
         function switchTab(tab) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.getElementById('sec-' + tab).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-' + tab).classList.add('active');
-            const nav = document.getElementById('bottom-nav');
-            nav.className = tab === 'reels' ? 'reels-nav-active' : '';
         }
 
-        function toggleLike(el) {
-            const i = el.querySelector('i');
-            i.classList.toggle('fas'); i.classList.toggle('far');
-            i.style.color = i.classList.contains('fas') ? '#ef4444' : '#fff';
+        // --- نظام اللودو ---
+        function rollLudoDice() {
+            const btn = document.getElementById('dice-btn');
+            btn.classList.add('animate-bounce');
+            const val = Math.floor(Math.random() * 6) + 1;
+            setTimeout(() => {
+                btn.classList.remove('animate-bounce');
+                btn.innerText = val;
+                const chat = document.getElementById('ludo-chat');
+                chat.innerHTML += `<div class="text-[10px] bg-red-50 p-1 rounded text-red-600">🎲 نبيل حصل على الرقم ${val}</div>`;
+                chat.scrollTop = chat.scrollHeight;
+            }, 500);
+        }
+
+        function sendLudoMsg() {
+            const input = document.getElementById('ludo-input');
+            if(!input.value) return;
+            const chat = document.getElementById('ludo-chat');
+            chat.innerHTML += `<div class="text-[11px]"><b>أنا:</b> ${input.value}</div>`;
+            input.value = '';
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        // --- نظام الغرف ---
+        function openRoomDetails() { document.getElementById('room-modal').classList.remove('hidden'); }
+        function closeRoomDetails() { document.getElementById('room-modal').classList.add('hidden'); }
+
+        function showUserOptions(name, isMe) {
+            if(isMe) return;
+            document.getElementById('user-options').classList.remove('hidden');
+            document.getElementById('opt-user-name').innerText = name;
+            document.getElementById('opt-user-avatar').innerText = name[0];
+        }
+
+        function sendRoomMsg() {
+            const input = document.getElementById('room-input');
+            if(!input.value) return;
+            const chat = document.getElementById('room-chat-msgs');
+            chat.innerHTML += `<div class="text-xs"><b>أنا:</b> ${input.value}</div>`;
+            input.value = '';
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function confirmKick() {
+            if(confirm("هل أنت متأكد من طرد هذا المستخدم نهائياً من الغرفة؟")) {
+                alert("تم الطرد بنجاح!");
+                document.getElementById('user-options').classList.add('hidden');
+            }
+        }
+
+        function goToPrivate() {
+            alert("جارٍ الانتقال للدردشة الخاصة...");
+            document.getElementById('user-options').classList.add('hidden');
+            switchTab('chats');
         }
     </script>
 </body>
