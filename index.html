@@ -41,7 +41,7 @@
     </nav>
 
     <!-- Content Area -->
-    <main class="flex-1 overflow-hidden relative">
+    <main class="flex-1 overflow-hidden relative text-right">
         
         <!-- Nearby Section -->
         <section id="section-nearby" class="active p-4 overflow-y-auto">
@@ -49,11 +49,35 @@
                 <h3 class="font-bold text-blue-800">رادار القريبين</h3>
                 <i class="fas fa-satellite-dish animate-pulse text-blue-600"></i>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm flex items-center border-r-4 border-green-500">
-                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white">ن</div>
-                <div class="mr-3 text-right">
-                    <h4 class="font-bold">نبيل (أنت)</h4>
-                    <span class="text-xs text-green-500 font-bold">نشط الآن</span>
+            
+            <div class="space-y-3">
+                <!-- My Card -->
+                <div class="bg-white p-4 rounded-xl shadow-sm flex items-center border-r-4 border-green-500">
+                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">ن</div>
+                    <div class="mr-3 flex-1">
+                        <h4 class="font-bold">نبيل (أنت)</h4>
+                        <span class="text-xs text-green-500 font-bold">نشط الآن</span>
+                    </div>
+                </div>
+
+                <!-- Nearby User (Clickable) -->
+                <div onclick="openChat('أحمد المار بموقعك', 'private')" class="bg-white p-4 rounded-xl shadow-sm flex items-center border-r-4 border-blue-500 cursor-pointer hover:bg-gray-50 active:scale-95 transition-transform">
+                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl">أ</div>
+                    <div class="mr-3 flex-1">
+                        <h4 class="font-bold">أحمد</h4>
+                        <p class="text-[10px] text-gray-500">على بعد 200 متر منك</p>
+                    </div>
+                    <i class="fas fa-comment-dots text-blue-500 opacity-50"></i>
+                </div>
+
+                <!-- Another Nearby User -->
+                <div onclick="openChat('سوبر ماركت الأمانة', 'private')" class="bg-white p-4 rounded-xl shadow-sm flex items-center border-r-4 border-orange-500 cursor-pointer hover:bg-gray-50 active:scale-95 transition-transform">
+                    <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center"><i class="fas fa-store"></i></div>
+                    <div class="mr-3 flex-1">
+                        <h4 class="font-bold">سوبر ماركت الأمانة</h4>
+                        <p class="text-[10px] text-gray-500">منشأة قريبة - متصل</p>
+                    </div>
+                    <i class="fas fa-comment-dots text-orange-500 opacity-50"></i>
                 </div>
             </div>
         </section>
@@ -62,9 +86,12 @@
         <section id="section-chats" class="overflow-y-auto">
             <div onclick="openChat('أحمد', 'private')" class="flex items-center p-4 bg-white border-b hover:bg-gray-50 cursor-pointer">
                 <div class="w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl">أ</div>
-                <div class="mr-4 flex-1 text-right">
-                    <h4 class="font-bold">أحمد</h4>
-                    <p class="text-sm text-gray-500 truncate">أرسل لي الموقع...</p>
+                <div class="mr-4 flex-1">
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold text-gray-800">أحمد</h4>
+                        <span class="text-[10px] text-gray-400">١٠:٣٠ ص</span>
+                    </div>
+                    <p class="text-sm text-gray-500 truncate text-right">أرسل لي الموقع...</p>
                 </div>
             </div>
         </section>
@@ -73,21 +100,20 @@
         <section id="section-groups" class="p-4 overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="font-bold text-lg">المجموعات</h2>
-                <button onclick="openGroupModal()" class="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm"><i class="fas fa-plus ml-2"></i>إنشاء مجموعة</button>
+                <button onclick="openGroupModal()" class="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm shadow-md active:scale-95 transition-transform"><i class="fas fa-plus ml-2"></i>إنشاء مجموعة</button>
             </div>
             <div id="groups-list" class="space-y-3">
-                <!-- Group Item -->
-                <div class="bg-white p-4 rounded-xl shadow-sm flex items-center justify-between">
-                    <div class="flex items-center cursor-pointer" onclick="openChat('مجموعة ملاك الخير', 'group')">
+                <div class="bg-white p-4 rounded-xl shadow-sm flex items-center justify-between border-r-4 border-orange-400">
+                    <div class="flex items-center cursor-pointer flex-1" onclick="openChat('مجموعة ملاك الخير', 'group')">
                         <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center"><i class="fas fa-users"></i></div>
-                        <div class="mr-3 text-right">
-                            <h4 class="font-bold">مجموعة ملاك الخير</h4>
+                        <div class="mr-3">
+                            <h4 class="font-bold text-gray-800">مجموعة ملاك الخير</h4>
                             <p class="text-xs text-gray-400">٥ أعضاء</p>
                         </div>
                     </div>
-                    <div class="flex space-x-2 space-x-reverse text-gray-400">
-                        <button onclick="editGroup('مجموعة ملاك الخير')"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteGroup(this)" class="text-red-400"><i class="fas fa-trash"></i></button>
+                    <div class="flex space-x-3 space-x-reverse text-gray-400">
+                        <button onclick="currentGroupElement=this.parentElement.parentElement; openGroupModal(true)" class="hover:text-blue-500"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteGroup(this)" class="hover:text-red-500"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
             </div>
@@ -97,55 +123,55 @@
         <section id="section-profile" class="p-6 text-center overflow-y-auto">
             <div class="relative inline-block">
                 <img id="my-pic" src="https://ui-avatars.com/api/?name=Nabeel&size=128" class="w-32 h-32 rounded-full border-4 border-white shadow-xl">
-                <button onclick="triggerUpload('profile')" class="absolute bottom-0 left-0 bg-[#128c7e] text-white p-3 rounded-full shadow-lg"><i class="fas fa-camera"></i></button>
+                <button onclick="triggerUpload('profile')" class="absolute bottom-0 left-0 bg-[#128c7e] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"><i class="fas fa-camera"></i></button>
             </div>
             <h2 class="text-2xl font-bold mt-4">نبيل</h2>
-            <p id="upload-status" class="text-gray-500 text-sm mt-2">عضو في "أنا هنا"</p>
+            <p id="upload-status" class="text-gray-500 text-sm mt-2 font-bold">عضو في "أنا هنا"</p>
         </section>
 
     </main>
 
     <!-- Chat View (Fullscreen Overlay) -->
     <div id="chat-view" class="fixed inset-0 bg-white z-[100] hidden flex flex-col">
-        <header class="bg-[#075E54] text-white p-4 flex items-center">
-            <button onclick="closeChat()" class="ml-4 text-xl"><i class="fas fa-arrow-right"></i></button>
-            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center ml-2"><i class="fas fa-user"></i></div>
+        <header class="bg-[#075E54] text-white p-4 flex items-center shadow-md">
+            <button onclick="closeChat()" class="ml-4 text-xl active:scale-90 transition-transform"><i class="fas fa-arrow-right"></i></button>
+            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center ml-2 shadow-inner"><i class="fas fa-user"></i></div>
             <div class="flex-1 text-right">
-                <h4 id="active-chat-name" class="font-bold">اسم الدردشة</h4>
+                <h4 id="active-chat-name" class="font-bold text-md">اسم الدردشة</h4>
                 <p class="text-[10px] opacity-70">نشط الآن</p>
             </div>
             <div class="flex space-x-4 space-x-reverse">
-                <button onclick="alert('اتصال...')"><i class="fas fa-phone"></i></button>
-                <button onclick="alert('فيديو...')"><i class="fas fa-video"></i></button>
+                <button onclick="alert('جاري الاتصال الصوتي...')" class="hover:bg-white/10 p-2 rounded-full"><i class="fas fa-phone"></i></button>
+                <button onclick="alert('جاري بدء مكالمة فيديو...')" class="hover:bg-white/10 p-2 rounded-full"><i class="fas fa-video"></i></button>
             </div>
         </header>
         
-        <div id="chat-messages" class="flex-1 chat-bg p-4 overflow-y-auto flex flex-col">
+        <div id="chat-messages" class="flex-1 chat-bg p-4 overflow-y-auto flex flex-col space-y-2">
             <!-- Messages go here -->
         </div>
 
-        <footer class="p-2 bg-gray-100 flex flex-col border-t">
-            <div id="upload-preview" class="hidden p-2 bg-white rounded-lg mb-2 text-xs flex justify-between items-center">
+        <footer class="p-2 bg-gray-100 flex flex-col border-t shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <div id="upload-preview" class="hidden p-2 bg-white rounded-lg mb-2 text-xs flex justify-between items-center shadow-sm">
                 <span>جاري اختيار ملف...</span>
-                <button class="text-red-500" onclick="cancelUpload()">إلغاء</button>
+                <button class="text-red-500 font-bold" onclick="cancelUpload()">إلغاء</button>
             </div>
             <div class="flex items-center space-x-2 space-x-reverse">
-                <button onclick="triggerUpload('chat')" class="text-gray-500 text-xl px-2 btn-action"><i class="fas fa-paperclip"></i></button>
-                <input type="text" id="msg-input" placeholder="اكتب رسالة..." class="flex-1 p-2 rounded-full border focus:outline-none text-right">
+                <button onclick="triggerUpload('chat')" class="text-gray-500 text-xl px-2 btn-action hover:text-[#128c7e]"><i class="fas fa-paperclip"></i></button>
+                <input type="text" id="msg-input" placeholder="اكتب رسالة..." class="flex-1 p-2 rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#128c7e] text-right">
                 <button id="voice-btn" class="text-green-600 text-xl px-2 btn-action" onmousedown="startRecording()" onmouseup="stopRecording()"><i class="fas fa-microphone"></i></button>
-                <button onclick="sendMessage()" class="bg-[#128c7e] text-white w-10 h-10 rounded-full flex items-center justify-center btn-action"><i class="fas fa-paper-plane text-sm"></i></button>
+                <button onclick="sendMessage()" class="bg-[#128c7e] text-white w-10 h-10 rounded-full flex items-center justify-center btn-action shadow-md hover:bg-[#075E54]"><i class="fas fa-paper-plane text-sm"></i></button>
             </div>
         </footer>
     </div>
 
     <!-- Group Modal -->
-    <div id="group-modal" class="fixed inset-0 bg-black/50 z-[200] hidden flex items-center justify-center p-6">
-        <div class="bg-white rounded-2xl w-full max-w-sm p-6">
-            <h3 id="modal-title" class="text-xl font-bold mb-4">إنشاء مجموعة</h3>
-            <input type="text" id="group-name-input" placeholder="اسم المجموعة" class="w-full border p-3 rounded-xl mb-4 text-right">
+    <div id="group-modal" class="fixed inset-0 bg-black/50 z-[200] hidden flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl scale-in">
+            <h3 id="modal-title" class="text-xl font-bold mb-4 text-[#075E54]">إنشاء مجموعة</h3>
+            <input type="text" id="group-name-input" placeholder="اسم المجموعة" class="w-full border border-gray-200 p-3 rounded-xl mb-4 text-right focus:border-orange-500 focus:outline-none">
             <div class="flex justify-end space-x-2 space-x-reverse">
-                <button onclick="closeGroupModal()" class="px-4 py-2 text-gray-400">إلغاء</button>
-                <button onclick="confirmGroupAction()" class="px-6 py-2 bg-orange-500 text-white rounded-xl">حفظ</button>
+                <button onclick="closeGroupModal()" class="px-4 py-2 text-gray-400 font-bold">إلغاء</button>
+                <button onclick="confirmGroupAction()" class="px-6 py-2 bg-orange-500 text-white rounded-xl font-bold shadow-md hover:bg-orange-600 transition-colors">حفظ</button>
             </div>
         </div>
     </div>
@@ -154,7 +180,7 @@
     <input type="file" id="global-file-input" class="hidden" onchange="processFile(this.files[0])">
 
     <script>
-        // --- القلب (Appwrite Integration) ---
+        // --- الإعدادات (Environment) ---
         const sdk = new Appwrite.Client()
             .setEndpoint('https://fra.cloud.appwrite.io/v1')
             .setProject('69ba1fa10035b7f1de96');
@@ -166,7 +192,7 @@
         async function init() { try { await account.createAnonymousSession(); } catch(e) {} }
         init();
 
-        // --- وظائف الواجهة ---
+        // --- التبديل بين الأقسام ---
         function showSection(id) {
             document.querySelectorAll('main section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
@@ -174,17 +200,19 @@
             document.getElementById('tab-' + id)?.classList.add('tab-active');
         }
 
+        // --- فتح وإغلاق الدردشة ---
         function openChat(name, type) {
             document.getElementById('active-chat-name').innerText = name;
-            document.getElementById('chat-view').classList.remove('hidden');
-            // Mock messages
+            const view = document.getElementById('chat-view');
+            view.classList.remove('hidden');
+            
             const chatBox = document.getElementById('chat-messages');
-            chatBox.innerHTML = `<div class="message msg-in">أهلاً بك في ${type === 'group' ? 'المجموعة' : 'الدردشة'}</div>`;
+            chatBox.innerHTML = `<div class="message msg-in shadow-sm">مرحباً بك في دردشة "${name}"</div>`;
         }
 
         function closeChat() { document.getElementById('chat-view').classList.add('hidden'); }
 
-        // --- وظائف الرفع (صور/فيديو) ---
+        // --- الرفع السحابي ---
         function triggerUpload(target) {
             uploadTarget = target;
             document.getElementById('global-file-input').click();
@@ -195,29 +223,31 @@
             const status = document.getElementById('upload-status');
             
             if(uploadTarget === 'profile') {
-                status.innerText = "⏳ جاري تحديث الصورة...";
+                status.innerText = "⏳ جاري الرفع لـ " + file.name;
+                status.className = "text-blue-500 text-sm mt-2 animate-pulse";
                 try {
                     await storage.createFile('69ba233f001368959e2e', 'unique()', file);
-                    status.innerText = "✅ تم التحديث بنجاح";
-                    alert("تم رفع الصورة الشخصية للسحابة!");
-                } catch(e) { status.innerText = "❌ فشل الرفع"; }
+                    status.innerText = "✅ تم تحديث صورتك الشخصية!";
+                    status.className = "text-green-600 text-sm mt-2 font-bold";
+                } catch(e) { 
+                    status.innerText = "❌ فشل الرفع";
+                    status.className = "text-red-500 text-sm mt-2";
+                }
             } else {
-                // Chat upload
                 const chatBox = document.getElementById('chat-messages');
-                const fileType = file.type.startsWith('image') ? 'صورة' : 'فيديو';
+                const isImage = file.type.startsWith('image');
                 chatBox.innerHTML += `
-                    <div class="message msg-out">
-                        <i class="fas fa-file-export ml-2"></i> جاري إرسال ${fileType}...
-                        <span class="block text-[10px] opacity-50 mt-1">⏳ جاري الرفع للسحابة</span>
+                    <div class="message msg-out shadow-sm border border-green-200">
+                        <i class="fas ${isImage ? 'fa-image' : 'fa-video'} ml-2"></i> جاري إرسال الملف...
                     </div>`;
                 try {
                     await storage.createFile('69ba233f001368959e2e', 'unique()', file);
-                    alert("تم إرسال الملف للسحابة بنجاح!");
+                    alert("✅ تم إرسال الملف بنجاح!");
                 } catch(e) { alert("فشل الإرسال"); }
             }
         }
 
-        // --- وظائف الرسائل (إرسال ومسح) ---
+        // --- إرسال ومسح الرسائل ---
         function sendMessage() {
             const input = document.getElementById('msg-input');
             const text = input.value.trim();
@@ -227,28 +257,30 @@
             const msgId = 'msg-' + Date.now();
             
             chatBox.innerHTML += `
-                <div id="${msgId}" class="message msg-out group flex flex-col">
+                <div id="${msgId}" class="message msg-out group flex flex-col shadow-sm">
                     <div class="flex justify-between items-start">
                         <span>${text}</span>
-                        <button onclick="showDeleteOptions('${msgId}')" class="text-[10px] text-gray-500 mr-2 opacity-0 group-hover:opacity-100"><i class="fas fa-chevron-down"></i></button>
+                        <button onclick="showDeleteOptions('${msgId}')" class="text-[10px] text-gray-400 mr-2 opacity-100"><i class="fas fa-trash-alt hover:text-red-500 transition-colors"></i></button>
                     </div>
-                    <span class="text-[9px] opacity-50 text-left mt-1">الآن</span>
+                    <span class="text-[8px] opacity-40 text-left mt-1">الآن</span>
                 </div>`;
             input.value = "";
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function showDeleteOptions(id) {
-            const choice = confirm("ماذا تريد أن تفعل؟\n- موافق: مسح للطرفين\n- إلغاء: مسح لدي فقط");
             const element = document.getElementById(id);
+            const choice = confirm("اختر نوع الحذف:\n- موافق: حذف للطرفين (يظهر كرسالة محذوفة)\n- إلغاء: حذف من شاشتي فقط");
             if(choice) {
-                element.innerHTML = "<span class='italic text-gray-400'>🚫 تم مسح هذه الرسالة من قبل المرسل</span>";
+                element.innerHTML = "<span class='italic text-gray-400 text-xs'>🚫 تم حذف هذه الرسالة من قبل المرسل</span>";
+                element.classList.replace('msg-out', 'bg-gray-50');
             } else {
-                element.remove();
+                element.style.opacity = '0';
+                setTimeout(() => element.remove(), 300);
             }
         }
 
-        // --- وظائف المجموعات ---
+        // --- إدارة المجموعات ---
         let currentGroupElement = null;
 
         function openGroupModal(edit = false) {
@@ -267,17 +299,17 @@
             } else {
                 const list = document.getElementById('groups-list');
                 list.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm flex items-center justify-between">
-                        <div class="flex items-center cursor-pointer" onclick="openChat('${name}', 'group')">
+                    <div class="bg-white p-4 rounded-xl shadow-sm flex items-center justify-between border-r-4 border-orange-400 animate-slide-up">
+                        <div class="flex items-center cursor-pointer flex-1" onclick="openChat('${name}', 'group')">
                             <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center"><i class="fas fa-users"></i></div>
                             <div class="mr-3 text-right">
                                 <h4 class="font-bold">${name}</h4>
                                 <p class="text-xs text-gray-400">عضو واحد</p>
                             </div>
                         </div>
-                        <div class="flex space-x-2 space-x-reverse text-gray-400">
-                            <button onclick="currentGroupElement=this.parentElement.parentElement; openGroupModal(true)"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteGroup(this)" class="text-red-400"><i class="fas fa-trash"></i></button>
+                        <div class="flex space-x-3 space-x-reverse text-gray-400">
+                            <button onclick="currentGroupElement=this.parentElement.parentElement; openGroupModal(true)" class="hover:text-blue-500"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteGroup(this)" class="hover:text-red-500"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>`;
             }
@@ -286,28 +318,34 @@
         }
 
         function deleteGroup(btn) {
-            if(confirm("هل أنت متأكد من مسح هذه المجموعة؟")) {
-                btn.parentElement.parentElement.remove();
+            if(confirm("هل تريد مغادرة ومسح هذه المجموعة؟")) {
+                const row = btn.parentElement.parentElement;
+                row.style.transform = 'translateX(100%)';
+                row.style.opacity = '0';
+                setTimeout(() => row.remove(), 300);
             }
         }
 
-        // --- وظائف الصوت ---
+        // --- تسجيل الصوت ---
         function startRecording() {
             document.getElementById('voice-btn').classList.replace('text-green-600', 'text-red-600');
-            console.log("تسجيل صوتي...");
+            document.getElementById('voice-btn').classList.add('animate-pulse');
         }
 
         function stopRecording() {
             document.getElementById('voice-btn').classList.replace('text-red-600', 'text-green-600');
+            document.getElementById('voice-btn').classList.remove('animate-pulse');
             const chatBox = document.getElementById('chat-messages');
             chatBox.innerHTML += `
-                <div class="message msg-out flex items-center">
-                    <i class="fas fa-play-circle ml-2 text-xl"></i>
-                    <div class="h-2 w-24 bg-gray-300 rounded-full"></div>
-                    <span class="text-[9px] mr-2">0:02</span>
+                <div class="message msg-out flex items-center shadow-sm">
+                    <i class="fas fa-play ml-2 text-green-600"></i>
+                    <div class="h-1 w-20 bg-gray-300 rounded-full mx-2 overflow-hidden">
+                        <div class="h-full w-1/3 bg-green-500"></div>
+                    </div>
+                    <span class="text-[8px]">0:05</span>
                 </div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
     </script>
 </body>
 </html>
-
