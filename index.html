@@ -3,349 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أنا هنا - النسخة المطورة</title>
+    <title>أنا هنا - لودو وغرف صوتية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
         :root {
             --app-green: #075e54;
-            --app-light-green: #128c7e;
+            --app-teal: #128c7e;
         }
-        body { font-family: 'Cairo', sans-serif; background-color: #f0f2f5; color: #1c1e21; overflow: hidden; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f4f7f6; color: #1c1e21; overflow: hidden; margin: 0; }
         
-        /* Header Styling like Image 1 */
-        header { background-color: var(--app-green); color: white; padding-top: 10px; }
-        .tabs-nav { display: flex; justify-content: space-around; border-bottom: 3px solid transparent; }
-        .tab-item { padding: 10px 5px; font-weight: 600; font-size: 14px; opacity: 0.8; cursor: pointer; position: relative; }
-        .tab-item.active { opacity: 1; }
-        .tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: white; }
+        /* Header & Tabs - Like Image 1 */
+        header { background-color: var(--app-green); color: white; }
+        .tab-item { padding: 12px 0; font-weight: 600; font-size: 14px; flex: 1; text-align: center; cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab-item.active { border-bottom-color: white; opacity: 1; }
+        .tab-item:not(.active) { opacity: 0.7; }
 
-        section { display: none; height: calc(100vh - 120px); overflow-y: auto; padding-bottom: 20px; }
+        section { display: none; height: calc(100vh - 110px); overflow-y: auto; }
         section.active { display: flex; flex-direction: column; }
 
-        /* Ludo Pro Layout like Image 2 */
-        .ludo-container { width: 100%; max-width: 400px; margin: auto; background: #fff; padding: 5px; border: 2px solid #333; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .ludo-board-grid { 
-            display: grid; 
-            grid-template-columns: repeat(15, 1fr); 
-            grid-template-rows: repeat(15, 1fr); 
-            width: 100%; aspect-ratio: 1/1; 
-            border: 1px solid #000;
+        /* Flags Scrolling */
+        .flags-bar { display: flex; gap: 15px; overflow-x: auto; padding: 15px; background: white; border-bottom: 1px solid #eee; scrollbar-width: none; }
+        .flags-bar::-webkit-scrollbar { display: none; }
+        .flag-unit { min-width: 60px; text-align: center; }
+        .flag-img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover; }
+
+        /* Ludo Pro Design - Like Image 2 */
+        .ludo-wrapper { background: #1a1a1a; padding: 10px; border-radius: 15px; margin: 10px; }
+        .ludo-board { 
+            display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr); 
+            width: 100%; aspect-ratio: 1/1; background: #fff; border: 2px solid #000;
         }
-        .cell { border: 0.1px solid #ccc; background: white; position: relative; }
-        .safe-zone { background: #eee; }
-        .star-cell::after { content: '★'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999; }
+        .cell { border: 0.5px solid #ddd; position: relative; }
+        .b-red { background: #ff4d4d; } .b-green { background: #2ecc71; } .b-yellow { background: #f1c40f; } .b-blue { background: #3498db; }
+        .home-area { grid-column: span 6; grid-row: span 6; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .pawn-spot { background: white; border-radius: 50%; width: 100%; aspect-ratio: 1/1; border: 1px solid #ccc; position: relative; }
+        .pawn { width: 80%; height: 80%; border-radius: 50%; border: 2px solid white; position: absolute; top: 10%; left: 10%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .center-home { grid-column: 7 / 10; grid-row: 7 / 10; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .triangle { width: 0; height: 0; border-style: solid; position: absolute; }
         
-        /* Bases */
-        .home-base { grid-column: span 6; grid-row: span 6; display: flex; align-items: center; justify-content: center; padding: 10px; }
-        .red { background: #ff3b30; } .green { background: #4cd964; } .yellow { background: #ffcc00; } .blue { background: #007aff; }
-        .inner-white { width: 80%; height: 80%; background: white; border-radius: 5px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 6px; }
-        .token { width: 100%; aspect-ratio: 1/1; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        /* Room Interaction */
+        .mic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 15px; }
+        .user-seat { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .avatar-ring { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--app-teal); display: flex; align-items: center; justify-content: center; background: #f0fdfa; position: relative; }
+        .crown-icon { position: absolute; -top-2: -5px; background: #fbbf24; border-radius: 50%; padding: 3px; font-size: 8px; color: white; }
 
-        /* Path colors */
-        .path-red { background: #ff3b30; } .path-green { background: #4cd964; } .path-yellow { background: #ffcc00; } .path-blue { background: #007aff; }
-        .center-triangle { grid-column: 7 / 10; grid-row: 7 / 10; background: #333; display: flex; align-items: center; justify-content: center; color: white; font-size: 8px; }
-
-        /* Action Modal */
-        .action-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 25px 25px 0 0; transition: 0.3s; z-index: 2000; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); }
-        .action-sheet.open { bottom: 0; }
+        /* Action Sheet */
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: none; }
+        .sheet-content { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 25px 25px 0 0; transition: 0.4s; z-index: 2001; padding: 25px; }
+        .sheet-content.active { bottom: 0; }
+        .action-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 15px; border-radius: 15px; font-weight: bold; font-size: 12px; }
     </style>
 </head>
 <body>
 
+    <!-- Header & Tabs -->
     <header>
-        <div class="px-4 py-2 flex justify-between items-center">
+        <div class="p-4 flex justify-between items-center">
             <h1 class="text-xl font-bold">أنا هنا</h1>
-            <div class="flex gap-4">
+            <div class="flex gap-5 text-lg">
                 <i class="fas fa-search"></i>
+                <i class="fas fa-user-plus"></i>
                 <i class="fas fa-ellipsis-v"></i>
             </div>
         </div>
-        <div class="tabs-nav">
-            <div class="tab-item" onclick="switchMainTab('nearby')">القريبين</div>
-            <div class="tab-item active" onclick="switchMainTab('rooms')">مجموعات</div>
-            <div class="tab-item" onclick="switchMainTab('chats')">دردشة</div>
-            <div class="tab-item" onclick="switchMainTab('calls')">مكالمات</div>
+        <div class="flex">
+            <div class="tab-item" onclick="showSection('nearby')">القريبين</div>
+            <div class="tab-item active" onclick="showSection('rooms')">مجموعات</div>
+            <div class="tab-item" onclick="showSection('games')">الألعاب</div>
+            <div class="tab-item" onclick="showSection('calls')">مكالمات</div>
         </div>
     </header>
 
     <main>
-        <!-- قسم الغرف والمجموعات -->
-        <section id="sec-rooms" class="active p-4">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="font-bold text-lg">المجموعات السحابية</h2>
-                <button class="bg-orange-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">+ إنشاء</button>
-            </div>
+        <!-- قسم المجموعات والغرف -->
+        <section id="sec-rooms" class="active">
+            <!-- شريط الأعلام -->
+            <div class="flags-bar" id="flags-list"></div>
 
-            <!-- شريط الأعلام العربية (كما طلبت) -->
-            <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar mb-4" id="flags-container">
-                <!-- سيتم تعبئتها بالجافا سكريبت -->
-            </div>
-
-            <div id="rooms-grid" class="space-y-3">
-                <!-- غرف افتراضية -->
-                <div class="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border-r-4 border-orange-500" onclick="enterRoom('مجلس اليمن السعيد', 'ye')">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold">Y</div>
-                        <div>
-                            <h4 class="font-bold">مجلس اليمن السعيد</h4>
-                            <p class="text-[10px] text-slate-400">مجموعة سحابية نشطة</p>
+            <div class="p-4 flex-1">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold">الغرف الصوتية النشطة</h3>
+                    <span class="text-xs text-blue-600 font-bold">رؤية الكل</span>
+                </div>
+                
+                <div id="rooms-container" class="space-y-3">
+                    <!-- غرفة افتراضية -->
+                    <div class="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border-r-4 border-green-600" onclick="openRoom('ديوان اليمن السعيد')">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold">🇾🇪</div>
+                            <div>
+                                <h4 class="font-bold">ديوان اليمن السعيد</h4>
+                                <p class="text-[10px] text-slate-400">45 شخص يتحدثون الآن...</p>
+                            </div>
                         </div>
+                        <button class="bg-green-600 text-white px-4 py-1 rounded-lg text-xs">دخول</button>
                     </div>
-                    <i class="fas fa-chevron-left text-slate-300"></i>
                 </div>
             </div>
         </section>
 
-        <!-- قسم اللودو والدردشة -->
-        <section id="sec-ludo" class="p-2">
-            <div class="ludo-container rounded-lg overflow-hidden border-2 border-slate-800 shadow-2xl">
-                <div class="bg-slate-800 p-2 flex justify-between items-center text-white">
-                    <span class="text-xs font-bold"><i class="fas fa-dice mr-2"></i> لودو نبيل</span>
-                    <button onclick="rollDice()" id="dice-trigger" class="bg-white text-slate-800 px-4 py-1 rounded-md font-bold text-lg">🎲 <span id="dice-val">?</span></button>
+        <!-- قسم الألعاب (اللودو) -->
+        <section id="sec-games" class="p-2">
+            <div class="ludo-wrapper shadow-2xl">
+                <div class="flex justify-between items-center mb-2 px-2">
+                    <div class="flex items-center gap-2 text-white">
+                        <div class="w-8 h-8 rounded-full bg-red-500 border border-white"></div>
+                        <span class="text-xs font-bold">نبيل (الأحمر)</span>
+                    </div>
+                    <button onclick="rollDice()" class="bg-white text-black px-6 py-2 rounded-xl font-bold text-xl shadow-lg active:scale-95 transition">🎲 <span id="dice-result">?</span></button>
                 </div>
-                
-                <div class="ludo-board-grid">
-                    <!-- Green Base -->
-                    <div class="home-base green"><div class="inner-white"><div class="token green"></div><div class="token green"></div><div class="token green"></div><div class="token green"></div></div></div>
-                    <!-- Top Path -->
-                    <div class="cell"></div><div class="cell path-yellow"></div><div class="cell star-cell"></div>
-                    <!-- Yellow Base -->
-                    <div class="home-base yellow"><div class="inner-white"><div class="token yellow"></div><div class="token yellow"></div><div class="token yellow"></div><div class="token yellow"></div></div></div>
-                    
-                    <!-- Left Path -->
-                    <div class="cell"></div><div class="cell path-green"></div><div class="cell"></div><div class="cell"></div><div class="cell path-green"></div><div class="cell"></div>
-                    <!-- Center -->
-                    <div class="center-triangle">HOME</div>
-                    <!-- Right Path -->
-                    <div class="cell"></div><div class="cell path-yellow"></div><div class="cell"></div><div class="cell"></div><div class="cell path-yellow"></div><div class="cell"></div>
 
-                    <!-- Red Base -->
-                    <div class="home-base red"><div class="inner-white"><div class="token red"></div><div class="token red"></div><div class="token red"></div><div class="token red"></div></div></div>
+                <div class="ludo-board">
+                    <!-- Green Home -->
+                    <div class="home-area b-green">
+                        <div class="pawn-spot"><div class="pawn b-green"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-green"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-green"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-green"></div></div>
+                    </div>
+                    <!-- Top Path -->
+                    <div class="cell"></div><div class="cell b-yellow"></div><div class="cell"></div>
+                    <!-- Yellow Home -->
+                    <div class="home-area b-yellow">
+                        <div class="pawn-spot"><div class="pawn b-yellow"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-yellow"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-yellow"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-yellow"></div></div>
+                    </div>
+
+                    <!-- Side Paths & Center -->
+                    <div class="cell"></div><div class="cell b-green"></div><div class="cell"></div><div class="cell"></div><div class="cell b-green"></div><div class="cell"></div>
+                    <div class="center-home font-bold text-[8px] text-black">HOME</div>
+                    <div class="cell"></div><div class="cell b-yellow"></div><div class="cell"></div><div class="cell"></div><div class="cell b-yellow"></div><div class="cell"></div>
+
+                    <!-- Red Home -->
+                    <div class="home-area b-red">
+                        <div class="pawn-spot"><div class="pawn b-red"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-red"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-red"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-red"></div></div>
+                    </div>
                     <!-- Bottom Path -->
-                    <div class="cell star-cell"></div><div class="cell path-red"></div><div class="cell"></div>
-                    <!-- Blue Base -->
-                    <div class="home-base blue"><div class="inner-white"><div class="token blue"></div><div class="token blue"></div><div class="token blue"></div><div class="token blue"></div></div></div>
+                    <div class="cell"></div><div class="cell b-red"></div><div class="cell"></div>
+                    <!-- Blue Home -->
+                    <div class="home-area b-blue">
+                        <div class="pawn-spot"><div class="pawn b-blue"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-blue"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-blue"></div></div>
+                        <div class="pawn-spot"><div class="pawn b-blue"></div></div>
+                    </div>
                 </div>
             </div>
-
-            <!-- دردشة اللعبة -->
-            <div class="mt-4 flex-1 flex flex-col bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-                <div id="ludo-msgs" class="flex-1 p-3 overflow-y-auto space-y-2 text-xs">
-                    <div class="text-center text-slate-300">دردشة اللعبة...</div>
+            
+            <div class="flex-1 bg-white mx-2 rounded-t-2xl p-4 shadow-inner">
+                <h4 class="font-bold text-sm mb-2 border-b pb-1">دردشة الألعاب</h4>
+                <div id="game-chat" class="h-32 overflow-y-auto text-xs space-y-2 mb-2">
+                    <div class="text-slate-400">نظام: بدأت اللعبة، دور اللاعب الأحمر.</div>
                 </div>
-                <div class="p-2 flex gap-2 border-t">
-                    <input type="text" id="ludo-input" placeholder="اكتب للاعبين..." class="flex-1 bg-slate-50 p-2 rounded-xl text-xs outline-none">
-                    <button onclick="sendLudoMsg()" class="bg-app-green text-white px-4 rounded-xl"><i class="fas fa-paper-plane"></i></button>
+                <div class="flex gap-2">
+                    <input type="text" id="game-input" placeholder="اكتب للاعبين..." class="flex-1 bg-slate-100 p-2 rounded-full text-xs outline-none">
+                    <button onclick="sendGameMsg()" class="w-8 h-8 bg-green-700 text-white rounded-full"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- واجهة الغرفة (الإدارة والمايكات) -->
-    <div id="room-full-view" class="fixed inset-0 bg-white z-[1500] hidden flex-col">
-        <header class="p-4 flex justify-between items-center">
+    <!-- واجهة الغرفة الكاملة -->
+    <div id="room-ui" class="fixed inset-0 bg-white z-[1500] hidden flex flex-col">
+        <div class="bg-green-900 text-white p-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <i class="fas fa-arrow-right" onclick="exitRoom()"></i>
-                <h2 id="active-room-name" class="font-bold">اسم الغرفة</h2>
+                <i class="fas fa-arrow-right" onclick="closeRoom()"></i>
+                <h2 id="active-room-title" class="font-bold">اسم الغرفة</h2>
             </div>
-            <div class="flex gap-3">
-                <i class="fas fa-share-alt"></i>
-                <i class="fas fa-cog"></i>
-            </div>
-        </header>
+            <i class="fas fa-cog"></i>
+        </div>
 
-        <div class="flex-1 overflow-y-auto p-4">
-            <!-- منصة المايكات -->
-            <div class="grid grid-cols-4 gap-4 mb-8">
-                <div class="flex flex-col items-center gap-1" onclick="manageUser('نبيل (المدير)', true)">
-                    <div class="w-14 h-14 bg-blue-100 rounded-full border-2 border-blue-500 flex items-center justify-center font-bold text-blue-600 relative">
-                        ن
-                        <div class="absolute -bottom-1 -right-1 bg-yellow-400 text-[8px] p-1 rounded-full"><i class="fas fa-crown"></i></div>
-                    </div>
-                    <span class="text-[10px] font-bold">نبيل</span>
+        <div class="flex-1 overflow-y-auto">
+            <div class="mic-grid">
+                <!-- المايكات -->
+                <div class="user-seat" onclick="openUserSheet('نبيل اليماني', true)">
+                    <div class="avatar-ring bg-blue-50">ن<i class="fas fa-crown crown-icon"></i></div>
+                    <span class="text-[10px] mt-1 font-bold">نبيل</span>
                 </div>
-                <!-- أعضاء آخرون للتحكم بهم -->
-                <div class="flex flex-col items-center gap-1" onclick="manageUser('أحمد المحمدي', false)">
-                    <div class="w-14 h-14 bg-slate-100 rounded-full border-2 border-slate-200 flex items-center justify-center text-slate-400">أ</div>
-                    <span class="text-[10px]">أحمد</span>
+                <div class="user-seat" onclick="openUserSheet('أحمد علي', false)">
+                    <div class="avatar-ring border-slate-200">أ</div>
+                    <span class="text-[10px] mt-1">أحمد</span>
                 </div>
-                <div class="flex flex-col items-center gap-1" onclick="manageUser('سارة علي', false)">
-                    <div class="w-14 h-14 bg-slate-100 rounded-full border-2 border-slate-200 flex items-center justify-center text-slate-400">س</div>
-                    <span class="text-[10px]">سارة</span>
+                <!-- مايكات فارغة -->
+                <div class="user-seat">
+                    <div class="avatar-ring border-dashed border-slate-300 bg-transparent text-slate-300"><i class="fas fa-plus"></i></div>
+                    <span class="text-[10px] mt-1 text-slate-300">متاح</span>
                 </div>
             </div>
 
-            <!-- ساحة الدردشة والهدايا -->
-            <div class="border-t pt-4">
-                <div id="room-chat" class="h-64 overflow-y-auto bg-slate-50 rounded-2xl p-3 space-y-2 mb-4">
-                    <div class="bg-white p-2 rounded-lg shadow-sm text-xs w-fit">نظام: أهلاً بك في الغرفة 🌹</div>
+            <!-- دردشة الغرفة -->
+            <div class="p-4 border-t">
+                <div id="room-msgs" class="h-64 overflow-y-auto mb-4 space-y-3">
+                    <div class="text-[10px] text-center text-slate-400">أهلاً بك في الديوان 🌹</div>
                 </div>
-                <div class="flex gap-2 items-center">
-                    <button class="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center shadow-sm" onclick="sendGift()"><i class="fas fa-gift"></i></button>
-                    <label class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shadow-sm cursor-pointer">
-                        <i class="fas fa-image"></i>
-                        <input type="file" class="hidden" onchange="sendImage(event)">
-                    </label>
-                    <input type="text" id="room-input" placeholder="دردش مع الجميع..." class="flex-1 bg-white border border-slate-200 p-2 rounded-full text-xs outline-none">
-                    <button onclick="sendRoomMsg()" class="w-10 h-10 bg-app-green text-white rounded-full flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
+                <div class="flex gap-2 items-center bg-slate-100 p-2 rounded-full">
+                    <i class="fas fa-gift text-orange-500 ml-2"></i>
+                    <input type="text" id="room-input-msg" placeholder="دردش الآن..." class="flex-1 bg-transparent text-xs outline-none">
+                    <button onclick="sendRoomMsg()" class="bg-green-700 text-white w-8 h-8 rounded-full"><i class="fas fa-paper-plane text-[10px]"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- قائمة خيارات العضو (طرد، خاص، مايك) -->
-    <div id="user-sheet" class="action-sheet">
-        <div class="flex flex-col items-center mb-6">
-            <div id="sheet-avatar" class="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center text-xl font-bold mb-2">؟</div>
-            <h3 id="sheet-name" class="font-bold">اسم العضو</h3>
-            <p class="text-[10px] text-slate-400">ID: 8872199</p>
+    <!-- قائمة التحكم بالعضو -->
+    <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+    <div class="sheet-content" id="sheet">
+        <div class="flex flex-col items-center mb-8">
+            <div id="u-avatar" class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-2xl font-bold text-slate-600 mb-2">؟</div>
+            <h3 id="u-name" class="font-bold text-lg">اسم المستخدم</h3>
+            <p class="text-[10px] text-slate-400">ID: 10092837</p>
         </div>
         <div class="grid grid-cols-2 gap-4">
-            <button class="bg-blue-50 text-blue-600 p-4 rounded-2xl flex flex-col items-center gap-2 font-bold text-xs" onclick="addFriend()">
-                <i class="fas fa-user-plus text-lg"></i> إضافة صديق
-            </button>
-            <button class="bg-teal-50 text-teal-600 p-4 rounded-2xl flex flex-col items-center gap-2 font-bold text-xs" onclick="goToPrivateChat()">
-                <i class="fas fa-envelope text-lg"></i> دردشة خاصة
-            </button>
-            <button class="bg-orange-50 text-orange-600 p-4 rounded-2xl flex flex-col items-center gap-2 font-bold text-xs" onclick="muteMic()">
-                <i class="fas fa-microphone-slash text-lg"></i> إنزال من المايك
-            </button>
-            <button class="bg-red-50 text-red-600 p-4 rounded-2xl flex flex-col items-center gap-2 font-bold text-xs" onclick="kickUser()">
-                <i class="fas fa-user-times text-lg"></i> طرد نهائي
-            </button>
+            <button class="action-btn bg-blue-50 text-blue-600" onclick="alert('تمت إضافة الصديق')"><i class="fas fa-user-plus"></i> إضافة صديق</button>
+            <button class="action-btn bg-teal-50 text-teal-600" onclick="goToPrivateChat()"><i class="fas fa-comment-dots"></i> محادثة خاصة</button>
+            <button class="action-btn bg-orange-50 text-orange-600" onclick="alert('تم إنزاله من المايك')"><i class="fas fa-microphone-slash"></i> إنزال مايك</button>
+            <button class="action-btn bg-red-50 text-red-600" onclick="confirmKick()"><i class="fas fa-user-times"></i> طرد من الغرفة</button>
         </div>
-        <button class="w-full mt-6 py-3 text-slate-300 font-bold" onclick="closeSheet()">إغلاق</button>
+        <button class="w-full mt-8 py-3 text-slate-400 font-bold" onclick="closeSheet()">إلغاء</button>
     </div>
 
     <script>
-        const arabFlags = [
-            {n: 'اليمن', c: 'ye'}, {n: 'السعودية', c: 'sa'}, {n: 'مصر', c: 'eg'},
-            {n: 'الكويت', c: 'kw'}, {n: 'الإمارات', c: 'ae'}, {n: 'قطر', c: 'qa'},
-            {n: 'العراق', c: 'iq'}, {n: 'المغرب', c: 'ma'}, {n: 'تونس', c: 'tn'}
+        const countries = [
+            {name: 'اليمن', code: 'ye'}, {name: 'السعودية', code: 'sa'},
+            {name: 'مصر', code: 'eg'}, {name: 'العراق', code: 'iq'},
+            {name: 'المغرب', code: 'ma'}, {name: 'الكويت', code: 'kw'},
+            {name: 'تونس', code: 'tn'}, {name: 'الأردن', code: 'jo'}
         ];
 
-        let currentActiveUser = null;
+        let selectedUser = "";
 
         window.onload = () => {
-            renderFlags();
-        };
-
-        function renderFlags() {
-            const container = document.getElementById('flags-container');
-            container.innerHTML = arabFlags.map(f => `
-                <div class="text-center">
-                    <img src="https://flagcdn.com/w80/${f.c}.png" class="w-12 h-12 rounded-full border-2 border-white shadow-sm" onclick="filterRooms('${f.n}')">
-                    <p class="text-[10px] mt-1 font-bold">${f.n}</p>
+            const list = document.getElementById('flags-list');
+            list.innerHTML = countries.map(c => `
+                <div class="flag-unit" onclick="filterBy('${c.name}')">
+                    <img src="https://flagcdn.com/w160/${c.code}.png" class="flag-img">
+                    <p class="text-[10px] mt-1 font-bold text-slate-600">${c.name}</p>
                 </div>
             `).join('');
-        }
+        };
 
-        function switchMainTab(tab) {
+        function showSection(id) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            if(document.getElementById('sec-' + tab)) document.getElementById('sec-' + tab).classList.add('active');
-            
-            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('sec-' + id).classList.add('active');
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
         }
 
-        function enterRoom(name, flag) {
-            document.getElementById('room-full-view').classList.remove('hidden');
-            document.getElementById('active-room-name').innerText = name;
+        // --- نظام الغرفة ---
+        function openRoom(name) {
+            document.getElementById('room-ui').classList.remove('hidden');
+            document.getElementById('active-room-title').innerText = name;
         }
 
-        function exitRoom() {
-            document.getElementById('room-full-view').classList.add('hidden');
+        function closeRoom() {
+            document.getElementById('room-ui').classList.add('hidden');
         }
 
-        function manageUser(name, isMe) {
+        function openUserSheet(name, isMe) {
             if(isMe) return;
-            currentActiveUser = name;
-            document.getElementById('sheet-name').innerText = name;
-            document.getElementById('sheet-avatar').innerText = name[0];
-            document.getElementById('user-sheet').classList.add('open');
+            selectedUser = name;
+            document.getElementById('u-name').innerText = name;
+            document.getElementById('u-avatar').innerText = name[0];
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('sheet').classList.add('active');
         }
 
         function closeSheet() {
-            document.getElementById('user-sheet').classList.remove('open');
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('sheet').classList.remove('active');
         }
 
-        // --- أفعال الإدارة ---
-        function kickUser() {
-            if(confirm(`هل تريد طرد ${currentActiveUser} من الغرفة؟`)) {
-                appendChatSystem(`تم طرد ${currentActiveUser} من قبل المدير.`);
+        function goToPrivateChat() {
+            alert("جارٍ الانتقال للخاص مع " + selectedUser);
+            closeSheet();
+            closeRoom();
+            // الانتقال لتبويب الدردشة
+        }
+
+        function confirmKick() {
+            if(confirm("هل أنت متأكد من طرد " + selectedUser + "؟")) {
+                alert("تم الطرد بنجاح");
                 closeSheet();
             }
         }
 
-        function muteMic() {
-            appendChatSystem(`تم إنزال ${currentActiveUser} من المايك.`);
-            closeSheet();
-        }
-
-        function addFriend() {
-            alert("تم إرسال طلب إضافة صديق إلى " + currentActiveUser);
-            closeSheet();
-        }
-
-        function goToPrivateChat() {
-            alert("سيتم نقلك الآن إلى الدردشة الخاصة مع " + currentActiveUser);
-            closeSheet();
-            exitRoom();
-            switchMainTab('chats');
-        }
-
-        // --- الدردشة ---
         function sendRoomMsg() {
-            const input = document.getElementById('room-input');
+            const input = document.getElementById('room-input-msg');
             if(!input.value) return;
-            const chat = document.getElementById('room-chat');
+            const chat = document.getElementById('room-msgs');
             chat.innerHTML += `<div class="bg-blue-600 text-white p-2 rounded-2xl rounded-tr-none text-xs w-fit mr-auto">أنا: ${input.value}</div>`;
             input.value = '';
             chat.scrollTop = chat.scrollHeight;
         }
 
-        function sendGift() {
-            const chat = document.getElementById('room-chat');
-            chat.innerHTML += `<div class="bg-yellow-100 p-2 rounded-lg text-xs w-fit mr-auto">أنا أرسلت هدية: 🎁 قلادة ذهبية</div>`;
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        function sendImage(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const url = URL.createObjectURL(file);
-                const chat = document.getElementById('room-chat');
-                chat.innerHTML += `<div class="bg-slate-100 p-1 rounded-lg w-32 mr-auto"><img src="${url}" class="rounded-lg"></div>`;
-                chat.scrollTop = chat.scrollHeight;
-            }
-        }
-
-        function appendChatSystem(msg) {
-            const chat = document.getElementById('room-chat');
-            chat.innerHTML += `<div class="text-[10px] text-center text-red-500 font-bold bg-red-50 p-1 rounded-full">${msg}</div>`;
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        // --- اللودو ---
+        // --- نظام اللودو ---
         function rollDice() {
-            const dice = document.getElementById('dice-val');
+            const result = document.getElementById('dice-result');
             const val = Math.floor(Math.random() * 6) + 1;
-            dice.innerText = "...";
+            result.innerText = "...";
             setTimeout(() => {
-                dice.innerText = val;
-                const chat = document.getElementById('ludo-msgs');
-                chat.innerHTML += `<div class="bg-red-50 p-1 border-r-2 border-red-500">🎲 حصل نبيل على الرقم ${val}</div>`;
+                result.innerText = val;
+                const chat = document.getElementById('game-chat');
+                chat.innerHTML += `<div>🎲 نبيل حصل على الرقم <b>${val}</b></div>`;
                 chat.scrollTop = chat.scrollHeight;
-            }, 600);
+            }, 500);
         }
 
-        function sendLudoMsg() {
-            const input = document.getElementById('ludo-input');
+        function sendGameMsg() {
+            const input = document.getElementById('game-input');
             if(!input.value) return;
-            const chat = document.getElementById('ludo-msgs');
-            chat.innerHTML += `<div><b>أنا:</b> ${input.value}</div>`;
+            const chat = document.getElementById('game-chat');
+            chat.innerHTML += `<div class="text-white bg-green-800 p-1 rounded w-fit">أنا: ${input.value}</div>`;
             input.value = '';
             chat.scrollTop = chat.scrollHeight;
         }
